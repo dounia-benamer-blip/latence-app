@@ -276,6 +276,7 @@ export default function WelcomeScreen() {
               key={mood.id}
               style={[
                 styles.moodCard,
+                { width: cardWidth },
                 dynamicStyles.card,
                 selectedMood === mood.id && dynamicStyles.cardSelected,
                 selectedMood === mood.id && { borderWidth: 1.5, borderColor: theme.accentWarm },
