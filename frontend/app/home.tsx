@@ -78,7 +78,7 @@ interface BookRecommendation {
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { theme, isDark, toggleTheme } = useTheme();
+  const { theme, themeMode, isDark, toggleTheme } = useTheme();
   const [userName, setUserName] = useState('');
   const [currentMood, setCurrentMood] = useState<any>(null);
   const [refreshing, setRefreshing] = useState(false);
