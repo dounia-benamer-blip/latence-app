@@ -609,9 +609,7 @@ const styles = StyleSheet.create({
   },
   moodRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     marginBottom: 12,
-    width: '100%',
   },
   moodGrid: {
     flexDirection: 'row',
