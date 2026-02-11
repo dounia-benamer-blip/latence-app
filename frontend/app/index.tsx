@@ -341,12 +341,13 @@ const styles = StyleSheet.create({
     color: '#a0a0c0',
     textAlign: 'center',
   },
-  moodGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: 12,
+  moodContainer: {
     marginBottom: 30,
+  },
+  moodRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 12,
   },
   moodCard: {
     width: (width - 64) / 2,
