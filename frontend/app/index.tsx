@@ -8,45 +8,72 @@ import {
   SafeAreaView,
   Dimensions,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, {
   FadeIn,
   FadeInUp,
+  FadeInDown,
   useSharedValue,
   useAnimatedStyle,
   withSpring,
   withRepeat,
   withSequence,
+  withTiming,
 } from 'react-native-reanimated';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
 
+// Extended moods with emojis instead of icons for better display
 const MOODS = [
-  { id: 'serein', label: 'Serein', icon: 'leaf-outline', color: '#8B9A7D' },
-  { id: 'joyeux', label: 'Joyeux', icon: 'sunny-outline', color: '#D4A574' },
-  { id: 'reveur', label: 'Rêveur', icon: 'cloud-outline', color: '#A8B4C4' },
-  { id: 'melancolique', label: 'Mélancolique', icon: 'water-outline', color: '#9B8B7D' },
-  { id: 'fatigue', label: 'Fatigué', icon: 'moon-outline', color: '#7D7D8B' },
-  { id: 'inspire', label: 'Inspiré', icon: 'sparkles-outline', color: '#C4A88B' },
+  { id: 'serein', label: 'Serein', emoji: '🍃', color: '#8B9A7D' },
+  { id: 'joyeux', label: 'Joyeux', emoji: '☀️', color: '#D4A574' },
+  { id: 'reveur', label: 'Rêveur', emoji: '☁️', color: '#A8B4C4' },
+  { id: 'melancolique', label: 'Mélancolique', emoji: '🌧️', color: '#9B8B7D' },
+  { id: 'fatigue', label: 'Fatigué', emoji: '🌙', color: '#7D7D8B' },
+  { id: 'inspire', label: 'Inspiré', emoji: '✨', color: '#C4A88B' },
+  { id: 'anxieux', label: 'Anxieux', emoji: '🌊', color: '#8B9AAA' },
+  { id: 'nostalgique', label: 'Nostalgique', emoji: '🍂', color: '#B8A090' },
+  { id: 'perdu', label: 'Perdu', emoji: '🌫️', color: '#A0A0A0' },
+  { id: 'reconnaissant', label: 'Reconnaissant', emoji: '🙏', color: '#9AAD8B' },
+  { id: 'contemplatif', label: 'Contemplatif', emoji: '🪷', color: '#C4B4D4' },
+  { id: 'eveille', label: 'Éveillé', emoji: '👁️', color: '#B4A48B' },
 ];
 
 const ENERGY_LEVELS = [1, 2, 3, 4, 5];
+
+// Poetic greetings based on time of day
+const getPoeticalGreeting = () => {
+  const hour = new Date().getHours();
+  if (hour >= 5 && hour < 12) {
+    return { greeting: "L'aube se lève", question: "Comment traverse ton âme ce matin ?" };
+  } else if (hour >= 12 && hour < 17) {
+    return { greeting: "Le soleil veille", question: "Que porte ton cœur en ce moment ?" };
+  } else if (hour >= 17 && hour < 21) {
+    return { greeting: "Le crépuscule approche", question: "Quel murmure habite ton esprit ?" };
+  } else {
+    return { greeting: "La nuit t'accueille", question: "Que confies-tu aux étoiles ce soir ?" };
+  }
+};
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
 export default function WelcomeScreen() {
   const router = useRouter();
-  const [step, setStep] = useState<'auth' | 'mood' | 'energy'>('auth');
+  const [step, setStep] = useState<'auth' | 'mood' | 'energy' | 'wisdom'>('auth');
   const [isAppleAvailable, setIsAppleAvailable] = useState(false);
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [energyLevel, setEnergyLevel] = useState<number>(3);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [sacredText, setSacredText] = useState<{ text: string; source: string } | null>(null);
+  const [isLoadingText, setIsLoadingText] = useState(false);
 
   const moonScale = useSharedValue(1);
+  const poeticGreeting = getPoeticalGreeting();
 
   useEffect(() => {
     checkAuth();
@@ -105,24 +132,47 @@ export default function WelcomeScreen() {
     setStep('mood');
   };
 
-  const handleContinue = async () => {
-    if (step === 'mood' && selectedMood) {
-      setStep('energy');
-    } else if (step === 'energy') {
-      try {
-        await fetch(`${API_URL}/api/mood`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            mood: selectedMood,
-            energy_level: energyLevel,
-          }),
-        });
-      } catch (e) {
-        console.log('Could not save mood:', e);
+  const fetchSacredText = async (mood: string) => {
+    setIsLoadingText(true);
+    try {
+      const res = await fetch(`${API_URL}/api/sacred-text/${mood}`);
+      if (res.ok) {
+        const data = await res.json();
+        setSacredText(data);
       }
-      router.push('/home');
+    } catch (e) {
+      console.log('Error fetching sacred text:', e);
+    } finally {
+      setIsLoadingText(false);
     }
+  };
+
+  const handleMoodContinue = async () => {
+    if (selectedMood) {
+      setStep('energy');
+    }
+  };
+
+  const handleEnergyContinue = async () => {
+    // Fetch sacred text based on mood
+    await fetchSacredText(selectedMood!);
+    setStep('wisdom');
+  };
+
+  const handleFinish = async () => {
+    try {
+      await fetch(`${API_URL}/api/mood`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mood: selectedMood,
+          energy_level: energyLevel,
+        }),
+      });
+    } catch (e) {
+      console.log('Could not save mood:', e);
+    }
+    router.push('/home');
   };
 
   const moonStyle = useAnimatedStyle(() => ({
@@ -164,56 +214,59 @@ export default function WelcomeScreen() {
   const renderMood = () => (
     <Animated.View entering={FadeIn.duration(600)} style={styles.moodContainer}>
       <View style={styles.header}>
-        <Text style={styles.greeting}>Bonsoir</Text>
-        <Text style={styles.subtitle}>Comment te sens-tu ?</Text>
+        <Text style={styles.greeting}>{poeticGreeting.greeting}</Text>
+        <Text style={styles.poeticQuestion}>{poeticGreeting.question}</Text>
       </View>
 
-      <View style={styles.moodGrid}>
-        {[0, 1, 2].map((rowIndex) => (
-          <View key={rowIndex} style={styles.moodRow}>
-            {MOODS.slice(rowIndex * 2, rowIndex * 2 + 2).map((mood) => (
+      <ScrollView 
+        style={styles.moodScrollView}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.moodScrollContent}
+      >
+        <View style={styles.moodGrid}>
+          {MOODS.map((mood, index) => (
+            <Animated.View
+              key={mood.id}
+              entering={FadeInUp.duration(400).delay(index * 40)}
+            >
               <TouchableOpacity
-                key={mood.id}
                 style={[
                   styles.moodCard,
                   selectedMood === mood.id && styles.moodCardSelected,
+                  selectedMood === mood.id && { borderColor: mood.color },
                 ]}
                 onPress={() => setSelectedMood(mood.id)}
                 activeOpacity={0.7}
               >
                 <View
                   style={[
-                    styles.moodIconContainer,
-                    { backgroundColor: `${mood.color}20` },
-                    selectedMood === mood.id && { backgroundColor: `${mood.color}40` },
+                    styles.moodEmojiContainer,
+                    { backgroundColor: `${mood.color}15` },
+                    selectedMood === mood.id && { backgroundColor: `${mood.color}30` },
                   ]}
                 >
-                  <Ionicons
-                    name={mood.icon as any}
-                    size={24}
-                    color={selectedMood === mood.id ? mood.color : '#8B8B7D'}
-                  />
+                  <Text style={styles.moodEmoji}>{mood.emoji}</Text>
                 </View>
                 <Text
                   style={[
                     styles.moodLabel,
-                    selectedMood === mood.id && { color: '#4A4A4A' },
+                    selectedMood === mood.id && { color: '#4A4A4A', fontWeight: '500' },
                   ]}
                 >
                   {mood.label}
                 </Text>
               </TouchableOpacity>
-            ))}
-          </View>
-        ))}
-      </View>
+            </Animated.View>
+          ))}
+        </View>
+      </ScrollView>
 
       <TouchableOpacity
         style={[
           styles.continueButton,
           !selectedMood && styles.continueButtonDisabled,
         ]}
-        onPress={handleContinue}
+        onPress={handleMoodContinue}
         disabled={!selectedMood}
         activeOpacity={0.8}
       >
@@ -226,7 +279,7 @@ export default function WelcomeScreen() {
     <Animated.View entering={FadeIn.duration(600)} style={styles.energyContainer}>
       <View style={styles.header}>
         <Text style={styles.greeting}>Ton énergie</Text>
-        <Text style={styles.subtitle}>Quel est ton niveau ?</Text>
+        <Text style={styles.subtitle}>Où se situe ta vitalité en ce moment ?</Text>
       </View>
 
       <View style={styles.energyScale}>
@@ -260,15 +313,51 @@ export default function WelcomeScreen() {
 
       <TouchableOpacity
         style={styles.continueButton}
-        onPress={handleContinue}
+        onPress={handleEnergyContinue}
         activeOpacity={0.8}
       >
-        <Text style={styles.continueButtonText}>Commencer</Text>
+        <Text style={styles.continueButtonText}>Continuer</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.backLink}
         onPress={() => setStep('mood')}
+      >
+        <Text style={styles.backLinkText}>Retour</Text>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+
+  const renderWisdom = () => (
+    <Animated.View entering={FadeIn.duration(800)} style={styles.wisdomContainer}>
+      <View style={styles.wisdomHeader}>
+        <Text style={styles.wisdomSubtitle}>Une lumière pour ce moment</Text>
+      </View>
+
+      {isLoadingText ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="small" color="#8B9A7D" />
+        </View>
+      ) : sacredText ? (
+        <Animated.View entering={FadeInUp.duration(600).delay(200)} style={styles.wisdomCard}>
+          <Text style={styles.wisdomQuote}>"{sacredText.text}"</Text>
+          <Text style={styles.wisdomSource}>— {sacredText.source}</Text>
+        </Animated.View>
+      ) : null}
+
+      <Animated.View entering={FadeInUp.duration(500).delay(600)}>
+        <TouchableOpacity
+          style={styles.beginButton}
+          onPress={handleFinish}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.beginButtonText}>Commencer le voyage</Text>
+        </TouchableOpacity>
+      </Animated.View>
+
+      <TouchableOpacity
+        style={styles.backLink}
+        onPress={() => setStep('energy')}
       >
         <Text style={styles.backLinkText}>Retour</Text>
       </TouchableOpacity>
@@ -284,6 +373,7 @@ export default function WelcomeScreen() {
         {step === 'auth' && renderAuth()}
         {step === 'mood' && renderMood()}
         {step === 'energy' && renderEnergy()}
+        {step === 'wisdom' && renderWisdom()}
       </ScrollView>
     </SafeAreaView>
   );
@@ -357,38 +447,49 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 24,
   },
   greeting: {
-    fontSize: 32,
-    fontWeight: '300',
+    fontSize: 28,
+    fontWeight: '200',
     color: '#4A4A4A',
     letterSpacing: 2,
     marginBottom: 8,
   },
-  subtitle: {
+  poeticQuestion: {
     fontSize: 15,
     color: '#8B8B7D',
+    fontStyle: 'italic',
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#8B8B7D',
+    textAlign: 'center',
   },
   moodContainer: {
     flex: 1,
-    paddingTop: 60,
+    paddingTop: 40,
+  },
+  moodScrollView: {
+    maxHeight: 420,
+    marginBottom: 24,
+  },
+  moodScrollContent: {
+    paddingBottom: 8,
   },
   moodGrid: {
-    marginBottom: 40,
-  },
-  moodRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'center',
-    marginBottom: 12,
+    gap: 10,
   },
   moodCard: {
-    width: (width - 72) / 2,
+    width: (width - 80) / 3,
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
-    padding: 20,
+    padding: 14,
     alignItems: 'center',
-    marginHorizontal: 6,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
@@ -397,21 +498,25 @@ const styles = StyleSheet.create({
   },
   moodCardSelected: {
     backgroundColor: '#FDF9F3',
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: '#D4C4A8',
   },
-  moodIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+  moodEmojiContainer: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
+    marginBottom: 8,
+  },
+  moodEmoji: {
+    fontSize: 22,
   },
   moodLabel: {
-    fontSize: 13,
-    fontWeight: '500',
+    fontSize: 11,
+    fontWeight: '400',
     color: '#8B8B7D',
+    textAlign: 'center',
   },
   continueButton: {
     backgroundColor: '#8B9A7D',
@@ -431,10 +536,12 @@ const styles = StyleSheet.create({
   energyContainer: {
     flex: 1,
     paddingTop: 60,
+    justifyContent: 'center',
   },
   energyScale: {
     alignItems: 'center',
     marginBottom: 40,
+    marginTop: 20,
   },
   energyRow: {
     flexDirection: 'row',
@@ -483,5 +590,66 @@ const styles = StyleSheet.create({
   backLinkText: {
     color: '#A0A090',
     fontSize: 13,
+  },
+  wisdomContainer: {
+    flex: 1,
+    paddingTop: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  wisdomHeader: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  wisdomSubtitle: {
+    fontSize: 14,
+    color: '#8B8B7D',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+  },
+  loadingContainer: {
+    height: 180,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  wisdomCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 28,
+    marginBottom: 40,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    elevation: 3,
+    width: '100%',
+  },
+  wisdomQuote: {
+    fontSize: 17,
+    fontWeight: '300',
+    color: '#4A4A4A',
+    textAlign: 'center',
+    lineHeight: 28,
+    marginBottom: 16,
+    fontStyle: 'italic',
+  },
+  wisdomSource: {
+    fontSize: 13,
+    color: '#A0A090',
+    letterSpacing: 0.5,
+  },
+  beginButton: {
+    backgroundColor: '#D4A574',
+    paddingVertical: 16,
+    paddingHorizontal: 48,
+    borderRadius: 30,
+    alignItems: 'center',
+  },
+  beginButtonText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '500',
+    letterSpacing: 1,
   },
 });
