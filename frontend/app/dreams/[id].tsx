@@ -16,11 +16,11 @@ import { fr } from 'date-fns/locale';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
-const DREAM_TYPES: { [key: string]: { label: string; icon: string; color: string } } = {
-  reve: { label: 'Rêve', icon: 'cloudy-night', color: '#3498DB' },
-  cauchemar: { label: 'Cauchemar', icon: 'thunderstorm', color: '#E74C3C' },
-  lucide: { label: 'Rêve Lucide', icon: 'eye', color: '#9B59B6' },
-  recurrent: { label: 'Récurrent', icon: 'repeat', color: '#27AE60' },
+const DREAM_TYPES: { [key: string]: { label: string; icon: string } } = {
+  reve: { label: 'Rêve', icon: 'cloudy-night-outline' },
+  cauchemar: { label: 'Cauchemar', icon: 'thunderstorm-outline' },
+  lucide: { label: 'Lucide', icon: 'eye-outline' },
+  recurrent: { label: 'Récurrent', icon: 'repeat-outline' },
 };
 
 interface Dream {
@@ -76,7 +76,6 @@ export default function DreamDetailScreen() {
       if (res.ok) {
         const data = await res.json();
         
-        // Save interpretation
         await fetch(`${API_URL}/api/dream/${dream.id}/interpretation`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -96,7 +95,7 @@ export default function DreamDetailScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#6C63FF" />
+          <ActivityIndicator size="large" color="#8B9A7D" />
         </View>
       </SafeAreaView>
     );
@@ -119,15 +118,13 @@ export default function DreamDetailScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
       <Animated.View entering={FadeIn.duration(500)} style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => router.back()}
         >
-          <Ionicons name="arrow-back" size={24} color="#fff" />
+          <Ionicons name="arrow-back" size={24} color="#6B6B5B" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Détail du rêve</Text>
         <View style={styles.placeholder} />
       </Animated.View>
 
@@ -135,15 +132,13 @@ export default function DreamDetailScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Type Badge */}
         <Animated.View entering={FadeInUp.duration(500)} style={styles.typeContainer}>
-          <View style={[styles.typeBadge, { backgroundColor: `${typeInfo.color}20` }]}>
-            <Ionicons name={typeInfo.icon as any} size={24} color={typeInfo.color} />
-            <Text style={[styles.typeText, { color: typeInfo.color }]}>{typeInfo.label}</Text>
+          <View style={styles.typeBadge}>
+            <Ionicons name={typeInfo.icon as any} size={20} color="#6B6B5B" />
+            <Text style={styles.typeText}>{typeInfo.label}</Text>
           </View>
         </Animated.View>
 
-        {/* Title */}
         <Animated.View entering={FadeInUp.duration(500).delay(100)}>
           <Text style={styles.title}>{dream.title}</Text>
           <Text style={styles.date}>
@@ -151,40 +146,29 @@ export default function DreamDetailScreen() {
           </Text>
         </Animated.View>
 
-        {/* Emotions */}
-        <Animated.View entering={FadeInUp.duration(500).delay(200)} style={styles.emotionsContainer}>
-          <Text style={styles.sectionLabel}>Émotions ressenties</Text>
-          <View style={styles.emotionsList}>
+        {dream.emotions.length > 0 && (
+          <Animated.View entering={FadeInUp.duration(500).delay(200)} style={styles.emotionsContainer}>
             {dream.emotions.map((emotion, index) => (
               <View key={index} style={styles.emotionChip}>
                 <Text style={styles.emotionText}>{emotion}</Text>
               </View>
             ))}
-          </View>
-        </Animated.View>
+          </Animated.View>
+        )}
 
-        {/* Dream Content */}
         <Animated.View entering={FadeInUp.duration(500).delay(300)} style={styles.contentCard}>
-          <View style={styles.contentHeader}>
-            <Ionicons name="document-text" size={18} color="#6C63FF" />
-            <Text style={styles.contentTitle}>Le rêve</Text>
-          </View>
           <Text style={styles.contentText}>{dream.content}</Text>
         </Animated.View>
 
-        {/* Interpretation */}
         {dream.interpretation ? (
           <Animated.View entering={FadeInUp.duration(500).delay(400)} style={styles.interpretationCard}>
-            <View style={styles.interpretationHeader}>
-              <Ionicons name="bulb" size={20} color="#FFD700" />
-              <Text style={styles.interpretationTitle}>Interprétation IA</Text>
-            </View>
+            <Text style={styles.interpretationTitle}>Interprétation</Text>
             <Text style={styles.interpretationText}>{dream.interpretation}</Text>
           </Animated.View>
         ) : (
           <Animated.View entering={FadeInUp.duration(500).delay(400)} style={styles.analyzeContainer}>
             <Text style={styles.analyzePrompt}>
-              Tu n'as pas encore analysé ce rêve. Veux-tu découvrir sa signification ?
+              Découvrir la signification de ce rêve ?
             </Text>
             <TouchableOpacity
               style={styles.analyzeButton}
@@ -195,10 +179,7 @@ export default function DreamDetailScreen() {
               {isAnalyzing ? (
                 <ActivityIndicator color="#fff" size="small" />
               ) : (
-                <>
-                  <Ionicons name="sparkles" size={20} color="#fff" />
-                  <Text style={styles.analyzeButtonText}>Analyser avec l'IA</Text>
-                </>
+                <Text style={styles.analyzeButtonText}>Interpréter</Text>
               )}
             </TouchableOpacity>
           </Animated.View>
@@ -211,7 +192,7 @@ export default function DreamDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a1a',
+    backgroundColor: '#F5F0E8',
   },
   loadingContainer: {
     flex: 1,
@@ -219,11 +200,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   errorText: {
-    fontSize: 16,
-    color: '#6a6a8a',
+    fontSize: 14,
+    color: '#A0A090',
   },
   backLink: {
-    color: '#6C63FF',
+    color: '#8B9A7D',
     fontSize: 14,
     marginTop: 16,
   },
@@ -240,119 +221,106 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#fff',
-  },
   placeholder: {
     width: 40,
   },
   scrollContent: {
-    padding: 20,
+    padding: 24,
     paddingBottom: 40,
   },
   typeContainer: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 24,
   },
   typeBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 25,
+    gap: 8,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   typeText: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 14,
+    color: '#4A4A4A',
+    fontWeight: '500',
   },
   title: {
     fontSize: 26,
-    fontWeight: '700',
-    color: '#fff',
+    fontWeight: '300',
+    color: '#4A4A4A',
     textAlign: 'center',
     marginBottom: 8,
+    letterSpacing: 0.5,
   },
   date: {
-    fontSize: 14,
-    color: '#6a6a8a',
+    fontSize: 13,
+    color: '#A0A090',
     textAlign: 'center',
     textTransform: 'capitalize',
     marginBottom: 24,
   },
   emotionsContainer: {
-    marginBottom: 24,
-  },
-  sectionLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#a0a0c0',
-    marginBottom: 12,
-  },
-  emotionsList: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    justifyContent: 'center',
     gap: 8,
+    marginBottom: 24,
   },
   emotionChip: {
-    backgroundColor: '#6C63FF20',
+    backgroundColor: '#FFFFFF',
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#6C63FF40',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 4,
+    elevation: 1,
   },
   emotionText: {
     fontSize: 13,
-    color: '#6C63FF',
-    fontWeight: '500',
+    color: '#6B6B5B',
   },
   contentCard: {
-    backgroundColor: '#1a1a2e',
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 20,
-  },
-  contentHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 16,
-  },
-  contentTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#6C63FF',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 24,
+    marginBottom: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   contentText: {
     fontSize: 15,
-    color: '#e0e0f0',
+    color: '#4A4A4A',
     lineHeight: 24,
   },
   interpretationCard: {
-    backgroundColor: '#1a1a2e',
-    borderRadius: 20,
-    padding: 20,
+    backgroundColor: '#FDF9F3',
+    borderRadius: 16,
+    padding: 24,
     borderWidth: 1,
-    borderColor: '#FFD70030',
-  },
-  interpretationHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 16,
+    borderColor: '#E8E0D4',
   },
   interpretationTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#FFD700',
+    fontWeight: '500',
+    color: '#4A4A4A',
+    marginBottom: 16,
   },
   interpretationText: {
     fontSize: 14,
-    color: '#a0a0c0',
-    lineHeight: 24,
+    color: '#6B6B5B',
+    lineHeight: 22,
   },
   analyzeContainer: {
     alignItems: 'center',
@@ -360,23 +328,20 @@ const styles = StyleSheet.create({
   },
   analyzePrompt: {
     fontSize: 14,
-    color: '#6a6a8a',
+    color: '#A0A090',
     textAlign: 'center',
-    marginBottom: 20,
-    paddingHorizontal: 20,
+    marginBottom: 16,
   },
   analyzeButton: {
-    backgroundColor: '#9B59B6',
+    backgroundColor: '#A8B4C4',
     paddingVertical: 14,
-    paddingHorizontal: 30,
+    paddingHorizontal: 32,
     borderRadius: 25,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
   },
   analyzeButtonText: {
     color: '#fff',
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '500',
+    letterSpacing: 0.5,
   },
 });

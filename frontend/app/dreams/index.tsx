@@ -13,21 +13,21 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
-import { format, formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
 const DREAM_TYPES = [
-  { id: 'reve', label: 'Rêve', icon: 'cloudy-night', color: '#3498DB' },
-  { id: 'cauchemar', label: 'Cauchemar', icon: 'thunderstorm', color: '#E74C3C' },
-  { id: 'lucide', label: 'Rêve Lucide', icon: 'eye', color: '#9B59B6' },
-  { id: 'recurrent', label: 'Récurrent', icon: 'repeat', color: '#27AE60' },
+  { id: 'reve', label: 'Rêve', icon: 'cloudy-night-outline' },
+  { id: 'cauchemar', label: 'Cauchemar', icon: 'thunderstorm-outline' },
+  { id: 'lucide', label: 'Lucide', icon: 'eye-outline' },
+  { id: 'recurrent', label: 'Récurrent', icon: 'repeat-outline' },
 ];
 
 const EMOTIONS = [
-  'Peur', 'Joie', 'Tristesse', 'Anxiété', 'Confusion',
-  'Paix', 'Colère', 'Excitation', 'Nostalgie', 'Curiosité'
+  'Peur', 'Joie', 'Tristesse', 'Paix', 'Confusion', 
+  'Colère', 'Nostalgie', 'Curiosité'
 ];
 
 interface Dream {
@@ -46,7 +46,6 @@ export default function DreamsScreen() {
   const [showNewDream, setShowNewDream] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   
-  // New dream form
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [dreamType, setDreamType] = useState('');
@@ -128,7 +127,6 @@ export default function DreamsScreen() {
       if (res.ok) {
         const dream = await res.json();
         
-        // Save interpretation if exists
         if (interpretation) {
           await fetch(`${API_URL}/api/dream/${dream.id}/interpretation`, {
             method: 'PUT',
@@ -137,12 +135,7 @@ export default function DreamsScreen() {
           });
         }
         
-        // Reset form and refresh
-        setTitle('');
-        setContent('');
-        setDreamType('');
-        setSelectedEmotions([]);
-        setInterpretation('');
+        resetForm();
         setShowNewDream(false);
         fetchDreams();
       }
@@ -151,41 +144,48 @@ export default function DreamsScreen() {
     }
   };
 
+  const resetForm = () => {
+    setTitle('');
+    setContent('');
+    setDreamType('');
+    setSelectedEmotions([]);
+    setInterpretation('');
+  };
+
   const getDreamTypeInfo = (typeId: string) => {
     return DREAM_TYPES.find(t => t.id === typeId);
   };
 
   const renderNewDreamForm = () => (
-    <Animated.View entering={FadeInDown.duration(500)} style={styles.newDreamContainer}>
+    <Animated.View entering={FadeInDown.duration(500)} style={styles.formContainer}>
       <View style={styles.formHeader}>
-        <Text style={styles.formTitle}>Nouveau Rêve</Text>
-        <TouchableOpacity onPress={() => setShowNewDream(false)}>
-          <Ionicons name="close" size={24} color="#fff" />
+        <Text style={styles.formTitle}>Nouveau rêve</Text>
+        <TouchableOpacity onPress={() => { resetForm(); setShowNewDream(false); }}>
+          <Ionicons name="close" size={24} color="#6B6B5B" />
         </TouchableOpacity>
       </View>
 
-      {/* Dream Type Selection */}
-      <Text style={styles.sectionLabel}>Type de rêve</Text>
-      <View style={styles.typeGrid}>
+      <Text style={styles.sectionLabel}>Type</Text>
+      <View style={styles.typeRow}>
         {DREAM_TYPES.map((type) => (
           <TouchableOpacity
             key={type.id}
             style={[
-              styles.typeCard,
-              dreamType === type.id && { borderColor: type.color, backgroundColor: `${type.color}20` },
+              styles.typeChip,
+              dreamType === type.id && styles.typeChipSelected,
             ]}
             onPress={() => setDreamType(type.id)}
             activeOpacity={0.7}
           >
             <Ionicons
               name={type.icon as any}
-              size={24}
-              color={dreamType === type.id ? type.color : '#6a6a8a'}
+              size={18}
+              color={dreamType === type.id ? '#4A4A4A' : '#A0A090'}
             />
             <Text
               style={[
                 styles.typeLabel,
-                dreamType === type.id && { color: type.color },
+                dreamType === type.id && styles.typeLabelSelected,
               ]}
             >
               {type.label}
@@ -194,30 +194,27 @@ export default function DreamsScreen() {
         ))}
       </View>
 
-      {/* Title Input */}
       <Text style={styles.sectionLabel}>Titre</Text>
       <TextInput
-        style={styles.titleInput}
-        placeholder="Donne un titre à ce rêve..."
-        placeholderTextColor="#4a4a6a"
+        style={styles.input}
+        placeholder="Un nom pour ce rêve..."
+        placeholderTextColor="#B0B0A0"
         value={title}
         onChangeText={setTitle}
       />
 
-      {/* Dream Content */}
-      <Text style={styles.sectionLabel}>Décris ton rêve</Text>
+      <Text style={styles.sectionLabel}>Récit</Text>
       <TextInput
-        style={styles.contentInput}
-        placeholder="Raconte ton rêve en détail... Les lieux, les personnes, les actions, les sensations..."
-        placeholderTextColor="#4a4a6a"
+        style={[styles.input, styles.textArea]}
+        placeholder="Décris ton rêve en détail..."
+        placeholderTextColor="#B0B0A0"
         value={content}
         onChangeText={setContent}
         multiline
         textAlignVertical="top"
       />
 
-      {/* Emotions */}
-      <Text style={styles.sectionLabel}>Émotions ressenties (max 3)</Text>
+      <Text style={styles.sectionLabel}>Émotions (max 3)</Text>
       <View style={styles.emotionsGrid}>
         {EMOTIONS.map((emotion) => (
           <TouchableOpacity
@@ -241,7 +238,6 @@ export default function DreamsScreen() {
         ))}
       </View>
 
-      {/* Analyze Button */}
       <TouchableOpacity
         style={[
           styles.analyzeButton,
@@ -254,27 +250,19 @@ export default function DreamsScreen() {
         {isAnalyzing ? (
           <ActivityIndicator color="#fff" size="small" />
         ) : (
-          <>
-            <Ionicons name="sparkles" size={20} color="#fff" />
-            <Text style={styles.analyzeButtonText}>Analyser avec l'IA</Text>
-          </>
+          <Text style={styles.analyzeButtonText}>Interpréter</Text>
         )}
       </TouchableOpacity>
 
-      {/* Interpretation Result */}
       {interpretation && (
         <Animated.View entering={FadeInUp.duration(500)} style={styles.interpretationCard}>
-          <View style={styles.interpretationHeader}>
-            <Ionicons name="bulb" size={20} color="#FFD700" />
-            <Text style={styles.interpretationTitle}>Interprétation</Text>
-          </View>
+          <Text style={styles.interpretationTitle}>Interprétation</Text>
           <ScrollView style={styles.interpretationScroll} nestedScrollEnabled>
             <Text style={styles.interpretationText}>{interpretation}</Text>
           </ScrollView>
         </Animated.View>
       )}
 
-      {/* Save Button */}
       <TouchableOpacity
         style={[
           styles.saveButton,
@@ -284,8 +272,7 @@ export default function DreamsScreen() {
         disabled={!title || !content || !dreamType}
         activeOpacity={0.8}
       >
-        <Ionicons name="save" size={20} color="#fff" />
-        <Text style={styles.saveButtonText}>Enregistrer le rêve</Text>
+        <Text style={styles.saveButtonText}>Enregistrer</Text>
       </TouchableOpacity>
     </Animated.View>
   );
@@ -294,10 +281,10 @@ export default function DreamsScreen() {
     <>
       {dreams.length === 0 ? (
         <Animated.View entering={FadeInUp.duration(600)} style={styles.emptyState}>
-          <Ionicons name="cloudy-night" size={60} color="#3a3a5e" />
-          <Text style={styles.emptyTitle}>Aucun rêve enregistré</Text>
+          <Ionicons name="cloudy-night-outline" size={48} color="#C4C4B4" />
+          <Text style={styles.emptyTitle}>Aucun rêve</Text>
           <Text style={styles.emptyText}>
-            Commence à enregistrer tes rêves pour découvrir leurs significations cachées
+            Enregistre tes rêves pour découvrir leurs significations
           </Text>
         </Animated.View>
       ) : (
@@ -307,7 +294,7 @@ export default function DreamsScreen() {
             return (
               <Animated.View
                 key={dream.id}
-                entering={FadeInUp.duration(500).delay(index * 100)}
+                entering={FadeInUp.duration(500).delay(index * 80)}
               >
                 <TouchableOpacity
                   style={styles.dreamCard}
@@ -315,16 +302,11 @@ export default function DreamsScreen() {
                   activeOpacity={0.7}
                 >
                   <View style={styles.dreamHeader}>
-                    <View style={[styles.typeBadge, { backgroundColor: `${typeInfo?.color}20` }]}>
-                      <Ionicons
-                        name={typeInfo?.icon as any}
-                        size={16}
-                        color={typeInfo?.color}
-                      />
-                      <Text style={[styles.typeBadgeText, { color: typeInfo?.color }]}>
-                        {typeInfo?.label}
-                      </Text>
-                    </View>
+                    <Ionicons
+                      name={typeInfo?.icon as any}
+                      size={18}
+                      color="#8B8B7D"
+                    />
                     <Text style={styles.dreamDate}>
                       {formatDistanceToNow(new Date(dream.date), {
                         addSuffix: true,
@@ -338,21 +320,11 @@ export default function DreamsScreen() {
                     {dream.content}
                   </Text>
                   
-                  <View style={styles.dreamFooter}>
-                    <View style={styles.emotionsList}>
-                      {dream.emotions.slice(0, 3).map((emotion, i) => (
-                        <View key={i} style={styles.emotionTag}>
-                          <Text style={styles.emotionTagText}>{emotion}</Text>
-                        </View>
-                      ))}
+                  {dream.interpretation && (
+                    <View style={styles.analyzedBadge}>
+                      <Text style={styles.analyzedText}>Interprété</Text>
                     </View>
-                    {dream.interpretation && (
-                      <View style={styles.interpretedBadge}>
-                        <Ionicons name="checkmark-circle" size={14} color="#4ECDC4" />
-                        <Text style={styles.interpretedText}>Analysé</Text>
-                      </View>
-                    )}
-                  </View>
+                  )}
                 </TouchableOpacity>
               </Animated.View>
             );
@@ -364,20 +336,19 @@ export default function DreamsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
       <Animated.View entering={FadeInDown.duration(500)} style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => router.back()}
         >
-          <Ionicons name="arrow-back" size={24} color="#fff" />
+          <Ionicons name="arrow-back" size={24} color="#6B6B5B" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Carnet des Rêves</Text>
+        <Text style={styles.headerTitle}>Rêves</Text>
         <TouchableOpacity
           style={styles.addButton}
           onPress={() => setShowNewDream(true)}
         >
-          <Ionicons name="add" size={24} color="#3498DB" />
+          <Ionicons name="add" size={24} color="#8B9A7D" />
         </TouchableOpacity>
       </Animated.View>
 
@@ -385,7 +356,7 @@ export default function DreamsScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6C63FF" />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#8B9A7D" />
         }
       >
         {showNewDream ? renderNewDreamForm() : renderDreamList()}
@@ -397,7 +368,7 @@ export default function DreamsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a1a',
+    backgroundColor: '#F5F0E8',
   },
   header: {
     flexDirection: 'row',
@@ -413,46 +384,49 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#fff',
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#4A4A4A',
+    letterSpacing: 0.5,
   },
   addButton: {
     width: 40,
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#3498DB20',
-    borderRadius: 20,
   },
   scrollContent: {
-    padding: 20,
+    padding: 24,
     paddingBottom: 40,
   },
   emptyState: {
     alignItems: 'center',
-    paddingVertical: 60,
+    paddingVertical: 80,
   },
   emptyTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#fff',
+    fontSize: 18,
+    fontWeight: '500',
+    color: '#4A4A4A',
     marginTop: 20,
     marginBottom: 8,
   },
   emptyText: {
     fontSize: 14,
-    color: '#6a6a8a',
+    color: '#A0A090',
     textAlign: 'center',
-    paddingHorizontal: 40,
   },
   dreamList: {
-    gap: 16,
+    gap: 12,
   },
   dreamCard: {
-    backgroundColor: '#1a1a2e',
-    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
     padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   dreamHeader: {
     flexDirection: 'row',
@@ -460,63 +434,35 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 12,
   },
-  typeBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  typeBadgeText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
   dreamDate: {
     fontSize: 12,
-    color: '#6a6a8a',
+    color: '#A0A090',
   },
   dreamTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#fff',
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#4A4A4A',
     marginBottom: 8,
   },
   dreamPreview: {
     fontSize: 14,
-    color: '#a0a0c0',
+    color: '#8B8B7D',
     lineHeight: 20,
-    marginBottom: 12,
   },
-  dreamFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  emotionsList: {
-    flexDirection: 'row',
-    gap: 6,
-  },
-  emotionTag: {
-    backgroundColor: '#2a2a4e',
-    paddingHorizontal: 8,
+  analyzedBadge: {
+    marginTop: 12,
+    alignSelf: 'flex-start',
+    backgroundColor: '#8B9A7D20',
+    paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 8,
+    borderRadius: 10,
   },
-  emotionTagText: {
-    fontSize: 10,
-    color: '#a0a0c0',
+  analyzedText: {
+    fontSize: 11,
+    color: '#8B9A7D',
+    fontWeight: '500',
   },
-  interpretedBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  interpretedText: {
-    fontSize: 12,
-    color: '#4ECDC4',
-  },
-  newDreamContainer: {
+  formContainer: {
     gap: 16,
   },
   formHeader: {
@@ -526,54 +472,63 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   formTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#fff',
+    fontSize: 24,
+    fontWeight: '300',
+    color: '#4A4A4A',
+    letterSpacing: 0.5,
   },
   sectionLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#a0a0c0',
-    marginBottom: 8,
+    fontSize: 12,
+    color: '#8B8B7D',
+    letterSpacing: 0.5,
+    marginBottom: -8,
   },
-  typeGrid: {
+  typeRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
+    gap: 8,
   },
-  typeCard: {
-    backgroundColor: '#1a1a2e',
-    borderRadius: 12,
-    padding: 12,
+  typeChip: {
+    flexDirection: 'row',
     alignItems: 'center',
-    width: '48%',
-    borderWidth: 2,
-    borderColor: 'transparent',
+    gap: 6,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  typeChipSelected: {
+    backgroundColor: '#FDF9F3',
+    borderWidth: 1,
+    borderColor: '#D4C4A8',
   },
   typeLabel: {
-    fontSize: 12,
-    color: '#6a6a8a',
-    marginTop: 6,
-    fontWeight: '600',
+    fontSize: 13,
+    color: '#A0A090',
   },
-  titleInput: {
-    backgroundColor: '#1a1a2e',
+  typeLabelSelected: {
+    color: '#4A4A4A',
+    fontWeight: '500',
+  },
+  input: {
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 16,
-    fontSize: 16,
-    color: '#fff',
-    borderWidth: 1,
-    borderColor: '#2a2a4e',
+    fontSize: 15,
+    color: '#4A4A4A',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
-  contentInput: {
-    backgroundColor: '#1a1a2e',
-    borderRadius: 12,
-    padding: 16,
-    fontSize: 16,
-    color: '#fff',
-    borderWidth: 1,
-    borderColor: '#2a2a4e',
-    minHeight: 120,
+  textArea: {
+    minHeight: 100,
   },
   emotionsGrid: {
     flexDirection: 'row',
@@ -581,80 +536,75 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   emotionChip: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#FFFFFF',
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#2a2a4e',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 4,
+    elevation: 1,
   },
   emotionChipSelected: {
-    backgroundColor: '#6C63FF20',
-    borderColor: '#6C63FF',
+    backgroundColor: '#FDF9F3',
+    borderWidth: 1,
+    borderColor: '#D4C4A8',
   },
   emotionText: {
     fontSize: 13,
-    color: '#6a6a8a',
+    color: '#A0A090',
   },
   emotionTextSelected: {
-    color: '#6C63FF',
-    fontWeight: '600',
+    color: '#4A4A4A',
+    fontWeight: '500',
   },
   analyzeButton: {
-    backgroundColor: '#9B59B6',
+    backgroundColor: '#A8B4C4',
     paddingVertical: 14,
     borderRadius: 25,
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
   },
   buttonDisabled: {
-    backgroundColor: '#3a3a5e',
+    backgroundColor: '#D4D4C4',
   },
   analyzeButtonText: {
     color: '#fff',
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '500',
+    letterSpacing: 0.5,
   },
   interpretationCard: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#FDF9F3',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#FFD70040',
-  },
-  interpretationHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 12,
+    borderColor: '#E8E0D4',
   },
   interpretationTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FFD700',
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#4A4A4A',
+    marginBottom: 12,
   },
   interpretationScroll: {
-    maxHeight: 200,
+    maxHeight: 180,
   },
   interpretationText: {
-    fontSize: 14,
-    color: '#a0a0c0',
-    lineHeight: 22,
+    fontSize: 13,
+    color: '#6B6B5B',
+    lineHeight: 20,
   },
   saveButton: {
-    backgroundColor: '#3498DB',
+    backgroundColor: '#8B9A7D',
     paddingVertical: 16,
     borderRadius: 25,
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
   },
   saveButtonText: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '500',
+    letterSpacing: 0.5,
   },
 });
