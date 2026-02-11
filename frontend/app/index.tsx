@@ -74,6 +74,7 @@ const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 export default function WelcomeScreen() {
   const router = useRouter();
   const { theme, themeMode, isDark, toggleTheme } = useTheme();
+  const { width } = useWindowDimensions();
   const [step, setStep] = useState<'auth' | 'mood' | 'energy' | 'wisdom'>('auth');
   const [isAppleAvailable, setIsAppleAvailable] = useState(false);
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
@@ -81,6 +82,9 @@ export default function WelcomeScreen() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [sacredText, setSacredText] = useState<{ text: string; source: string } | null>(null);
   const [isLoadingText, setIsLoadingText] = useState(false);
+  
+  // Calculate card width for 2-column grid
+  const cardWidth = (width - 60) / 2;  // screen width - (padding*2 + gap)
 
   const moonScale = useSharedValue(1);
   const poeticGreeting = getPoeticalGreeting();
