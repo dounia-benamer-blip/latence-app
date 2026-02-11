@@ -25,7 +25,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useTheme } from './components/ThemeContext';
+import { useTheme } from '../src/context/ThemeContext';
 
 const { width } = Dimensions.get('window');
 
