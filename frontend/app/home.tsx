@@ -288,7 +288,7 @@ export default function HomeScreen() {
               activeOpacity={0.7}
             >
               <Ionicons 
-                name={isDark ? 'sunny-outline' : 'moon-outline'} 
+                name={getThemeIcon(themeMode) as any} 
                 size={20} 
                 color={theme.accentWarm} 
               />
