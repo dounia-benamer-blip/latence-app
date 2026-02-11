@@ -4,6 +4,7 @@ from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
+import random
 from pathlib import Path
 from pydantic import BaseModel, Field
 from typing import List, Optional
@@ -24,6 +25,142 @@ EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY')
 
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
+
+# ==================== SACRED TEXTS DATABASE ====================
+# Texts from various wisdom traditions - presented without religious labels
+
+SACRED_TEXTS = {
+    "serein": [
+        {"text": "L'eau qui reste immobile devient claire.", "source": "Lao Tseu"},
+        {"text": "La paix vient de l'intérieur. Ne la cherchez pas à l'extérieur.", "source": "Sagesse ancienne"},
+        {"text": "Sois comme l'eau qui trouve toujours son chemin.", "source": "Proverbe"},
+        {"text": "Le calme est la clé de toute clarté.", "source": "Marc Aurèle"},
+        {"text": "Dans le silence, l'âme trouve ses réponses.", "source": "Rumi"},
+        {"text": "La sérénité n'est pas d'être à l'abri de la tempête, mais de trouver la paix au cœur de celle-ci.", "source": "Sagesse soufie"},
+    ],
+    "joyeux": [
+        {"text": "La joie est la forme la plus simple de la gratitude.", "source": "Karl Barth"},
+        {"text": "Le bonheur n'est pas une destination, c'est une manière de voyager.", "source": "Proverbe"},
+        {"text": "Celui qui sourit au lieu de s'emporter est toujours le plus fort.", "source": "Sagesse japonaise"},
+        {"text": "La joie est un filet d'amour par lequel tu peux attraper les âmes.", "source": "Mère Teresa"},
+        {"text": "Chaque jour est un don, chaque instant une grâce.", "source": "Khalil Gibran"},
+        {"text": "Le sourire que tu envoies revient vers toi.", "source": "Proverbe hindou"},
+    ],
+    "reveur": [
+        {"text": "Tous ceux qui errent ne sont pas perdus.", "source": "J.R.R. Tolkien"},
+        {"text": "Les rêves sont les lettres que l'inconscient nous écrit.", "source": "Carl Jung"},
+        {"text": "L'imagination est plus importante que le savoir.", "source": "Albert Einstein"},
+        {"text": "Le monde n'est qu'un pont, traverse-le mais n'y construis pas ta demeure.", "source": "Sagesse ancienne"},
+        {"text": "Celui qui rêve marche à la lumière des étoiles.", "source": "Proverbe berbère"},
+        {"text": "Les rêves sont la porte vers l'âme.", "source": "Sagesse mystique"},
+    ],
+    "melancolique": [
+        {"text": "La blessure est l'endroit par où la lumière entre en vous.", "source": "Rumi"},
+        {"text": "Même la nuit la plus longue prendra fin avec l'aube.", "source": "Proverbe"},
+        {"text": "Dans les profondeurs de l'hiver, j'appris enfin qu'il y avait en moi un été invincible.", "source": "Albert Camus"},
+        {"text": "Les larmes sont la pluie de l'âme.", "source": "Sagesse ancienne"},
+        {"text": "Ce qui te manque t'enseigne ce qui compte.", "source": "Khalil Gibran"},
+        {"text": "La mélancolie est le bonheur d'être triste.", "source": "Victor Hugo"},
+    ],
+    "fatigue": [
+        {"text": "Le repos fait partie du travail.", "source": "Proverbe"},
+        {"text": "Comme un champ, l'esprit doit se reposer pour donner une bonne récolte.", "source": "Sénèque"},
+        {"text": "Le silence est un ami qui ne trahit jamais.", "source": "Confucius"},
+        {"text": "Dieu a fait le sommeil pour guérir les blessures de l'âme.", "source": "Sagesse ancienne"},
+        {"text": "Celui qui dort ouvre la porte aux rêves.", "source": "Proverbe arabe"},
+        {"text": "Le repos est la clé de la force retrouvée.", "source": "Marc Aurèle"},
+    ],
+    "inspire": [
+        {"text": "Ce que tu cherches te cherche aussi.", "source": "Rumi"},
+        {"text": "L'inspiration existe, mais elle doit te trouver au travail.", "source": "Pablo Picasso"},
+        {"text": "Tu dois être le changement que tu veux voir dans le monde.", "source": "Gandhi"},
+        {"text": "L'âme qui a contemplé une beauté reste marquée à jamais.", "source": "Platon"},
+        {"text": "La créativité, c'est l'intelligence qui s'amuse.", "source": "Albert Einstein"},
+        {"text": "Chaque pensée est une graine qui peut devenir forêt.", "source": "Sagesse bouddhiste"},
+    ],
+    "anxieux": [
+        {"text": "Ne te soucie pas du lendemain, car le lendemain aura soin de lui-même.", "source": "Sagesse ancienne"},
+        {"text": "La peur frappe à la porte, la foi ouvre, il n'y a personne.", "source": "Proverbe"},
+        {"text": "Ce sur quoi tu portes ton attention grandit.", "source": "Sagesse amérindienne"},
+        {"text": "L'anxiété ne vide pas demain de ses soucis, elle vide aujourd'hui de sa force.", "source": "Corrie ten Boom"},
+        {"text": "Respire. Laisse aller. Et rappelle-toi que ce moment est le seul que tu sais avoir.", "source": "Oprah Winfrey"},
+        {"text": "La patience est un arbre dont la racine est amère mais le fruit très doux.", "source": "Proverbe persan"},
+    ],
+    "nostalgique": [
+        {"text": "Les souvenirs sont les parfums de l'âme.", "source": "George Sand"},
+        {"text": "Ce que nous gardons dans notre mémoire est à nous pour toujours.", "source": "Sagesse ancienne"},
+        {"text": "Le passé est un prologue.", "source": "Shakespeare"},
+        {"text": "Nous ne regardons pas en arrière avec regret, mais avec gratitude.", "source": "Khalil Gibran"},
+        {"text": "Chaque souvenir est un trésor que le temps ne peut voler.", "source": "Proverbe"},
+        {"text": "Le cœur se souvient de ce que l'esprit oublie.", "source": "Sagesse celte"},
+    ],
+    "perdu": [
+        {"text": "C'est en se perdant qu'on se retrouve.", "source": "Proverbe"},
+        {"text": "Parfois, le chemin le plus long est le raccourci vers soi-même.", "source": "Sagesse soufie"},
+        {"text": "Au milieu de la difficulté se trouve l'opportunité.", "source": "Albert Einstein"},
+        {"text": "Quand tu ne sais pas où tu vas, regarde d'où tu viens.", "source": "Proverbe africain"},
+        {"text": "La confusion précède la clarté comme la nuit précède l'aube.", "source": "Sagesse ancienne"},
+        {"text": "Se perdre est le premier pas pour se trouver.", "source": "Rumi"},
+    ],
+    "reconnaissant": [
+        {"text": "La gratitude transforme ce que nous avons en suffisance.", "source": "Melody Beattie"},
+        {"text": "Celui qui ne remercie pas pour peu ne remerciera pas pour beaucoup.", "source": "Proverbe"},
+        {"text": "La reconnaissance est la mémoire du cœur.", "source": "Hans Christian Andersen"},
+        {"text": "Béni soit celui qui a appris à admirer mais pas à envier.", "source": "Sagesse ancienne"},
+        {"text": "Le secret du bonheur est de compter ses bénédictions pendant que d'autres comptent leurs problèmes.", "source": "William Penn"},
+        {"text": "Un cœur reconnaissant est un aimant à miracles.", "source": "Proverbe"},
+    ],
+    "contemplatif": [
+        {"text": "Connais-toi toi-même.", "source": "Oracle de Delphes"},
+        {"text": "L'œil par lequel je vois Dieu est le même œil par lequel Dieu me voit.", "source": "Maître Eckhart"},
+        {"text": "La méditation n'est pas une évasion mais une rencontre sereine avec la réalité.", "source": "Thich Nhat Hanh"},
+        {"text": "Regarde en toi-même. Tout ce dont tu as besoin s'y trouve.", "source": "Rumi"},
+        {"text": "Le silence est le langage de Dieu, tout le reste n'est que traduction.", "source": "Rumi"},
+        {"text": "L'univers est un livre dont nous sommes les lettres.", "source": "Ibn Arabi"},
+    ],
+    "eveille": [
+        {"text": "S'éveiller, c'est voir le miracle dans l'ordinaire.", "source": "Sagesse zen"},
+        {"text": "La conscience est le premier pas vers la transformation.", "source": "Carl Jung"},
+        {"text": "Chaque matin est une nouvelle naissance.", "source": "Sagesse hindoue"},
+        {"text": "L'éveil n'est pas de devenir quelqu'un d'autre, mais de devenir vraiment soi-même.", "source": "Thich Nhat Hanh"},
+        {"text": "Celui qui s'éveille à lui-même s'éveille au monde.", "source": "Proverbe"},
+        {"text": "La vraie vision commence quand les yeux se ferment.", "source": "Sagesse soufie"},
+    ],
+}
+
+# Book recommendations by mood
+BOOK_RECOMMENDATIONS = {
+    "serein": [
+        {"title": "L'Art de la simplicité", "author": "Dominique Loreau", "why": "Pour cultiver la paix intérieure"},
+        {"title": "Le Prophète", "author": "Khalil Gibran", "why": "Poésie sur la vie et l'âme"},
+        {"title": "Méditations", "author": "Marc Aurèle", "why": "Sagesse stoïcienne pour l'équilibre"},
+    ],
+    "melancolique": [
+        {"title": "Les Fleurs du Mal", "author": "Charles Baudelaire", "why": "La beauté dans la mélancolie"},
+        {"title": "Le Livre de l'intranquillité", "author": "Fernando Pessoa", "why": "Compagnon des âmes rêveuses"},
+        {"title": "La Nuit", "author": "Elie Wiesel", "why": "Traverser l'obscurité vers la lumière"},
+    ],
+    "inspire": [
+        {"title": "Lettres à un jeune poète", "author": "Rainer Maria Rilke", "why": "Nourrir ta flamme créatrice"},
+        {"title": "Le Pouvoir du moment présent", "author": "Eckhart Tolle", "why": "Ancrage dans l'instant créatif"},
+        {"title": "L'Alchimiste", "author": "Paulo Coelho", "why": "Suivre ta légende personnelle"},
+    ],
+    "anxieux": [
+        {"title": "L'Art de la méditation", "author": "Matthieu Ricard", "why": "Techniques pour apaiser l'esprit"},
+        {"title": "Siddhartha", "author": "Hermann Hesse", "why": "Voyage vers la paix intérieure"},
+        {"title": "Autobiography of a Yogi", "author": "Paramahansa Yogananda", "why": "Trouver le calme dans le chaos"},
+    ],
+    "reveur": [
+        {"title": "Les Rêves et les moyens de les diriger", "author": "Léon d'Hervey de Saint-Denys", "why": "Explorer tes rêves lucides"},
+        {"title": "Le Petit Prince", "author": "Antoine de Saint-Exupéry", "why": "Voir avec les yeux de l'âme"},
+        {"title": "Cent ans de solitude", "author": "Gabriel García Márquez", "why": "Voyage dans le réalisme magique"},
+    ],
+    "default": [
+        {"title": "Le Prophète", "author": "Khalil Gibran", "why": "Sagesse universelle pour toutes les humeurs"},
+        {"title": "Ainsi parlait Zarathoustra", "author": "Friedrich Nietzsche", "why": "Réflexion profonde sur l'existence"},
+        {"title": "L'Étranger", "author": "Albert Camus", "why": "Méditation sur le sens de la vie"},
+    ],
+}
 
 # ==================== MODELS ====================
 
