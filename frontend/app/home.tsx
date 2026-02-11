@@ -7,10 +7,13 @@ import {
   ScrollView,
   SafeAreaView,
   RefreshControl,
+  TextInput,
+  ActivityIndicator,
+  Modal,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+import Animated, { FadeInDown, FadeInUp, FadeIn } from 'react-native-reanimated';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -56,6 +59,12 @@ const MENU_ITEMS: MenuItem[] = [
   },
 ];
 
+interface BookRecommendation {
+  title: string;
+  author: string;
+  why: string;
+}
+
 export default function HomeScreen() {
   const router = useRouter();
   const [userName, setUserName] = useState('');
@@ -63,6 +72,16 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [capsuleCount, setCapsuleCount] = useState(0);
   const [dreamCount, setDreamCount] = useState(0);
+  
+  // AI Companion
+  const [showCompanion, setShowCompanion] = useState(false);
+  const [companionMessage, setCompanionMessage] = useState('');
+  const [companionResponse, setCompanionResponse] = useState('');
+  const [isLoadingCompanion, setIsLoadingCompanion] = useState(false);
+  
+  // Book recommendations
+  const [bookRecommendations, setBookRecommendations] = useState<BookRecommendation[]>([]);
+  const [showBooks, setShowBooks] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -83,6 +102,19 @@ export default function HomeScreen() {
       if (moodRes.ok) {
         const mood = await moodRes.json();
         setCurrentMood(mood);
+        
+        // Fetch book recommendations based on mood
+        if (mood?.mood) {
+          try {
+            const booksRes = await fetch(`${API_URL}/api/book-recommendations/${mood.mood}`);
+            if (booksRes.ok) {
+              const booksData = await booksRes.json();
+              setBookRecommendations(booksData.recommendations || []);
+            }
+          } catch (e) {
+            console.log('Error fetching books:', e);
+          }
+        }
       }
       if (capsulesRes.ok) {
         const capsules = await capsulesRes.json();
@@ -132,6 +164,63 @@ export default function HomeScreen() {
     return { name: 'Nouvelle Lune', emoji: '🌑' };
   };
 
+  const handleCompanionChat = async () => {
+    if (!companionMessage.trim() || !currentMood) return;
+    
+    setIsLoadingCompanion(true);
+    try {
+      const res = await fetch(`${API_URL}/api/companion/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mood: currentMood.mood,
+          energy_level: currentMood.energy_level,
+          message: companionMessage,
+        }),
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        setCompanionResponse(data.response);
+      }
+    } catch (e) {
+      console.log('Error with companion:', e);
+      setCompanionResponse("Les étoiles murmurent doucement... Que souhaitez-vous partager ?");
+    } finally {
+      setIsLoadingCompanion(false);
+    }
+  };
+
+  const openCompanion = async () => {
+    setShowCompanion(true);
+    setCompanionResponse('');
+    setCompanionMessage('');
+    
+    // Get initial greeting
+    if (currentMood) {
+      setIsLoadingCompanion(true);
+      try {
+        const res = await fetch(`${API_URL}/api/companion/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            mood: currentMood.mood,
+            energy_level: currentMood.energy_level,
+          }),
+        });
+        
+        if (res.ok) {
+          const data = await res.json();
+          setCompanionResponse(data.response);
+        }
+      } catch (e) {
+        setCompanionResponse("Bienvenue, voyageur. Que porte votre cœur ce soir ?");
+      } finally {
+        setIsLoadingCompanion(false);
+      }
+    }
+  };
+
   const moonPhase = getMoonPhase();
   const today = format(new Date(), "EEEE d MMMM", { locale: fr });
 
@@ -159,10 +248,28 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </Animated.View>
 
-        {/* Moon Phase */}
+        {/* Moon Phase Card */}
         <Animated.View entering={FadeInUp.duration(600).delay(100)} style={styles.moonCard}>
           <Text style={styles.moonEmoji}>{moonPhase.emoji}</Text>
           <Text style={styles.moonName}>{moonPhase.name}</Text>
+        </Animated.View>
+
+        {/* AI Companion Button */}
+        <Animated.View entering={FadeInUp.duration(600).delay(150)}>
+          <TouchableOpacity 
+            style={styles.companionButton}
+            onPress={openCompanion}
+            activeOpacity={0.8}
+          >
+            <View style={styles.companionIcon}>
+              <Text style={styles.companionEmoji}>✨</Text>
+            </View>
+            <View style={styles.companionText}>
+              <Text style={styles.companionTitle}>Dialogue intérieur</Text>
+              <Text style={styles.companionSubtitle}>Parler avec ton compagnon poétique</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color="#C4C4B4" />
+          </TouchableOpacity>
         </Animated.View>
 
         {/* Stats */}
@@ -207,7 +314,115 @@ export default function HomeScreen() {
             </Animated.View>
           ))}
         </View>
+
+        {/* Book Recommendations */}
+        {bookRecommendations.length > 0 && (
+          <Animated.View entering={FadeInUp.duration(600).delay(600)}>
+            <TouchableOpacity 
+              style={styles.booksSection}
+              onPress={() => setShowBooks(true)}
+            >
+              <View style={styles.booksHeader}>
+                <Text style={styles.booksTitle}>📚 Lectures suggérées</Text>
+                <Text style={styles.booksSubtitle}>Pour prolonger ce moment</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#C4C4B4" />
+            </TouchableOpacity>
+          </Animated.View>
+        )}
       </ScrollView>
+
+      {/* AI Companion Modal */}
+      <Modal
+        visible={showCompanion}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowCompanion(false)}
+      >
+        <SafeAreaView style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>Dialogue intérieur</Text>
+            <TouchableOpacity onPress={() => setShowCompanion(false)}>
+              <Ionicons name="close" size={28} color="#6B6B5B" />
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView style={styles.modalContent} contentContainerStyle={styles.modalContentContainer}>
+            <View style={styles.companionIntro}>
+              <Text style={styles.companionIntroEmoji}>🌙</Text>
+              <Text style={styles.companionIntroText}>
+                Un espace pour explorer tes pensées et émotions à travers un dialogue poétique et bienveillant.
+              </Text>
+            </View>
+
+            {companionResponse && (
+              <Animated.View entering={FadeIn.duration(400)} style={styles.responseCard}>
+                <Text style={styles.responseText}>{companionResponse}</Text>
+              </Animated.View>
+            )}
+
+            {isLoadingCompanion && (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="small" color="#8B9A7D" />
+              </View>
+            )}
+          </ScrollView>
+
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.companionInput}
+              placeholder="Qu'habite ton esprit en ce moment ?"
+              placeholderTextColor="#B0B0A0"
+              value={companionMessage}
+              onChangeText={setCompanionMessage}
+              multiline
+              maxLength={500}
+            />
+            <TouchableOpacity
+              style={[styles.sendButton, !companionMessage.trim() && styles.sendButtonDisabled]}
+              onPress={handleCompanionChat}
+              disabled={!companionMessage.trim() || isLoadingCompanion}
+            >
+              <Ionicons name="send" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      </Modal>
+
+      {/* Books Modal */}
+      <Modal
+        visible={showBooks}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowBooks(false)}
+      >
+        <SafeAreaView style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>Lectures suggérées</Text>
+            <TouchableOpacity onPress={() => setShowBooks(false)}>
+              <Ionicons name="close" size={28} color="#6B6B5B" />
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView style={styles.modalContent} contentContainerStyle={styles.booksContainer}>
+            <Text style={styles.booksIntro}>
+              Basé sur ton humeur actuelle, voici quelques lectures qui pourraient résonner avec toi...
+            </Text>
+            
+            {bookRecommendations.map((book, index) => (
+              <Animated.View 
+                key={index} 
+                entering={FadeInUp.duration(400).delay(index * 100)}
+                style={styles.bookCard}
+              >
+                <Text style={styles.bookTitle}>{book.title}</Text>
+                <Text style={styles.bookAuthor}>{book.author}</Text>
+                <Text style={styles.bookWhy}>{book.why}</Text>
+              </Animated.View>
+            ))}
+          </ScrollView>
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -263,7 +478,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 24,
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
@@ -278,6 +493,46 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#6B6B5B',
     fontWeight: '500',
+  },
+  companionButton: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#D4A57430',
+  },
+  companionIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#D4A57420',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  companionEmoji: {
+    fontSize: 22,
+  },
+  companionText: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  companionTitle: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: '#4A4A4A',
+  },
+  companionSubtitle: {
+    fontSize: 12,
+    color: '#A0A090',
+    marginTop: 2,
   },
   statsRow: {
     flexDirection: 'row',
@@ -342,5 +597,148 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#A0A090',
     marginTop: 2,
+  },
+  booksSection: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  booksHeader: {
+    flex: 1,
+  },
+  booksTitle: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: '#4A4A4A',
+  },
+  booksSubtitle: {
+    fontSize: 12,
+    color: '#A0A090',
+    marginTop: 2,
+  },
+  
+  // Modal Styles
+  modalContainer: {
+    flex: 1,
+    backgroundColor: '#F5F0E8',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E8E0D4',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '500',
+    color: '#4A4A4A',
+  },
+  modalContent: {
+    flex: 1,
+  },
+  modalContentContainer: {
+    padding: 24,
+  },
+  companionIntro: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  companionIntroEmoji: {
+    fontSize: 48,
+    marginBottom: 16,
+  },
+  companionIntroText: {
+    fontSize: 14,
+    color: '#8B8B7D',
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+  responseCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+  },
+  responseText: {
+    fontSize: 16,
+    color: '#4A4A4A',
+    lineHeight: 26,
+    fontStyle: 'italic',
+  },
+  loadingContainer: {
+    padding: 20,
+    alignItems: 'center',
+  },
+  inputContainer: {
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#E8E0D4',
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 12,
+  },
+  companionInput: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 15,
+    color: '#4A4A4A',
+    maxHeight: 100,
+  },
+  sendButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#8B9A7D',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sendButtonDisabled: {
+    backgroundColor: '#D4D4C4',
+  },
+  
+  // Books Modal
+  booksContainer: {
+    padding: 24,
+  },
+  booksIntro: {
+    fontSize: 14,
+    color: '#8B8B7D',
+    marginBottom: 20,
+    lineHeight: 22,
+  },
+  bookCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 12,
+  },
+  bookTitle: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#4A4A4A',
+    marginBottom: 4,
+  },
+  bookAuthor: {
+    fontSize: 13,
+    color: '#8B8B7D',
+    marginBottom: 12,
+  },
+  bookWhy: {
+    fontSize: 13,
+    color: '#6B6B5B',
+    fontStyle: 'italic',
   },
 });
