@@ -350,13 +350,14 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   moodCard: {
-    width: (width - 64) / 2,
+    width: 150,
     backgroundColor: '#1a1a2e',
     borderRadius: 16,
     padding: 16,
     alignItems: 'center',
     borderWidth: 2,
     borderColor: 'transparent',
+    marginHorizontal: 6,
   },
   moodIconContainer: {
     width: 56,
