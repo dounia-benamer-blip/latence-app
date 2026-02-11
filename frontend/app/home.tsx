@@ -367,8 +367,11 @@ export default function HomeScreen() {
               style={[styles.booksSection, dynamicStyles.card]}
               onPress={() => setShowBooks(true)}
             >
+              <View style={[styles.booksIconContainer, { backgroundColor: `${theme.accentWarm}20` }]}>
+                <Ionicons name="book-outline" size={20} color={theme.accentWarm} />
+              </View>
               <View style={styles.booksHeader}>
-                <Text style={[styles.booksTitle, dynamicStyles.text]}>📚 Lectures suggérées</Text>
+                <Text style={[styles.booksTitle, dynamicStyles.text]}>Lectures suggérées</Text>
                 <Text style={[styles.booksSubtitle, dynamicStyles.textMuted]}>Pour prolonger ce moment</Text>
               </View>
               <Ionicons name="chevron-forward" size={20} color={theme.textMuted} />
