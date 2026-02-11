@@ -564,7 +564,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   moodCard: {
-    width: (width - 60) / 2,  // 2 columns: (screen - padding*2 - gap) / 2
     borderRadius: 16,
     padding: 16,
     alignItems: 'center',
