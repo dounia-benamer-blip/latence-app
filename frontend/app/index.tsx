@@ -252,7 +252,7 @@ export default function WelcomeScreen() {
         onPress={toggleTheme}
       >
         <Ionicons 
-          name={isDark ? 'sunny-outline' : 'moon-outline'} 
+          name={getThemeIcon(themeMode) as any} 
           size={18} 
           color={theme.accentWarm} 
         />
