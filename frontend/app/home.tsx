@@ -17,9 +17,19 @@ import Animated, { FadeInDown, FadeInUp, FadeIn } from 'react-native-reanimated'
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useTheme } from '../src/context/ThemeContext';
+import { useTheme, ThemeMode } from '../src/context/ThemeContext';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
+
+// Get icon name for theme toggle
+const getThemeIcon = (mode: ThemeMode): string => {
+  switch (mode) {
+    case 'light': return 'moon-outline';      // Click to go to dark
+    case 'dark': return 'eye-outline';        // Click to go to silence
+    case 'silence': return 'sunny-outline';   // Click to go to light
+    default: return 'moon-outline';
+  }
+};
 
 interface MenuItem {
   id: string;
