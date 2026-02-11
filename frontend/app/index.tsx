@@ -75,7 +75,7 @@ const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
 export default function WelcomeScreen() {
   const router = useRouter();
-  const { theme, isDark, toggleTheme } = useTheme();
+  const { theme, themeMode, isDark, toggleTheme } = useTheme();
   const [step, setStep] = useState<'auth' | 'mood' | 'energy' | 'wisdom'>('auth');
   const [isAppleAvailable, setIsAppleAvailable] = useState(false);
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
