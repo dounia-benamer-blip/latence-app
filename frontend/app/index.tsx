@@ -117,14 +117,12 @@ export default function MoodScreen() {
           /* Mood Selection */
           <Animated.View
             entering={FadeInUp.duration(600).delay(300)}
-            style={styles.moodGrid}
+            style={styles.moodContainer}
           >
-            {MOODS.map((mood, index) => (
-              <Animated.View
-                key={mood.id}
-                entering={FadeInDown.duration(400).delay(index * 50)}
-              >
+            <View style={styles.moodRow}>
+              {MOODS.slice(0, 2).map((mood, index) => (
                 <TouchableOpacity
+                  key={mood.id}
                   style={[
                     styles.moodCard,
                     selectedMood === mood.id && {
@@ -149,8 +147,98 @@ export default function MoodScreen() {
                   </View>
                   <Text style={styles.moodLabel}>{mood.label}</Text>
                 </TouchableOpacity>
-              </Animated.View>
-            ))}
+              ))}
+            </View>
+            <View style={styles.moodRow}>
+              {MOODS.slice(2, 4).map((mood, index) => (
+                <TouchableOpacity
+                  key={mood.id}
+                  style={[
+                    styles.moodCard,
+                    selectedMood === mood.id && {
+                      borderColor: mood.color,
+                      backgroundColor: `${mood.color}20`,
+                    },
+                  ]}
+                  onPress={() => handleMoodSelect(mood.id)}
+                  activeOpacity={0.7}
+                >
+                  <View
+                    style={[
+                      styles.moodIconContainer,
+                      { backgroundColor: `${mood.color}30` },
+                    ]}
+                  >
+                    <Ionicons
+                      name={mood.icon as any}
+                      size={28}
+                      color={mood.color}
+                    />
+                  </View>
+                  <Text style={styles.moodLabel}>{mood.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            <View style={styles.moodRow}>
+              {MOODS.slice(4, 6).map((mood, index) => (
+                <TouchableOpacity
+                  key={mood.id}
+                  style={[
+                    styles.moodCard,
+                    selectedMood === mood.id && {
+                      borderColor: mood.color,
+                      backgroundColor: `${mood.color}20`,
+                    },
+                  ]}
+                  onPress={() => handleMoodSelect(mood.id)}
+                  activeOpacity={0.7}
+                >
+                  <View
+                    style={[
+                      styles.moodIconContainer,
+                      { backgroundColor: `${mood.color}30` },
+                    ]}
+                  >
+                    <Ionicons
+                      name={mood.icon as any}
+                      size={28}
+                      color={mood.color}
+                    />
+                  </View>
+                  <Text style={styles.moodLabel}>{mood.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            <View style={styles.moodRow}>
+              {MOODS.slice(6, 8).map((mood, index) => (
+                <TouchableOpacity
+                  key={mood.id}
+                  style={[
+                    styles.moodCard,
+                    selectedMood === mood.id && {
+                      borderColor: mood.color,
+                      backgroundColor: `${mood.color}20`,
+                    },
+                  ]}
+                  onPress={() => handleMoodSelect(mood.id)}
+                  activeOpacity={0.7}
+                >
+                  <View
+                    style={[
+                      styles.moodIconContainer,
+                      { backgroundColor: `${mood.color}30` },
+                    ]}
+                  >
+                    <Ionicons
+                      name={mood.icon as any}
+                      size={28}
+                      color={mood.color}
+                    />
+                  </View>
+                  <Text style={styles.moodLabel}>{mood.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
           </Animated.View>
         ) : (
           /* Energy Level Selection */
