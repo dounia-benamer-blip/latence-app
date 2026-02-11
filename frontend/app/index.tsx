@@ -85,7 +85,44 @@ export default function WelcomeScreen() {
   const [isLoadingText, setIsLoadingText] = useState(false);
   
   // Calculate card width for 2-column grid
-  const cardWidth = (width - 60) / 2;  // screen width - (padding*2 + gap)
+  const cardWidth = (width - 52) / 2;  // screen width - (padding*2 + gap)
+
+  const renderMoodItem = ({ item: mood }: { item: typeof MOODS[0] }) => (
+    <TouchableOpacity
+      style={[
+        styles.moodCard,
+        { width: cardWidth },
+        dynamicStyles.card,
+        selectedMood === mood.id && dynamicStyles.cardSelected,
+        selectedMood === mood.id && { borderWidth: 1.5, borderColor: theme.accentWarm },
+      ]}
+      onPress={() => setSelectedMood(mood.id)}
+      activeOpacity={0.7}
+    >
+      <View
+        style={[
+          styles.moodIconContainer,
+          { backgroundColor: isDark ? `${theme.accentWarm}15` : `${mood.color}12` },
+          selectedMood === mood.id && { backgroundColor: `${theme.accentWarm}25` },
+        ]}
+      >
+        <Ionicons 
+          name={mood.icon as any} 
+          size={24} 
+          color={selectedMood === mood.id ? theme.accentWarm : (isDark ? theme.accentWarm : mood.color)} 
+        />
+      </View>
+      <Text
+        style={[
+          styles.moodLabel,
+          dynamicStyles.textSecondary,
+          selectedMood === mood.id && { color: theme.text, fontWeight: '500' },
+        ]}
+      >
+        {mood.label}
+      </Text>
+    </TouchableOpacity>
+  );
 
   const moonScale = useSharedValue(1);
   const poeticGreeting = getPoeticalGreeting();
