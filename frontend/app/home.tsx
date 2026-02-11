@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
@@ -26,30 +27,38 @@ interface MenuItem {
 
 const MENU_ITEMS: MenuItem[] = [
   {
-    id: 'capsule',
-    title: 'Déposer',
-    subtitle: 'Sceller une pensée pour le futur',
+    id: 'ecrire',
+    title: 'Écrire',
+    subtitle: 'Déposer une pensée',
+    icon: 'create-outline',
+    route: '/capsule/write',
+  },
+  {
+    id: 'sceller',
+    title: 'Sceller',
+    subtitle: 'Fermer une capsule',
     icon: 'lock-closed-outline',
-    route: '/capsule/create',
+    route: '/capsule/seal',
   },
   {
     id: 'dreams',
-    title: 'Rêver',
-    subtitle: 'Journal et interprétation des rêves',
+    title: 'Rêves',
+    subtitle: 'Journal et interprétation',
     icon: 'cloudy-night-outline',
     route: '/dreams',
   },
   {
-    id: 'lunar',
-    title: 'Lune',
-    subtitle: 'Cycles lunaires et astrologie',
+    id: 'astro',
+    title: 'Astres',
+    subtitle: 'Lune, Celtique, Arabe, Maisons',
     icon: 'moon-outline',
-    route: '/astrology/lunar',
+    route: '/astrology',
   },
 ];
 
 export default function HomeScreen() {
   const router = useRouter();
+  const [userName, setUserName] = useState('');
   const [currentMood, setCurrentMood] = useState<any>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [capsuleCount, setCapsuleCount] = useState(0);
@@ -57,6 +66,14 @@ export default function HomeScreen() {
 
   const fetchData = async () => {
     try {
+      const user = await AsyncStorage.getItem('user');
+      if (user) {
+        const userData = JSON.parse(user);
+        if (userData.firstName) {
+          setUserName(userData.firstName);
+        }
+      }
+
       const [moodRes, capsulesRes, dreamsRes] = await Promise.all([
         fetch(`${API_URL}/api/mood/latest`),
         fetch(`${API_URL}/api/capsules`),
@@ -107,9 +124,9 @@ export default function HomeScreen() {
     if (phase < 0.03) return { name: 'Nouvelle Lune', emoji: '🌑' };
     if (phase < 0.25) return { name: 'Premier Croissant', emoji: '🌒' };
     if (phase < 0.28) return { name: 'Premier Quartier', emoji: '🌓' };
-    if (phase < 0.47) return { name: 'Gibbeuse Croissante', emoji: '🌔' };
+    if (phase < 0.47) return { name: 'Gibbeuse', emoji: '🌔' };
     if (phase < 0.53) return { name: 'Pleine Lune', emoji: '🌕' };
-    if (phase < 0.72) return { name: 'Gibbeuse Décroissante', emoji: '🌖' };
+    if (phase < 0.72) return { name: 'Gibbeuse', emoji: '🌖' };
     if (phase < 0.78) return { name: 'Dernier Quartier', emoji: '🌗' };
     if (phase < 0.97) return { name: 'Dernier Croissant', emoji: '🌘' };
     return { name: 'Nouvelle Lune', emoji: '🌑' };
@@ -131,14 +148,21 @@ export default function HomeScreen() {
         <Animated.View entering={FadeInDown.duration(600)} style={styles.header}>
           <View>
             <Text style={styles.date}>{today}</Text>
-            <Text style={styles.title}>Journal</Text>
+            <Text style={styles.title}>Latence</Text>
+            <Text style={styles.byLine}>by Atelier Benamer</Text>
           </View>
           <TouchableOpacity 
-            style={styles.moonBadge}
-            onPress={() => router.push('/astrology/lunar')}
+            style={styles.profileButton}
+            onPress={() => router.push('/profile')}
           >
-            <Text style={styles.moonEmoji}>{moonPhase.emoji}</Text>
+            <Ionicons name="person-outline" size={22} color="#6B6B5B" />
           </TouchableOpacity>
+        </Animated.View>
+
+        {/* Moon Phase */}
+        <Animated.View entering={FadeInUp.duration(600).delay(100)} style={styles.moonCard}>
+          <Text style={styles.moonEmoji}>{moonPhase.emoji}</Text>
+          <Text style={styles.moonName}>{moonPhase.name}</Text>
         </Animated.View>
 
         {/* Stats */}
@@ -164,7 +188,7 @@ export default function HomeScreen() {
           {MENU_ITEMS.map((item, index) => (
             <Animated.View
               key={item.id}
-              entering={FadeInUp.duration(500).delay(400 + index * 100)}
+              entering={FadeInUp.duration(500).delay(300 + index * 80)}
             >
               <TouchableOpacity
                 style={styles.menuItem}
@@ -183,18 +207,6 @@ export default function HomeScreen() {
             </Animated.View>
           ))}
         </View>
-
-        {/* View Capsules */}
-        <Animated.View entering={FadeInUp.duration(600).delay(700)}>
-          <TouchableOpacity
-            style={styles.viewAllButton}
-            onPress={() => router.push('/capsule/list')}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.viewAllText}>Mes capsules scellées</Text>
-            <Ionicons name="arrow-forward" size={16} color="#8B9A7D" />
-          </TouchableOpacity>
-        </Animated.View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -213,31 +225,64 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 32,
+    marginBottom: 24,
   },
   date: {
-    fontSize: 13,
+    fontSize: 12,
     color: '#A0A090',
     textTransform: 'capitalize',
     letterSpacing: 0.5,
   },
   title: {
     fontSize: 32,
-    fontWeight: '300',
+    fontWeight: '200',
     color: '#4A4A4A',
-    letterSpacing: 1,
-    marginTop: 4,
+    letterSpacing: 4,
   },
-  moonBadge: {
-    padding: 8,
+  byLine: {
+    fontSize: 10,
+    color: '#A0A090',
+    letterSpacing: 1,
+    marginTop: 2,
+  },
+  profileButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  moonCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 24,
+    alignItems: 'center',
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   moonEmoji: {
-    fontSize: 32,
+    fontSize: 48,
+    marginBottom: 8,
+  },
+  moonName: {
+    fontSize: 14,
+    color: '#6B6B5B',
+    fontWeight: '500',
   },
   statsRow: {
     flexDirection: 'row',
     gap: 12,
-    marginBottom: 32,
+    marginBottom: 24,
   },
   statCard: {
     flex: 1,
@@ -260,11 +305,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#A0A090',
     marginTop: 4,
-    letterSpacing: 0.5,
   },
   menuContainer: {
     gap: 12,
-    marginBottom: 24,
   },
   menuItem: {
     backgroundColor: '#FFFFFF',
@@ -294,24 +337,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     color: '#4A4A4A',
-    letterSpacing: 0.3,
   },
   menuSubtitle: {
     fontSize: 12,
     color: '#A0A090',
-    marginTop: 4,
-  },
-  viewAllButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 16,
-  },
-  viewAllText: {
-    fontSize: 13,
-    color: '#8B9A7D',
-    fontWeight: '500',
-    letterSpacing: 0.5,
+    marginTop: 2,
   },
 });
