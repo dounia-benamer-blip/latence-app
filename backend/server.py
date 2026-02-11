@@ -595,6 +595,23 @@ class JournalCreate(BaseModel):
     content: str
     date: Optional[str] = None
 
+class AstrologyProfileCreate(BaseModel):
+    name: str
+    birth_date: str  # DD/MM/YYYY
+    birth_place: str
+
+class AstrologyProfileResponse(BaseModel):
+    id: str
+    name: str
+    birth_date: str
+    birth_place: str
+    celtic_tree: Optional[dict] = None
+    arabic_mansion: Optional[dict] = None
+    lunar_house: Optional[dict] = None
+    moon_phase_at_birth: Optional[dict] = None
+    ai_interpretation: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
 @api_router.get("/sacred-text/{mood}")
 async def get_sacred_text(mood: str):
     """Get a random sacred text based on current mood"""
