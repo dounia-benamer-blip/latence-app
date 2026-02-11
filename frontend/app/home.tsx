@@ -295,7 +295,7 @@ export default function HomeScreen() {
 
         {/* Moon Phase Card */}
         <Animated.View entering={FadeInUp.duration(600).delay(100)} style={[styles.moonCard, dynamicStyles.card]}>
-          <Text style={styles.moonEmoji}>{moonPhase.emoji}</Text>
+          <Ionicons name={moonPhase.icon as any} size={48} color={theme.accentWarm} />
           <Text style={[styles.moonName, dynamicStyles.textSecondary]}>{moonPhase.name}</Text>
         </Animated.View>
 
@@ -307,7 +307,7 @@ export default function HomeScreen() {
             activeOpacity={0.8}
           >
             <View style={[styles.companionIcon, { backgroundColor: `${theme.accentWarm}20` }]}>
-              <Text style={styles.companionEmoji}>✨</Text>
+              <Ionicons name="sparkles-outline" size={22} color={theme.accentWarm} />
             </View>
             <View style={styles.companionText}>
               <Text style={[styles.companionTitle, dynamicStyles.text]}>Dialogue intérieur</Text>
