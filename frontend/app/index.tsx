@@ -25,6 +25,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTheme } from './components/ThemeContext';
 
 const { width } = Dimensions.get('window');
 
@@ -64,6 +65,7 @@ const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
 export default function WelcomeScreen() {
   const router = useRouter();
+  const { theme, isDark, toggleTheme } = useTheme();
   const [step, setStep] = useState<'auth' | 'mood' | 'energy' | 'wisdom'>('auth');
   const [isAppleAvailable, setIsAppleAvailable] = useState(false);
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
@@ -154,7 +156,6 @@ export default function WelcomeScreen() {
   };
 
   const handleEnergyContinue = async () => {
-    // Fetch sacred text based on mood
     await fetchSacredText(selectedMood!);
     setStep('wisdom');
   };
@@ -179,25 +180,47 @@ export default function WelcomeScreen() {
     transform: [{ scale: moonScale.value }],
   }));
 
+  // Dynamic styles based on theme
+  const dynamicStyles = {
+    container: { backgroundColor: theme.background },
+    text: { color: theme.text },
+    textSecondary: { color: theme.textSecondary },
+    textMuted: { color: theme.textMuted },
+    card: { backgroundColor: theme.card },
+    cardSelected: { backgroundColor: theme.cardSelected, borderColor: theme.border },
+  };
+
   const renderAuth = () => (
     <Animated.View entering={FadeIn.duration(800)} style={styles.authContainer}>
+      {/* Theme Toggle in corner */}
+      <TouchableOpacity 
+        style={[styles.themeToggle, dynamicStyles.card]}
+        onPress={toggleTheme}
+      >
+        <Ionicons 
+          name={isDark ? 'sunny-outline' : 'moon-outline'} 
+          size={20} 
+          color={theme.accentWarm} 
+        />
+      </TouchableOpacity>
+
       <View style={styles.brandingContainer}>
         <Animated.View style={[styles.moonContainer, moonStyle]}>
           <Text style={styles.moonEmoji}>🌙</Text>
         </Animated.View>
-        <Text style={styles.appName}>Latence</Text>
-        <Text style={styles.byLine}>by Atelier Benamer</Text>
+        <Text style={[styles.appName, dynamicStyles.text]}>Latence</Text>
+        <Text style={[styles.byLine, dynamicStyles.textMuted]}>by Atelier Benamer</Text>
       </View>
 
       <View style={styles.authButtons}>
         {(isAppleAvailable || Platform.OS === 'web') && (
           <TouchableOpacity
-            style={styles.appleButton}
+            style={[styles.appleButton, isDark && styles.appleButtonDark]}
             onPress={handleAppleSignIn}
             activeOpacity={0.8}
           >
-            <Ionicons name="logo-apple" size={20} color="#fff" />
-            <Text style={styles.appleButtonText}>Continuer avec Apple</Text>
+            <Ionicons name="logo-apple" size={20} color={isDark ? '#000' : '#fff'} />
+            <Text style={[styles.appleButtonText, isDark && styles.appleButtonTextDark]}>Continuer avec Apple</Text>
           </TouchableOpacity>
         )}
 
@@ -205,7 +228,7 @@ export default function WelcomeScreen() {
           style={styles.skipButton}
           onPress={handleSkipAuth}
         >
-          <Text style={styles.skipText}>Continuer en invité</Text>
+          <Text style={[styles.skipText, dynamicStyles.textMuted]}>Continuer en invité</Text>
         </TouchableOpacity>
       </View>
     </Animated.View>
@@ -213,9 +236,21 @@ export default function WelcomeScreen() {
 
   const renderMood = () => (
     <Animated.View entering={FadeIn.duration(600)} style={styles.moodContainer}>
+      {/* Theme Toggle */}
+      <TouchableOpacity 
+        style={[styles.themeToggleTop, dynamicStyles.card]}
+        onPress={toggleTheme}
+      >
+        <Ionicons 
+          name={isDark ? 'sunny-outline' : 'moon-outline'} 
+          size={18} 
+          color={theme.accentWarm} 
+        />
+      </TouchableOpacity>
+
       <View style={styles.header}>
-        <Text style={styles.greeting}>{poeticGreeting.greeting}</Text>
-        <Text style={styles.poeticQuestion}>{poeticGreeting.question}</Text>
+        <Text style={[styles.greeting, dynamicStyles.text]}>{poeticGreeting.greeting}</Text>
+        <Text style={[styles.poeticQuestion, dynamicStyles.textSecondary]}>{poeticGreeting.question}</Text>
       </View>
 
       <ScrollView 
@@ -232,8 +267,9 @@ export default function WelcomeScreen() {
               <TouchableOpacity
                 style={[
                   styles.moodCard,
-                  selectedMood === mood.id && styles.moodCardSelected,
-                  selectedMood === mood.id && { borderColor: mood.color },
+                  dynamicStyles.card,
+                  selectedMood === mood.id && dynamicStyles.cardSelected,
+                  selectedMood === mood.id && { borderWidth: 1.5, borderColor: mood.color },
                 ]}
                 onPress={() => setSelectedMood(mood.id)}
                 activeOpacity={0.7}
@@ -250,7 +286,8 @@ export default function WelcomeScreen() {
                 <Text
                   style={[
                     styles.moodLabel,
-                    selectedMood === mood.id && { color: '#4A4A4A', fontWeight: '500' },
+                    dynamicStyles.textSecondary,
+                    selectedMood === mood.id && { color: theme.text, fontWeight: '500' },
                   ]}
                 >
                   {mood.label}
@@ -278,8 +315,8 @@ export default function WelcomeScreen() {
   const renderEnergy = () => (
     <Animated.View entering={FadeIn.duration(600)} style={styles.energyContainer}>
       <View style={styles.header}>
-        <Text style={styles.greeting}>Ton énergie</Text>
-        <Text style={styles.subtitle}>Où se situe ta vitalité en ce moment ?</Text>
+        <Text style={[styles.greeting, dynamicStyles.text]}>Ton énergie</Text>
+        <Text style={[styles.subtitle, dynamicStyles.textSecondary]}>Où se situe ta vitalité en ce moment ?</Text>
       </View>
 
       <View style={styles.energyScale}>
@@ -289,6 +326,7 @@ export default function WelcomeScreen() {
               key={level}
               style={[
                 styles.energyButton,
+                dynamicStyles.card,
                 energyLevel === level && styles.energyButtonActive,
               ]}
               onPress={() => setEnergyLevel(level)}
@@ -297,6 +335,7 @@ export default function WelcomeScreen() {
               <Text
                 style={[
                   styles.energyText,
+                  dynamicStyles.textSecondary,
                   energyLevel === level && styles.energyTextActive,
                 ]}
               >
@@ -306,8 +345,8 @@ export default function WelcomeScreen() {
           ))}
         </View>
         <View style={styles.energyLabels}>
-          <Text style={styles.energyLabelText}>Épuisé</Text>
-          <Text style={styles.energyLabelText}>Plein d'énergie</Text>
+          <Text style={[styles.energyLabelText, dynamicStyles.textMuted]}>Épuisé</Text>
+          <Text style={[styles.energyLabelText, dynamicStyles.textMuted]}>Plein d'énergie</Text>
         </View>
       </View>
 
@@ -323,7 +362,7 @@ export default function WelcomeScreen() {
         style={styles.backLink}
         onPress={() => setStep('mood')}
       >
-        <Text style={styles.backLinkText}>Retour</Text>
+        <Text style={[styles.backLinkText, dynamicStyles.textMuted]}>Retour</Text>
       </TouchableOpacity>
     </Animated.View>
   );
@@ -331,17 +370,17 @@ export default function WelcomeScreen() {
   const renderWisdom = () => (
     <Animated.View entering={FadeIn.duration(800)} style={styles.wisdomContainer}>
       <View style={styles.wisdomHeader}>
-        <Text style={styles.wisdomSubtitle}>Une lumière pour ce moment</Text>
+        <Text style={[styles.wisdomSubtitle, dynamicStyles.textSecondary]}>Une lumière pour ce moment</Text>
       </View>
 
       {isLoadingText ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="small" color="#8B9A7D" />
+          <ActivityIndicator size="small" color={theme.accent} />
         </View>
       ) : sacredText ? (
-        <Animated.View entering={FadeInUp.duration(600).delay(200)} style={styles.wisdomCard}>
-          <Text style={styles.wisdomQuote}>"{sacredText.text}"</Text>
-          <Text style={styles.wisdomSource}>— {sacredText.source}</Text>
+        <Animated.View entering={FadeInUp.duration(600).delay(200)} style={[styles.wisdomCard, dynamicStyles.card]}>
+          <Text style={[styles.wisdomQuote, dynamicStyles.text]}>"{sacredText.text}"</Text>
+          <Text style={[styles.wisdomSource, dynamicStyles.textMuted]}>— {sacredText.source}</Text>
         </Animated.View>
       ) : null}
 
@@ -359,13 +398,13 @@ export default function WelcomeScreen() {
         style={styles.backLink}
         onPress={() => setStep('energy')}
       >
-        <Text style={styles.backLinkText}>Retour</Text>
+        <Text style={[styles.backLinkText, dynamicStyles.textMuted]}>Retour</Text>
       </TouchableOpacity>
     </Animated.View>
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, dynamicStyles.container]}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -382,13 +421,43 @@ export default function WelcomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F0E8',
   },
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: 24,
     paddingBottom: 40,
     justifyContent: 'center',
+  },
+  themeToggle: {
+    position: 'absolute',
+    top: 20,
+    right: 0,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  themeToggleTop: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
   },
   authContainer: {
     flex: 1,
@@ -409,13 +478,11 @@ const styles = StyleSheet.create({
   appName: {
     fontSize: 42,
     fontWeight: '200',
-    color: '#4A4A4A',
     letterSpacing: 8,
     marginBottom: 8,
   },
   byLine: {
     fontSize: 12,
-    color: '#A0A090',
     letterSpacing: 2,
     textTransform: 'uppercase',
   },
@@ -432,17 +499,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 10,
   },
+  appleButtonDark: {
+    backgroundColor: '#FFFFFF',
+  },
   appleButtonText: {
     color: '#fff',
     fontSize: 15,
     fontWeight: '500',
+  },
+  appleButtonTextDark: {
+    color: '#000',
   },
   skipButton: {
     paddingVertical: 16,
     alignItems: 'center',
   },
   skipText: {
-    color: '#A0A090',
     fontSize: 14,
   },
   header: {
@@ -452,19 +524,16 @@ const styles = StyleSheet.create({
   greeting: {
     fontSize: 28,
     fontWeight: '200',
-    color: '#4A4A4A',
     letterSpacing: 2,
     marginBottom: 8,
   },
   poeticQuestion: {
     fontSize: 15,
-    color: '#8B8B7D',
     fontStyle: 'italic',
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 14,
-    color: '#8B8B7D',
     textAlign: 'center',
   },
   moodContainer: {
@@ -486,7 +555,6 @@ const styles = StyleSheet.create({
   },
   moodCard: {
     width: (width - 68) / 3,
-    backgroundColor: '#FFFFFF',
     borderRadius: 14,
     padding: 12,
     alignItems: 'center',
@@ -496,11 +564,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.04,
     shadowRadius: 8,
     elevation: 2,
-  },
-  moodCardSelected: {
-    backgroundColor: '#FDF9F3',
-    borderWidth: 1.5,
-    borderColor: '#D4C4A8',
   },
   moodEmojiContainer: {
     width: 44,
@@ -516,7 +579,6 @@ const styles = StyleSheet.create({
   moodLabel: {
     fontSize: 11,
     fontWeight: '400',
-    color: '#8B8B7D',
     textAlign: 'center',
   },
   continueButton: {
@@ -553,7 +615,6 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
@@ -568,7 +629,6 @@ const styles = StyleSheet.create({
   energyText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#8B8B7D',
   },
   energyTextActive: {
     color: '#fff',
@@ -581,7 +641,6 @@ const styles = StyleSheet.create({
   },
   energyLabelText: {
     fontSize: 12,
-    color: '#A0A090',
   },
   backLink: {
     alignItems: 'center',
@@ -589,7 +648,6 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   backLinkText: {
-    color: '#A0A090',
     fontSize: 13,
   },
   wisdomContainer: {
@@ -604,7 +662,6 @@ const styles = StyleSheet.create({
   },
   wisdomSubtitle: {
     fontSize: 14,
-    color: '#8B8B7D',
     letterSpacing: 1,
     textTransform: 'uppercase',
   },
@@ -614,7 +671,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   wisdomCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 20,
     padding: 28,
     marginBottom: 40,
@@ -629,7 +685,6 @@ const styles = StyleSheet.create({
   wisdomQuote: {
     fontSize: 17,
     fontWeight: '300',
-    color: '#4A4A4A',
     textAlign: 'center',
     lineHeight: 28,
     marginBottom: 16,
@@ -637,7 +692,6 @@ const styles = StyleSheet.create({
   },
   wisdomSource: {
     fontSize: 13,
-    color: '#A0A090',
     letterSpacing: 0.5,
   },
   beginButton: {
