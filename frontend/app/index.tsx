@@ -9,6 +9,7 @@ import {
   useWindowDimensions,
   Platform,
   ActivityIndicator,
+  FlatList,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
