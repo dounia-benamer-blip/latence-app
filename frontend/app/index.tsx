@@ -561,17 +561,26 @@ const styles = StyleSheet.create({
   moodScrollContent: {
     paddingBottom: 16,
   },
+  moodList: {
+    flex: 1,
+    marginBottom: 16,
+  },
+  moodListContent: {
+    paddingBottom: 16,
+  },
+  moodRow: {
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
   moodGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
   moodCard: {
-    flexBasis: '48%',
     borderRadius: 16,
     padding: 18,
     alignItems: 'center',
-    marginBottom: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
