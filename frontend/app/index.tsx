@@ -304,20 +304,16 @@ export default function WelcomeScreen() {
         <Text style={[styles.poeticQuestion, dynamicStyles.textSecondary]}>{poeticGreeting.question}</Text>
       </View>
 
-      <ScrollView 
-        style={styles.moodList}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.moodListContent}
-      >
-        {/* Render mood cards in rows of 2 */}
+      <View style={styles.moodGrid}>
         {Array.from({ length: Math.ceil(MOODS.length / 2) }, (_, rowIndex) => (
-          <View key={rowIndex} style={styles.moodRow}>
+          <View key={rowIndex} style={styles.moodRow} data-testid={`mood-row-${rowIndex}`}>
             {MOODS.slice(rowIndex * 2, rowIndex * 2 + 2).map((mood) => (
               <TouchableOpacity
                 key={mood.id}
+                data-testid={`mood-card-${mood.id}`}
                 style={[
                   styles.moodCard,
-                  { width: cardWidth },
+                  { flex: 1 },
                   dynamicStyles.card,
                   selectedMood === mood.id && dynamicStyles.cardSelected,
                   selectedMood === mood.id && { borderWidth: 1.5, borderColor: theme.accentWarm },
@@ -351,7 +347,7 @@ export default function WelcomeScreen() {
             ))}
           </View>
         ))}
-      </ScrollView>
+      </View>
 
       <TouchableOpacity
         style={[
@@ -609,12 +605,11 @@ const styles = StyleSheet.create({
   },
   moodRow: {
     flexDirection: 'row',
-    marginBottom: 12,
+    gap: 10,
+    marginBottom: 10,
   },
   moodGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    marginBottom: 20,
   },
   moodCard: {
     borderRadius: 16,
