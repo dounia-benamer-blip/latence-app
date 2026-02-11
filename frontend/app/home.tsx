@@ -154,15 +154,15 @@ export default function HomeScreen() {
     const jd = (Math.floor(365.25 * yy) + Math.floor(30.6 * mm) + day - 694039.09) / 29.53;
     const phase = jd - Math.floor(jd);
     
-    if (phase < 0.03) return { name: 'Nouvelle Lune', emoji: '🌑' };
-    if (phase < 0.25) return { name: 'Premier Croissant', emoji: '🌒' };
-    if (phase < 0.28) return { name: 'Premier Quartier', emoji: '🌓' };
-    if (phase < 0.47) return { name: 'Gibbeuse', emoji: '🌔' };
-    if (phase < 0.53) return { name: 'Pleine Lune', emoji: '🌕' };
-    if (phase < 0.72) return { name: 'Gibbeuse', emoji: '🌖' };
-    if (phase < 0.78) return { name: 'Dernier Quartier', emoji: '🌗' };
-    if (phase < 0.97) return { name: 'Dernier Croissant', emoji: '🌘' };
-    return { name: 'Nouvelle Lune', emoji: '🌑' };
+    if (phase < 0.03) return { name: 'Nouvelle Lune', icon: 'moon-outline' };
+    if (phase < 0.25) return { name: 'Premier Croissant', icon: 'moon-outline' };
+    if (phase < 0.28) return { name: 'Premier Quartier', icon: 'moon-outline' };
+    if (phase < 0.47) return { name: 'Gibbeuse Croissante', icon: 'moon-outline' };
+    if (phase < 0.53) return { name: 'Pleine Lune', icon: 'moon' };
+    if (phase < 0.72) return { name: 'Gibbeuse Décroissante', icon: 'moon' };
+    if (phase < 0.78) return { name: 'Dernier Quartier', icon: 'moon-outline' };
+    if (phase < 0.97) return { name: 'Dernier Croissant', icon: 'moon-outline' };
+    return { name: 'Nouvelle Lune', icon: 'moon-outline' };
   };
 
   const handleCompanionChat = async () => {
