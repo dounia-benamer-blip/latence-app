@@ -564,8 +564,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   moodCard: {
+    flexBasis: '48%',
     borderRadius: 16,
-    padding: 16,
+    padding: 18,
     alignItems: 'center',
     marginBottom: 12,
     shadowColor: '#000',
