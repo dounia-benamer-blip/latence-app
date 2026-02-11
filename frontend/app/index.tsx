@@ -27,8 +27,6 @@ import * as AppleAuthentication from 'expo-apple-authentication';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme, ThemeMode } from '../src/context/ThemeContext';
 
-const { width } = Dimensions.get('window');
-
 // Get icon name for theme toggle
 const getThemeIcon = (mode: ThemeMode): string => {
   switch (mode) {
