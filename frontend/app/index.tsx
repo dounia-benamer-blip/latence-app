@@ -29,20 +29,20 @@ import { useTheme } from './components/ThemeContext';
 
 const { width } = Dimensions.get('window');
 
-// Extended moods with emojis instead of icons for better display
+// Extended moods with elegant Ionicons
 const MOODS = [
-  { id: 'serein', label: 'Serein', emoji: '🍃', color: '#8B9A7D' },
-  { id: 'joyeux', label: 'Joyeux', emoji: '☀️', color: '#D4A574' },
-  { id: 'reveur', label: 'Rêveur', emoji: '☁️', color: '#A8B4C4' },
-  { id: 'melancolique', label: 'Mélancolique', emoji: '🌧️', color: '#9B8B7D' },
-  { id: 'fatigue', label: 'Fatigué', emoji: '🌙', color: '#7D7D8B' },
-  { id: 'inspire', label: 'Inspiré', emoji: '✨', color: '#C4A88B' },
-  { id: 'anxieux', label: 'Anxieux', emoji: '🌊', color: '#8B9AAA' },
-  { id: 'nostalgique', label: 'Nostalgique', emoji: '🍂', color: '#B8A090' },
-  { id: 'perdu', label: 'Perdu', emoji: '🌫️', color: '#A0A0A0' },
-  { id: 'reconnaissant', label: 'Reconnaissant', emoji: '🙏', color: '#9AAD8B' },
-  { id: 'contemplatif', label: 'Contemplatif', emoji: '🪷', color: '#C4B4D4' },
-  { id: 'eveille', label: 'Éveillé', emoji: '👁️', color: '#B4A48B' },
+  { id: 'serein', label: 'Serein', icon: 'leaf-outline', color: '#8B9A7D' },
+  { id: 'joyeux', label: 'Joyeux', icon: 'sunny-outline', color: '#D4A574' },
+  { id: 'reveur', label: 'Rêveur', icon: 'cloud-outline', color: '#A8B4C4' },
+  { id: 'melancolique', label: 'Mélancolique', icon: 'rainy-outline', color: '#9B8B7D' },
+  { id: 'fatigue', label: 'Fatigué', icon: 'moon-outline', color: '#7D7D8B' },
+  { id: 'inspire', label: 'Inspiré', icon: 'sparkles-outline', color: '#C4A88B' },
+  { id: 'anxieux', label: 'Anxieux', icon: 'water-outline', color: '#8B9AAA' },
+  { id: 'nostalgique', label: 'Nostalgique', icon: 'time-outline', color: '#B8A090' },
+  { id: 'perdu', label: 'Perdu', icon: 'compass-outline', color: '#A0A0A0' },
+  { id: 'reconnaissant', label: 'Reconnaissant', icon: 'heart-outline', color: '#9AAD8B' },
+  { id: 'contemplatif', label: 'Contemplatif', icon: 'eye-outline', color: '#C4B4D4' },
+  { id: 'eveille', label: 'Éveillé', icon: 'flash-outline', color: '#B4A48B' },
 ];
 
 const ENERGY_LEVELS = [1, 2, 3, 4, 5];
@@ -206,7 +206,7 @@ export default function WelcomeScreen() {
 
       <View style={styles.brandingContainer}>
         <Animated.View style={[styles.moonContainer, moonStyle]}>
-          <Text style={styles.moonEmoji}>🌙</Text>
+          <Ionicons name="moon" size={64} color={theme.accentWarm} />
         </Animated.View>
         <Text style={[styles.appName, dynamicStyles.text]}>Latence</Text>
         <Text style={[styles.byLine, dynamicStyles.textMuted]}>by Atelier Benamer</Text>
@@ -269,19 +269,23 @@ export default function WelcomeScreen() {
                   styles.moodCard,
                   dynamicStyles.card,
                   selectedMood === mood.id && dynamicStyles.cardSelected,
-                  selectedMood === mood.id && { borderWidth: 1.5, borderColor: mood.color },
+                  selectedMood === mood.id && { borderWidth: 1.5, borderColor: theme.accentWarm },
                 ]}
                 onPress={() => setSelectedMood(mood.id)}
                 activeOpacity={0.7}
               >
                 <View
                   style={[
-                    styles.moodEmojiContainer,
-                    { backgroundColor: `${mood.color}15` },
-                    selectedMood === mood.id && { backgroundColor: `${mood.color}30` },
+                    styles.moodIconContainer,
+                    { backgroundColor: isDark ? `${theme.accentWarm}15` : `${mood.color}12` },
+                    selectedMood === mood.id && { backgroundColor: `${theme.accentWarm}25` },
                   ]}
                 >
-                  <Text style={styles.moodEmoji}>{mood.emoji}</Text>
+                  <Ionicons 
+                    name={mood.icon as any} 
+                    size={22} 
+                    color={selectedMood === mood.id ? theme.accentWarm : (isDark ? theme.accentWarm : mood.color)} 
+                  />
                 </View>
                 <Text
                   style={[
@@ -379,6 +383,7 @@ export default function WelcomeScreen() {
         </View>
       ) : sacredText ? (
         <Animated.View entering={FadeInUp.duration(600).delay(200)} style={[styles.wisdomCard, dynamicStyles.card]}>
+          <Ionicons name="sparkles-outline" size={28} color={theme.accentWarm} style={{ marginBottom: 16 }} />
           <Text style={[styles.wisdomQuote, dynamicStyles.text]}>"{sacredText.text}"</Text>
           <Text style={[styles.wisdomSource, dynamicStyles.textMuted]}>— {sacredText.source}</Text>
         </Animated.View>
@@ -472,9 +477,6 @@ const styles = StyleSheet.create({
   moonContainer: {
     marginBottom: 24,
   },
-  moonEmoji: {
-    fontSize: 64,
-  },
   appName: {
     fontSize: 42,
     fontWeight: '200',
@@ -565,16 +567,13 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
   },
-  moodEmojiContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+  moodIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 8,
-  },
-  moodEmoji: {
-    fontSize: 22,
   },
   moodLabel: {
     fontSize: 11,
