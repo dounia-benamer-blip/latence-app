@@ -26,7 +26,9 @@
     "ThemeContext.tsx: Well-structured theme system with 3 modes (light, dark, silence) - good implementation",
     "Astrology page: Contains comprehensive data for Celtic trees (13), Arabic mansions (28), and Western houses (12) - all working",
     "Mood selection: All 12 emotional states properly displayed with icons",
-    "Tab navigation uses data-testid attributes but may need verification on web platform"
+    "Tab navigation uses data-testid attributes but may need verification on web platform",
+    "WARNING: Frontend logs show 'shadow*' style props are deprecated - should use 'boxShadow' instead (non-critical)",
+    "WARNING: Some 'Unexpected text node' errors in logs - may need to check View components for stray text"
   ],
   "updated_files": [],
   "success_rate": {
