@@ -663,7 +663,7 @@ export default function AstrologyScreen() {
         {tab === 'maisons' && renderHousesTab()}
       </ScrollView>
 
-      {/* Date Input Modal */}
+      {/* Profile Input Modal */}
       <Modal
         visible={showDateModal}
         animationType="slide"
@@ -672,18 +672,29 @@ export default function AstrologyScreen() {
       >
         <SafeAreaView style={[styles.modalContainer, ds.container]}>
           <View style={[styles.modalHeader, { borderBottomColor: theme.border }]}>
-            <Text style={[styles.modalTitle, ds.text]}>Date de naissance</Text>
-            <TouchableOpacity onPress={() => setShowDateModal(false)}>
+            <Text style={[styles.modalTitle, ds.text]}>Profil astral</Text>
+            <TouchableOpacity onPress={() => setShowDateModal(false)} data-testid="close-profile-modal">
               <Ionicons name="close" size={28} color={theme.iconColor} />
             </TouchableOpacity>
           </View>
 
-          <View style={styles.modalContent}>
-            <Ionicons name="calendar-outline" size={48} color={theme.accentWarm} style={{ marginBottom: 24 }} />
+          <ScrollView style={styles.modalContent} contentContainerStyle={{ padding: 32, alignItems: 'center' }}>
+            <Ionicons name="sparkles-outline" size={48} color={theme.accentWarm} style={{ marginBottom: 24 }} />
             <Text style={[styles.modalIntro, ds.textSecondary]}>
-              Entre ta date de naissance pour découvrir ta maison lunaire, ton arbre celtique et ta demeure arabe.
+              Remplis ces informations pour découvrir ton portrait astrologique personnalisé.
             </Text>
             
+            <Text style={[styles.inputLabel, ds.textMuted]}>Prénom</Text>
+            <TextInput
+              style={[styles.dateInput, ds.input, { borderColor: theme.border }]}
+              placeholder="Ton prénom"
+              placeholderTextColor={theme.textMuted}
+              value={userName}
+              onChangeText={setUserName}
+              data-testid="profile-name-input"
+            />
+
+            <Text style={[styles.inputLabel, ds.textMuted]}>Date de naissance</Text>
             <TextInput
               style={[styles.dateInput, ds.input, { borderColor: theme.border }]}
               placeholder="JJ/MM/AAAA"
@@ -692,15 +703,32 @@ export default function AstrologyScreen() {
               onChangeText={setBirthDateInput}
               keyboardType="numeric"
               maxLength={10}
+              data-testid="profile-birthdate-input"
+            />
+
+            <Text style={[styles.inputLabel, ds.textMuted]}>Lieu de naissance</Text>
+            <TextInput
+              style={[styles.dateInput, ds.input, { borderColor: theme.border }]}
+              placeholder="Ville, Pays"
+              placeholderTextColor={theme.textMuted}
+              value={birthPlace}
+              onChangeText={setBirthPlace}
+              data-testid="profile-birthplace-input"
             />
             
             <TouchableOpacity
-              style={[styles.saveButton, { backgroundColor: theme.accentWarm }]}
+              style={[styles.saveButton, { backgroundColor: theme.accentWarm }, isLoadingProfile && { opacity: 0.6 }]}
               onPress={saveBirthDate}
+              disabled={isLoadingProfile || !userName.trim() || !birthDateInput}
+              data-testid="save-profile-btn"
             >
-              <Text style={styles.saveButtonText}>Découvrir mon profil</Text>
+              {isLoadingProfile ? (
+                <ActivityIndicator color="#fff" size="small" />
+              ) : (
+                <Text style={styles.saveButtonText}>Découvrir mon profil</Text>
+              )}
             </TouchableOpacity>
-          </View>
+          </ScrollView>
         </SafeAreaView>
       </Modal>
     </SafeAreaView>
