@@ -741,6 +741,251 @@ async def get_journal_entries():
     entries = await db.journals.find().sort("date", -1).to_list(100)
     return [JournalEntry(**e) for e in entries]
 
+# --- Astrology Profile Routes ---
+
+def calculate_moon_phase_for_date(date: datetime):
+    """Calculate moon phase for a given date"""
+    year = date.year
+    month = date.month
+    day = date.day
+    c = year // 100
+    y = year - 100 * c
+    mm = month + 12 if month < 3 else month
+    yy = y - 1 if month < 3 else y
+    jd = (int(365.25 * yy) + int(30.6 * mm) + day - 694039.09) / 29.53
+    phase = jd - int(jd)
+    day_in_cycle = int(phase * 28) + 1
+    phase_index = int(phase * 8) % 8
+    phase_names = [
+        "Nouvelle Lune", "Premier Croissant", "Premier Quartier",
+        "Gibbeuse Croissante", "Pleine Lune", "Gibbeuse Décroissante",
+        "Dernier Quartier", "Dernier Croissant"
+    ]
+    return {
+        "name": phase_names[phase_index],
+        "day_in_cycle": day_in_cycle,
+        "phase_index": phase_index,
+        "phase_value": round(phase, 4),
+    }
+
+def get_celtic_tree_for_date(month: int, day: int):
+    """Get Celtic tree based on birth date"""
+    date_ranges = [
+        ((12, 24), (1, 20), "Bouleau", "Renouveau et purification"),
+        ((1, 21), (2, 17), "Sorbier", "Vision et protection"),
+        ((2, 18), (3, 17), "Frêne", "Connexion entre les mondes"),
+        ((3, 18), (4, 14), "Aulne", "Courage et passion"),
+        ((4, 15), (5, 12), "Saule", "Cycles lunaires et émotions"),
+        ((5, 13), (6, 9), "Aubépine", "Dualité et transformation"),
+        ((6, 10), (7, 7), "Chêne", "Force et sagesse"),
+        ((7, 8), (8, 4), "Houx", "Royauté et persévérance"),
+        ((8, 5), (9, 1), "Noisetier", "Sagesse et inspiration"),
+        ((9, 2), (9, 29), "Vigne", "Raffinement et harmonie"),
+        ((9, 30), (10, 27), "Lierre", "Transformation et survie"),
+        ((10, 28), (11, 24), "Roseau", "Secret et vérité"),
+        ((11, 25), (12, 23), "Sureau", "Fin et renaissance"),
+    ]
+    for start, end, tree, meaning in date_ranges:
+        if start[0] > end[0]:
+            if (month == start[0] and day >= start[1]) or (month == end[0] and day <= end[1]):
+                return {"tree": tree, "meaning": meaning}
+        else:
+            if (month == start[0] and day >= start[1]) or \
+               (month == end[0] and day <= end[1]) or \
+               (start[0] < month < end[0]):
+                return {"tree": tree, "meaning": meaning}
+    return {"tree": "Bouleau", "meaning": "Renouveau et purification"}
+
+def get_arabic_mansion_for_date(date: datetime):
+    """Get Arabic lunar mansion based on moon phase"""
+    moon = calculate_moon_phase_for_date(date)
+    mansion_index = (moon["day_in_cycle"] - 1) % 28
+    mansions = [
+        {"number": i+1, "name": m["name"], "arabic": m["arabic"], "meaning": m["meaning"], "element": m.get("element", ""), "planet": m.get("planet", "")}
+        for i, m in enumerate(ARABIC_MANSIONS_DATA)
+    ] if 'ARABIC_MANSIONS_DATA' in dir() else []
+    # Use simplified mansion data
+    mansion_names = [
+        "Al-Sharatain", "Al-Butain", "Al-Thurayya", "Al-Dabaran",
+        "Al-Haq'a", "Al-Han'a", "Al-Dhira", "Al-Nathra",
+        "Al-Tarf", "Al-Jabha", "Al-Zubra", "Al-Sarfa",
+        "Al-Awwa", "Al-Simak", "Al-Ghafr", "Al-Zubana",
+        "Al-Iklil", "Al-Qalb", "Al-Shaula", "Al-Na'a'im",
+        "Al-Balda", "Sa'd al-Dhabih", "Sa'd Bula", "Sa'd al-Su'ud",
+        "Sa'd al-Akhbiya", "Al-Fargh al-Muqaddam", "Al-Fargh al-Mu'akhkhar", "Batn al-Hut"
+    ]
+    return {"number": mansion_index + 1, "name": mansion_names[mansion_index]}
+
+def calculate_lunar_house(phase_value: float):
+    """Calculate Western astrological house from moon phase"""
+    house_number = int(phase_value * 12) + 1
+    if house_number > 12:
+        house_number = 12
+    house_data = ASTROLOGY_HOUSES[house_number - 1]
+    return {"number": house_number, "name": house_data["name"], "theme": house_data["theme"]}
+
+@api_router.post("/astrology/profile")
+async def create_astrology_profile(input: AstrologyProfileCreate):
+    """Create astrology profile with full calculations and AI interpretation"""
+    # Parse birth date (DD/MM/YYYY)
+    try:
+        parts = input.birth_date.split('/')
+        day, month, year = int(parts[0]), int(parts[1]), int(parts[2])
+        birth_dt = datetime(year, month, day)
+    except (ValueError, IndexError):
+        raise HTTPException(status_code=400, detail="Format de date invalide. Utilisez JJ/MM/AAAA")
+
+    # Calculate all astrological data
+    moon_phase = calculate_moon_phase_for_date(birth_dt)
+    celtic_tree = get_celtic_tree_for_date(month, day)
+    arabic_mansion = get_arabic_mansion_for_date(birth_dt)
+    lunar_house = calculate_lunar_house(moon_phase["phase_value"])
+
+    # Generate AI interpretation
+    ai_interpretation = await generate_astrology_interpretation(
+        input.name, input.birth_date, input.birth_place,
+        moon_phase, celtic_tree, arabic_mansion, lunar_house
+    )
+
+    profile_id = str(uuid.uuid4())
+    profile = {
+        "id": profile_id,
+        "name": input.name,
+        "birth_date": input.birth_date,
+        "birth_place": input.birth_place,
+        "celtic_tree": celtic_tree,
+        "arabic_mansion": arabic_mansion,
+        "lunar_house": lunar_house,
+        "moon_phase_at_birth": moon_phase,
+        "ai_interpretation": ai_interpretation,
+        "created_at": datetime.utcnow(),
+    }
+
+    await db.astrology_profiles.update_one(
+        {"name": input.name, "birth_date": input.birth_date},
+        {"$set": profile},
+        upsert=True
+    )
+
+    profile.pop("_id", None)
+    profile["created_at"] = profile["created_at"].isoformat()
+    return profile
+
+async def generate_astrology_interpretation(name, birth_date, birth_place, moon_phase, celtic_tree, arabic_mansion, lunar_house):
+    """Generate AI-powered astrological interpretation"""
+    system_prompt = """Tu es un astrologue poétique et érudit, formé dans les traditions occidentale, celtique et arabe.
+Tu rédiges des portraits astrologiques personnalisés avec sagesse, poésie et profondeur.
+
+STYLE :
+- Poétique mais accessible
+- Profond et personnel (utilise le prénom de la personne)
+- Références aux éléments naturels
+- Bienveillant et lumineux
+- 3 à 4 paragraphes
+
+Tu ne prédis pas l'avenir. Tu éclaires l'essence de l'âme."""
+
+    chat = LlmChat(
+        api_key=EMERGENT_LLM_KEY,
+        session_id=f"astro-profile-{uuid.uuid4()}",
+        system_message=system_prompt
+    ).with_model("openai", "gpt-4o")
+
+    prompt = f"""Compose un portrait astrologique personnalisé pour :
+
+**Prénom** : {name}
+**Date de naissance** : {birth_date}
+**Lieu de naissance** : {birth_place}
+
+**Données calculées** :
+- Phase lunaire de naissance : {moon_phase['name']} (jour {moon_phase['day_in_cycle']} du cycle)
+- Arbre celtique : {celtic_tree['tree']} ({celtic_tree['meaning']})
+- Demeure lunaire arabe : {arabic_mansion['name']} (demeure n°{arabic_mansion['number']})
+- Maison astrologique : {lunar_house['name']} ({lunar_house['theme']})
+
+Rédige un portrait qui relie ces différentes traditions en un tout cohérent et lumineux."""
+
+    try:
+        response = await chat.send_message(UserMessage(text=prompt))
+        return response
+    except Exception as e:
+        logging.error(f"Astrology interpretation error: {e}")
+        return f"Les astres murmurent pour {name}... Né(e) sous la phase de {moon_phase['name']}, guidé(e) par l'arbre {celtic_tree['tree']} et la demeure de {arabic_mansion['name']}, ton chemin brille d'une lumière unique."
+
+@api_router.get("/astrology/profile/latest")
+async def get_latest_astrology_profile():
+    """Get the latest saved astrology profile"""
+    profile = await db.astrology_profiles.find_one(
+        sort=[("created_at", -1)],
+        projection={"_id": 0}
+    )
+    if not profile:
+        return None
+    if isinstance(profile.get("created_at"), datetime):
+        profile["created_at"] = profile["created_at"].isoformat()
+    return profile
+
+# --- Daily Notification Routes ---
+
+POETIC_NOTIFICATIONS = {
+    "Nouvelle Lune": [
+        "La nuit est un encrier, et la lune nouvelle t'invite à écrire un nouveau chapitre.",
+        "Dans l'obscurité lunaire, tes rêves germent en silence. Plante une intention ce soir.",
+        "La lune se cache pour mieux renaître. Toi aussi, permets-toi ce renouveau.",
+    ],
+    "Premier Croissant": [
+        "Le croissant naissant dessine un sourire dans le ciel. Quelle promesse porte ton cœur ?",
+        "Comme la lune qui grandit, laisse tes intentions prendre forme, doucement.",
+        "Un mince fil d'argent éclaire ton chemin. Chaque pas compte.",
+    ],
+    "Premier Quartier": [
+        "La lune est à mi-chemin. Quelle direction choisit ton âme ce soir ?",
+        "Les défis sont des rivières à traverser, pas des murs. Continue d'avancer.",
+        "La lune te montre sa force tranquille. Tu possèdes la même en toi.",
+    ],
+    "Gibbeuse Croissante": [
+        "La lumière grandit. Tes efforts portent leurs fruits, patience.",
+        "Presque pleine, la lune t'enseigne la persévérance. L'aboutissement approche.",
+        "Comme la lune qui se parfait, affine tes intentions avec soin.",
+    ],
+    "Pleine Lune": [
+        "La pleine lune illumine tes vérités cachées. Accueille-les avec tendresse.",
+        "Ce soir, la lune est un miroir d'argent. Que reflète-t-elle de ton âme ?",
+        "Sous la pleine lune, les émotions dansent. Laisse-les s'exprimer librement.",
+    ],
+    "Gibbeuse Décroissante": [
+        "La lune commence sa descente. C'est le temps de la gratitude et du partage.",
+        "Ce que tu as reçu, transmets-le. La lumière décroissante éclaire la générosité.",
+        "La sagesse vient après l'accomplissement. Que retiens-tu de ce cycle ?",
+    ],
+    "Dernier Quartier": [
+        "La lune t'enseigne l'art du lâcher-prise. Que libères-tu ce soir ?",
+        "Comme la marée qui se retire, laisse partir ce qui t'alourdit.",
+        "Le pardon est une porte vers la lumière. La lune t'y invite.",
+    ],
+    "Dernier Croissant": [
+        "La lune murmure : repose-toi. Le silence est la plus belle des mélodies.",
+        "Dans le crépuscule lunaire, écoute les murmures de ton âme.",
+        "Bientôt un nouveau cycle. Prépare ton cœur à accueillir le renouveau.",
+    ],
+}
+
+@api_router.get("/notifications/daily")
+async def get_daily_notification():
+    """Get a poetic daily notification based on current lunar phase"""
+    now = datetime.utcnow()
+    moon = calculate_moon_phase_for_date(now)
+    phase_name = moon["name"]
+    messages = POETIC_NOTIFICATIONS.get(phase_name, POETIC_NOTIFICATIONS["Nouvelle Lune"])
+    # Use day of year for consistent daily selection
+    day_of_year = now.timetuple().tm_yday
+    message = messages[day_of_year % len(messages)]
+    return {
+        "message": message,
+        "moon_phase": phase_name,
+        "day_in_cycle": moon["day_in_cycle"],
+    }
+
 app.include_router(api_router)
 
 app.add_middleware(
