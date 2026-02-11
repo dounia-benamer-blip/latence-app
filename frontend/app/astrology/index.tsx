@@ -861,7 +861,8 @@ const styles = StyleSheet.create({
   modalTitle: { fontSize: 18, fontWeight: '500' },
   modalContent: { flex: 1, padding: 32, alignItems: 'center', justifyContent: 'center' },
   modalIntro: { fontSize: 14, textAlign: 'center', lineHeight: 22, marginBottom: 32 },
-  dateInput: { width: '100%', borderRadius: 14, padding: 16, fontSize: 18, textAlign: 'center', borderWidth: 1, marginBottom: 24 },
+  inputLabel: { fontSize: 12, alignSelf: 'flex-start', marginBottom: 6, marginLeft: 4, letterSpacing: 0.5, textTransform: 'uppercase' },
+  dateInput: { width: '100%', borderRadius: 14, padding: 16, fontSize: 16, textAlign: 'center', borderWidth: 1, marginBottom: 20 },
   saveButton: { paddingVertical: 16, paddingHorizontal: 40, borderRadius: 28 },
   saveButtonText: { color: '#fff', fontSize: 15, fontWeight: '500' },
 });
