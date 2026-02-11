@@ -591,6 +591,7 @@ const styles = StyleSheet.create({
   moodContainer: {
     flex: 1,
     paddingTop: 40,
+    paddingHorizontal: 20,
   },
   moodScrollView: {
     flex: 1,
