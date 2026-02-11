@@ -85,7 +85,8 @@ export default function WelcomeScreen() {
   const [isLoadingText, setIsLoadingText] = useState(false);
   
   // Calculate card width for 2-column grid
-  const cardWidth = (width - 52) / 2;  // screen width - (padding*2 + gap)
+  // Width minus: scrollContent padding (24*2) + gap between cards (8)
+  const cardWidth = (width - 48 - 8) / 2;
 
   const renderMoodItem = ({ item: mood }: { item: typeof MOODS[0] }) => (
     <TouchableOpacity
