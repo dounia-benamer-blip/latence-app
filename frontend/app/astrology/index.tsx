@@ -179,15 +179,31 @@ export default function AstrologyScreen() {
 
   const loadBirthDate = async () => {
     try {
+      // Try loading from backend first
+      const res = await fetch(`${API_URL}/api/astrology/profile/latest`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.name) {
+          setUserProfile(data);
+          setUserName(data.name);
+          setBirthDateInput(data.birth_date);
+          setBirthPlace(data.birth_place || '');
+          const parts = data.birth_date.split('/');
+          if (parts.length === 3) {
+            setBirthDate(new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0])));
+          }
+          return;
+        }
+      }
+      // Fallback to local storage
       const saved = await AsyncStorage.getItem('birth_date');
       if (saved) {
         const date = new Date(saved);
         setBirthDate(date);
         setBirthDateInput(formatDateInput(date));
-        setUserProfile(calculateLunarHouse(date));
       }
     } catch (e) {
-      console.log('Error loading birth date:', e);
+      console.log('Error loading profile:', e);
     }
   };
 
