@@ -313,94 +313,107 @@ export default function AstrologyScreen() {
   const renderProfileTab = () => (
     <Animated.View entering={FadeIn.duration(300)}>
       {!userProfile ? (
-        <View style={[styles.emptyProfile, ds.card]}>
+        <View style={[styles.emptyProfile, ds.card]} data-testid="empty-profile">
           <Ionicons name="person-circle-outline" size={64} color={theme.accentWarm} />
           <Text style={[styles.emptyTitle, ds.text]}>Découvre ton profil astral</Text>
           <Text style={[styles.emptySubtitle, ds.textSecondary]}>
-            Entre ta date de naissance pour révéler ta maison lunaire, ton arbre celtique et ta demeure arabe.
+            Entre ton prénom, ta date et ton lieu de naissance pour révéler ton portrait astrologique unique.
           </Text>
           <TouchableOpacity
             style={[styles.primaryButton, { backgroundColor: theme.accentWarm }]}
             onPress={() => setShowDateModal(true)}
+            data-testid="open-profile-form-btn"
           >
-            <Text style={styles.primaryButtonText}>Entrer ma date de naissance</Text>
+            <Text style={styles.primaryButtonText}>Créer mon profil astral</Text>
           </TouchableOpacity>
         </View>
       ) : (
-        <View>
-          {/* Birth date display */}
-          <TouchableOpacity style={[styles.dateCard, ds.card]} onPress={() => setShowDateModal(true)}>
-            <Ionicons name="calendar-outline" size={22} color={theme.accentWarm} />
+        <View data-testid="profile-results">
+          {/* Profile header */}
+          <TouchableOpacity style={[styles.dateCard, ds.card]} onPress={() => setShowDateModal(true)} data-testid="edit-profile-btn">
+            <Ionicons name="person-outline" size={22} color={theme.accentWarm} />
             <View style={styles.dateInfo}>
-              <Text style={[styles.dateLabel, ds.textMuted]}>Date de naissance</Text>
-              <Text style={[styles.dateValue, ds.text]}>{formatDateInput(birthDate!)}</Text>
+              <Text style={[styles.dateLabel, ds.textMuted]}>{userProfile.name}</Text>
+              <Text style={[styles.dateValue, ds.text]}>
+                {userProfile.birth_date} - {userProfile.birth_place}
+              </Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color={theme.textMuted} />
+            <Ionicons name="create-outline" size={20} color={theme.textMuted} />
           </TouchableOpacity>
 
+          {/* AI Interpretation */}
+          {userProfile.ai_interpretation && (
+            <Animated.View entering={FadeInUp.duration(400).delay(50)} style={[styles.profileCard, ds.card]}>
+              <View style={[styles.profileIconContainer, { backgroundColor: `${theme.accentWarm}20` }]}>
+                <Ionicons name="sparkles" size={28} color={theme.accentWarm} />
+              </View>
+              <Text style={[styles.profileCardTitle, ds.text]}>Ton portrait astral</Text>
+              <Text style={[styles.profileCardDesc, ds.textSecondary]}>
+                {userProfile.ai_interpretation}
+              </Text>
+            </Animated.View>
+          )}
+
+          {/* Moon phase at birth */}
+          {userProfile.moon_phase_at_birth && (
+            <Animated.View entering={FadeInUp.duration(400).delay(150)} style={[styles.profileCard, ds.card]}>
+              <View style={[styles.profileIconContainer, { backgroundColor: `${theme.accentWarm}20` }]}>
+                <Ionicons name="moon" size={28} color={theme.accentWarm} />
+              </View>
+              <Text style={[styles.profileCardTitle, ds.text]}>Phase lunaire de naissance</Text>
+              <Text style={[styles.profileCardValue, ds.textSecondary]}>
+                {userProfile.moon_phase_at_birth.name}
+              </Text>
+            </Animated.View>
+          )}
+
           {/* Lunar House */}
-          <Animated.View entering={FadeInUp.duration(400).delay(100)} style={[styles.profileCard, ds.card]}>
-            <View style={[styles.profileIconContainer, { backgroundColor: `${theme.accentWarm}20` }]}>
-              <Ionicons name="moon" size={28} color={theme.accentWarm} />
-            </View>
-            <Text style={[styles.profileCardTitle, ds.text]}>Ta Maison Lunaire</Text>
-            <Text style={[styles.profileCardValue, ds.textSecondary]}>
-              Maison {userProfile.house.number} - {userProfile.house.name}
-            </Text>
-            <Text style={[styles.profileCardTheme, { color: theme.accentWarm }]}>{userProfile.house.theme}</Text>
-            <Text style={[styles.profileCardDesc, ds.textSecondary]}>{userProfile.house.description}</Text>
-            
-            <View style={styles.profileChips}>
-              {userProfile.house.governs.map((g: string, i: number) => (
-                <View key={i} style={[styles.profileChip, { backgroundColor: `${theme.accent}20` }]}>
-                  <Text style={[styles.profileChipText, { color: theme.accent }]}>{g}</Text>
-                </View>
-              ))}
-            </View>
-          </Animated.View>
+          {userProfile.lunar_house && (
+            <Animated.View entering={FadeInUp.duration(400).delay(250)} style={[styles.profileCard, ds.card]}>
+              <View style={[styles.profileIconContainer, { backgroundColor: `${theme.accent}20` }]}>
+                <Ionicons name="home-outline" size={28} color={theme.accent} />
+              </View>
+              <Text style={[styles.profileCardTitle, ds.text]}>Maison lunaire</Text>
+              <Text style={[styles.profileCardValue, ds.textSecondary]}>
+                {userProfile.lunar_house.name}
+              </Text>
+              <Text style={[styles.profileCardTheme, { color: theme.accent }]}>
+                {userProfile.lunar_house.theme}
+              </Text>
+            </Animated.View>
+          )}
 
           {/* Celtic Tree */}
-          <Animated.View entering={FadeInUp.duration(400).delay(200)} style={[styles.profileCard, ds.card]}>
-            <View style={[styles.profileIconContainer, { backgroundColor: `${theme.accent}20` }]}>
-              <Text style={styles.profileOgham}>{userProfile.celticTree.ogham}</Text>
-            </View>
-            <Text style={[styles.profileCardTitle, ds.text]}>Ton Arbre Celtique</Text>
-            <Text style={[styles.profileCardValue, ds.textSecondary]}>{userProfile.celticTree.tree}</Text>
-            <Text style={[styles.profileCardTheme, { color: theme.accent }]}>{userProfile.celticTree.meaning}</Text>
-            <Text style={[styles.profileCardDesc, ds.textSecondary]}>{userProfile.celticTree.personality}</Text>
-            
-            <View style={styles.profileChips}>
-              {userProfile.celticTree.qualities.map((q: string, i: number) => (
-                <View key={i} style={[styles.profileChip, { backgroundColor: `${theme.accent}20` }]}>
-                  <Text style={[styles.profileChipText, { color: theme.accent }]}>{q}</Text>
-                </View>
-              ))}
-            </View>
-            
-            <View style={[styles.shadowSection, { borderTopColor: theme.border }]}>
-              <Text style={[styles.shadowLabel, ds.textMuted]}>Ombre :</Text>
-              <Text style={[styles.shadowText, { color: theme.accentWarm }]}>{userProfile.celticTree.shadow}</Text>
-            </View>
-            
-            <Text style={[styles.messageText, ds.textSecondary]}>"{userProfile.celticTree.message}"</Text>
-          </Animated.View>
+          {userProfile.celtic_tree && (
+            <Animated.View entering={FadeInUp.duration(400).delay(350)} style={[styles.profileCard, ds.card]}>
+              <View style={[styles.profileIconContainer, { backgroundColor: `${theme.accent}20` }]}>
+                <Ionicons name="leaf" size={28} color={theme.accent} />
+              </View>
+              <Text style={[styles.profileCardTitle, ds.text]}>Arbre celtique</Text>
+              <Text style={[styles.profileCardValue, ds.textSecondary]}>
+                {userProfile.celtic_tree.tree}
+              </Text>
+              <Text style={[styles.profileCardTheme, { color: theme.accent }]}>
+                {userProfile.celtic_tree.meaning}
+              </Text>
+            </Animated.View>
+          )}
 
-          {/* Arabic Mansion at birth */}
-          <Animated.View entering={FadeInUp.duration(400).delay(300)} style={[styles.profileCard, ds.card]}>
-            <Text style={[styles.mansionArabicProfile, { color: theme.accentWarm }]}>{userProfile.mansion.arabic}</Text>
-            <Text style={[styles.profileCardTitle, ds.text]}>Ta Demeure Lunaire Arabe</Text>
-            <Text style={[styles.profileCardValue, ds.textSecondary]}>{userProfile.mansion.name}</Text>
-            <Text style={[styles.profileCardTheme, { color: theme.accentWarm }]}>{userProfile.mansion.meaning}</Text>
-            
-            <View style={styles.mansionMeta}>
-              <Text style={[styles.metaText, ds.textMuted]}>{userProfile.mansion.element}</Text>
-              <View style={[styles.metaDot, { backgroundColor: theme.textMuted }]} />
-              <Text style={[styles.metaText, ds.textMuted]}>{userProfile.mansion.planet}</Text>
-            </View>
-            
-            <Text style={[styles.profileCardDesc, ds.textSecondary]}>{userProfile.mansion.description}</Text>
-            <Text style={[styles.natureText, { color: theme.accent }]}>{userProfile.mansion.nature}</Text>
-          </Animated.View>
+          {/* Arabic Mansion */}
+          {userProfile.arabic_mansion && (
+            <Animated.View entering={FadeInUp.duration(400).delay(450)} style={[styles.profileCard, ds.card]}>
+              <View style={[styles.profileIconContainer, { backgroundColor: `${theme.accentWarm}20` }]}>
+                <Ionicons name="star" size={28} color={theme.accentWarm} />
+              </View>
+              <Text style={[styles.profileCardTitle, ds.text]}>Demeure lunaire arabe</Text>
+              <Text style={[styles.profileCardValue, ds.textSecondary]}>
+                {userProfile.arabic_mansion.name}
+              </Text>
+              <Text style={[styles.profileCardTheme, { color: theme.accentWarm }]}>
+                Demeure n°{userProfile.arabic_mansion.number}
+              </Text>
+            </Animated.View>
+          )}
         </View>
       )}
     </Animated.View>
