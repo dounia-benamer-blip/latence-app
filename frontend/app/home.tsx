@@ -578,6 +578,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
   },
+  notificationCard: {
+    borderRadius: 16,
+    padding: 18,
+    marginBottom: 16,
+    borderLeftWidth: 3,
+  },
+  notificationText: {
+    fontSize: 14,
+    fontStyle: 'italic',
+    lineHeight: 22,
+  },
   companionButton: {
     borderRadius: 16,
     padding: 16,
