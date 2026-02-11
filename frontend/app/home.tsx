@@ -655,6 +655,14 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
   },
+  booksIconContainer: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
   booksHeader: {
     flex: 1,
   },
