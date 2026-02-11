@@ -9,7 +9,6 @@ import {
   useWindowDimensions,
   Platform,
   ActivityIndicator,
-  FlatList,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -77,7 +76,6 @@ export default function WelcomeScreen() {
   const { theme, themeMode, isDark, toggleTheme } = useTheme();
   const { width } = useWindowDimensions();
   const [step, setStep] = useState<'auth' | 'mood' | 'energy' | 'wisdom'>('auth');
-  const [isAppleAvailable, setIsAppleAvailable] = useState(false);
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [energyLevel, setEnergyLevel] = useState<number>(3);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
