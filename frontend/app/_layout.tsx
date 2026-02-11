@@ -1,7 +1,7 @@
 import React from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { ThemeProvider, useTheme } from './components/ThemeContext';
+import { ThemeProvider, useTheme } from '../src/context/ThemeContext';
 
 function RootLayoutNav() {
   const { theme, isDark } = useTheme();
