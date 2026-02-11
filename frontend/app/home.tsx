@@ -286,6 +286,7 @@ export default function HomeScreen() {
               style={[styles.themeButton, dynamicStyles.card]}
               onPress={toggleTheme}
               activeOpacity={0.7}
+              data-testid="theme-toggle"
             >
               <Ionicons 
                 name={getThemeIcon(themeMode) as any} 
