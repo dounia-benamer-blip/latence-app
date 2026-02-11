@@ -285,7 +285,7 @@ export default function WelcomeScreen() {
         {step === 'mood' && renderMood()}
         {step === 'energy' && renderEnergy()}
       </ScrollView>
-    </Animated.View>
+    </SafeAreaView>
   );
 }
 
