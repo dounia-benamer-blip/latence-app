@@ -753,7 +753,7 @@ def calculate_moon_phase_for_date(date: datetime):
     mm = month + 12 if month < 3 else month
     yy = y - 1 if month < 3 else y
     jd = (int(365.25 * yy) + int(30.6 * mm) + day - 694039.09) / 29.53
-    phase = jd - int(jd)
+    phase = jd % 1.0  # Always 0..1
     day_in_cycle = int(phase * 28) + 1
     phase_index = int(phase * 8) % 8
     phase_names = [
