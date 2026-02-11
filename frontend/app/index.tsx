@@ -270,39 +270,36 @@ export default function WelcomeScreen() {
       >
         <View style={styles.moodGrid}>
           {MOODS.map((mood, index) => (
-            <Animated.View
+            <TouchableOpacity
               key={mood.id}
-              entering={FadeInUp.duration(400).delay(index * 40)}
+              style={[
+                styles.moodCard,
+                dynamicStyles.card,
+                selectedMood === mood.id && dynamicStyles.cardSelected,
+                selectedMood === mood.id && { borderWidth: 1.5, borderColor: theme.accentWarm },
+              ]}
+              onPress={() => setSelectedMood(mood.id)}
+              activeOpacity={0.7}
             >
-              <TouchableOpacity
+              <View
                 style={[
-                  styles.moodCard,
-                  dynamicStyles.card,
-                  selectedMood === mood.id && dynamicStyles.cardSelected,
-                  selectedMood === mood.id && { borderWidth: 1.5, borderColor: theme.accentWarm },
+                  styles.moodIconContainer,
+                  { backgroundColor: isDark ? `${theme.accentWarm}15` : `${mood.color}12` },
+                  selectedMood === mood.id && { backgroundColor: `${theme.accentWarm}25` },
                 ]}
-                onPress={() => setSelectedMood(mood.id)}
-                activeOpacity={0.7}
               >
-                <View
-                  style={[
-                    styles.moodIconContainer,
-                    { backgroundColor: isDark ? `${theme.accentWarm}15` : `${mood.color}12` },
-                    selectedMood === mood.id && { backgroundColor: `${theme.accentWarm}25` },
-                  ]}
-                >
-                  <Ionicons 
-                    name={mood.icon as any} 
-                    size={22} 
-                    color={selectedMood === mood.id ? theme.accentWarm : (isDark ? theme.accentWarm : mood.color)} 
-                  />
-                </View>
-                <Text
-                  style={[
-                    styles.moodLabel,
-                    dynamicStyles.textSecondary,
-                    selectedMood === mood.id && { color: theme.text, fontWeight: '500' },
-                  ]}
+                <Ionicons 
+                  name={mood.icon as any} 
+                  size={24} 
+                  color={selectedMood === mood.id ? theme.accentWarm : (isDark ? theme.accentWarm : mood.color)} 
+                />
+              </View>
+              <Text
+                style={[
+                  styles.moodLabel,
+                  dynamicStyles.textSecondary,
+                  selectedMood === mood.id && { color: theme.text, fontWeight: '500' },
+                ]}
                 >
                   {mood.label}
                 </Text>
