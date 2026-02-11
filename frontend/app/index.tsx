@@ -300,11 +300,10 @@ export default function WelcomeScreen() {
                   dynamicStyles.textSecondary,
                   selectedMood === mood.id && { color: theme.text, fontWeight: '500' },
                 ]}
-                >
-                  {mood.label}
-                </Text>
-              </TouchableOpacity>
-            </Animated.View>
+              >
+                {mood.label}
+              </Text>
+            </TouchableOpacity>
           ))}
         </View>
       </ScrollView>
