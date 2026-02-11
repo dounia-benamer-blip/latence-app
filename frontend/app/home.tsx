@@ -17,7 +17,7 @@ import Animated, { FadeInDown, FadeInUp, FadeIn } from 'react-native-reanimated'
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useTheme } from './components/ThemeContext';
+import { useTheme } from '../src/context/ThemeContext';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
