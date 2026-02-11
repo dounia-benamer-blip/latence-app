@@ -158,17 +158,20 @@ const calculateLunarHouse = (birthDate: Date) => {
 export default function AstrologyScreen() {
   const router = useRouter();
   const { theme, isDark } = useTheme();
-  const [tab, setTab] = useState<string>('profile');
+  const [tab, setTab] = useState<string>('lune');
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [lunarReading, setLunarReading] = useState<string>('');
   const [isLoadingReading, setIsLoadingReading] = useState(false);
   const [userQuestion, setUserQuestion] = useState('');
   
-  // Birth date
-  const [birthDate, setBirthDate] = useState<Date | null>(null);
+  // Profile form
+  const [userName, setUserName] = useState('');
   const [birthDateInput, setBirthDateInput] = useState('');
+  const [birthPlace, setBirthPlace] = useState('');
   const [showDateModal, setShowDateModal] = useState(false);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
+  const [birthDate, setBirthDate] = useState<Date | null>(null);
 
   useEffect(() => {
     loadBirthDate();
