@@ -566,11 +566,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   moodCard: {
-    width: (width - 68) / 3,
-    borderRadius: 14,
-    padding: 12,
+    width: (width - 56) / 2,  // 2 columns for mobile
+    borderRadius: 16,
+    padding: 16,
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
