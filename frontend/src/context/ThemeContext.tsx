@@ -41,18 +41,18 @@ export const darkTheme = {
 // Silence theme - AMOLED pure black, ultra gentle on eyes
 export const silenceTheme = {
   background: '#000000',
-  card: '#0A0A0A',
-  cardSelected: '#141414',
-  text: '#B8B0A4',        // Warm muted text, easy on eyes
-  textSecondary: '#7A7468',
-  textMuted: '#4A4640',
-  border: '#1A1A1A',
-  accent: '#6B7A5D',      // Very muted accent
-  accentWarm: '#A88858',  // Dimmed warm accent
-  inputBackground: '#0A0A0A',
+  card: '#080808',
+  cardSelected: '#101010',
+  text: '#8A8478',            // Very muted warm text
+  textSecondary: '#5A564E',   // Even more muted
+  textMuted: '#3A3834',       // Very dim
+  border: '#151515',
+  accent: '#5A6A4D',          // Very muted green
+  accentWarm: '#8A7548',      // Dimmed warm accent
+  inputBackground: '#080808',
   headerBackground: '#000000',
   shadow: '#000',
-  iconColor: '#7A7468',
+  iconColor: '#5A564E',
 };
 
 export type Theme = typeof lightTheme;
