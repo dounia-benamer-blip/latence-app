@@ -562,15 +562,13 @@ const styles = StyleSheet.create({
   moodGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    paddingHorizontal: 4,
+    gap: 12,
   },
   moodCard: {
-    width: (width - 56) / 2,  // 2 columns for mobile
+    width: '47%',  // 2 columns with gap
     borderRadius: 16,
     padding: 16,
     alignItems: 'center',
-    marginBottom: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
