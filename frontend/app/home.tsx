@@ -21,42 +21,30 @@ interface MenuItem {
   title: string;
   subtitle: string;
   icon: string;
-  color: string;
   route: string;
 }
 
 const MENU_ITEMS: MenuItem[] = [
   {
     id: 'capsule',
-    title: 'Capsule Temporelle',
-    subtitle: 'Scelle tes pensées pour le futur',
-    icon: 'lock-closed',
-    color: '#9B59B6',
+    title: 'Déposer',
+    subtitle: 'Sceller une pensée pour le futur',
+    icon: 'lock-closed-outline',
     route: '/capsule/create',
   },
   {
     id: 'dreams',
-    title: 'Carnet des Rêves',
-    subtitle: 'Journal et interprétation IA',
-    icon: 'cloudy-night',
-    color: '#3498DB',
+    title: 'Rêver',
+    subtitle: 'Journal et interprétation des rêves',
+    icon: 'cloudy-night-outline',
     route: '/dreams',
   },
   {
-    id: 'western',
-    title: 'Astrologie Occidentale',
-    subtitle: 'Les 12 maisons du zodiaque',
-    icon: 'planet',
-    color: '#E74C3C',
-    route: '/astrology/western',
-  },
-  {
-    id: 'celtic',
-    title: 'Astrologie Celtique',
-    subtitle: 'Les arbres sacrés et la lune',
-    icon: 'leaf',
-    color: '#27AE60',
-    route: '/astrology/celtic',
+    id: 'lunar',
+    title: 'Lune',
+    subtitle: 'Cycles lunaires et astrologie',
+    icon: 'moon-outline',
+    route: '/astrology/lunar',
   },
 ];
 
@@ -119,9 +107,9 @@ export default function HomeScreen() {
     if (phase < 0.03) return { name: 'Nouvelle Lune', emoji: '🌑' };
     if (phase < 0.25) return { name: 'Premier Croissant', emoji: '🌒' };
     if (phase < 0.28) return { name: 'Premier Quartier', emoji: '🌓' };
-    if (phase < 0.47) return { name: 'Lune Gibbeuse', emoji: '🌔' };
+    if (phase < 0.47) return { name: 'Gibbeuse Croissante', emoji: '🌔' };
     if (phase < 0.53) return { name: 'Pleine Lune', emoji: '🌕' };
-    if (phase < 0.72) return { name: 'Lune Gibbeuse', emoji: '🌖' };
+    if (phase < 0.72) return { name: 'Gibbeuse Décroissante', emoji: '🌖' };
     if (phase < 0.78) return { name: 'Dernier Quartier', emoji: '🌗' };
     if (phase < 0.97) return { name: 'Dernier Croissant', emoji: '🌘' };
     return { name: 'Nouvelle Lune', emoji: '🌑' };
@@ -136,54 +124,42 @@ export default function HomeScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6C63FF" />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#8B9A7D" />
         }
       >
         {/* Header */}
         <Animated.View entering={FadeInDown.duration(600)} style={styles.header}>
           <View>
             <Text style={styles.date}>{today}</Text>
-            <Text style={styles.title}>Journal Astral</Text>
+            <Text style={styles.title}>Journal</Text>
           </View>
-          <View style={styles.moonBadge}>
+          <TouchableOpacity 
+            style={styles.moonBadge}
+            onPress={() => router.push('/astrology/lunar')}
+          >
             <Text style={styles.moonEmoji}>{moonPhase.emoji}</Text>
-            <Text style={styles.moonName}>{moonPhase.name}</Text>
-          </View>
+          </TouchableOpacity>
         </Animated.View>
 
-        {/* Current Mood */}
-        {currentMood && (
-          <Animated.View entering={FadeInUp.duration(600).delay(200)} style={styles.moodCard}>
-            <View style={styles.moodHeader}>
-              <Ionicons name="heart" size={20} color="#FF6B6B" />
-              <Text style={styles.moodTitle}>Ton état actuel</Text>
-            </View>
-            <View style={styles.moodContent}>
-              <Text style={styles.moodValue}>
-                {currentMood.mood?.charAt(0).toUpperCase() + currentMood.mood?.slice(1)}
-              </Text>
-              <View style={styles.energyBadge}>
-                <Text style={styles.energyLabel}>Énergie: {currentMood.energy_level}/5</Text>
-              </View>
-            </View>
-          </Animated.View>
-        )}
-
-        {/* Stats Row */}
-        <Animated.View entering={FadeInUp.duration(600).delay(300)} style={styles.statsRow}>
-          <View style={styles.statCard}>
-            <Ionicons name="lock-closed" size={24} color="#9B59B6" />
+        {/* Stats */}
+        <Animated.View entering={FadeInUp.duration(600).delay(200)} style={styles.statsRow}>
+          <TouchableOpacity 
+            style={styles.statCard}
+            onPress={() => router.push('/capsule/list')}
+          >
             <Text style={styles.statNumber}>{capsuleCount}</Text>
-            <Text style={styles.statLabel}>Capsules</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Ionicons name="cloudy-night" size={24} color="#3498DB" />
+            <Text style={styles.statLabel}>capsules</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.statCard}
+            onPress={() => router.push('/dreams')}
+          >
             <Text style={styles.statNumber}>{dreamCount}</Text>
-            <Text style={styles.statLabel}>Rêves</Text>
-          </View>
+            <Text style={styles.statLabel}>rêves</Text>
+          </TouchableOpacity>
         </Animated.View>
 
-        {/* Menu Items */}
+        {/* Menu */}
         <View style={styles.menuContainer}>
           {MENU_ITEMS.map((item, index) => (
             <Animated.View
@@ -195,28 +171,28 @@ export default function HomeScreen() {
                 onPress={() => router.push(item.route as any)}
                 activeOpacity={0.7}
               >
-                <View style={[styles.menuIcon, { backgroundColor: `${item.color}20` }]}>
-                  <Ionicons name={item.icon as any} size={28} color={item.color} />
+                <View style={styles.menuIcon}>
+                  <Ionicons name={item.icon as any} size={24} color="#6B6B5B" />
                 </View>
                 <View style={styles.menuText}>
                   <Text style={styles.menuTitle}>{item.title}</Text>
                   <Text style={styles.menuSubtitle}>{item.subtitle}</Text>
                 </View>
-                <Ionicons name="chevron-forward" size={24} color="#4a4a6a" />
+                <Ionicons name="chevron-forward" size={20} color="#C4C4B4" />
               </TouchableOpacity>
             </Animated.View>
           ))}
         </View>
 
-        {/* Quick Access - View Capsules */}
-        <Animated.View entering={FadeInUp.duration(600).delay(800)}>
+        {/* View Capsules */}
+        <Animated.View entering={FadeInUp.duration(600).delay(700)}>
           <TouchableOpacity
             style={styles.viewAllButton}
             onPress={() => router.push('/capsule/list')}
             activeOpacity={0.7}
           >
-            <Text style={styles.viewAllText}>Voir mes capsules scellées</Text>
-            <Ionicons name="arrow-forward" size={18} color="#6C63FF" />
+            <Text style={styles.viewAllText}>Mes capsules scellées</Text>
+            <Ionicons name="arrow-forward" size={16} color="#8B9A7D" />
           </TouchableOpacity>
         </Animated.View>
       </ScrollView>
@@ -227,119 +203,86 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a1a',
+    backgroundColor: '#F5F0E8',
   },
   scrollContent: {
-    padding: 20,
+    padding: 24,
     paddingBottom: 40,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 24,
+    marginBottom: 32,
   },
   date: {
-    fontSize: 14,
-    color: '#6a6a8a',
+    fontSize: 13,
+    color: '#A0A090',
     textTransform: 'capitalize',
+    letterSpacing: 0.5,
   },
   title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#fff',
+    fontSize: 32,
+    fontWeight: '300',
+    color: '#4A4A4A',
+    letterSpacing: 1,
     marginTop: 4,
   },
   moonBadge: {
-    alignItems: 'center',
-    backgroundColor: '#1a1a2e',
-    padding: 12,
-    borderRadius: 16,
+    padding: 8,
   },
   moonEmoji: {
-    fontSize: 28,
-  },
-  moonName: {
-    fontSize: 10,
-    color: '#a0a0c0',
-    marginTop: 4,
-    textAlign: 'center',
-  },
-  moodCard: {
-    backgroundColor: '#1a1a2e',
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 20,
-  },
-  moodHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 12,
-  },
-  moodTitle: {
-    fontSize: 14,
-    color: '#a0a0c0',
-  },
-  moodContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  moodValue: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#fff',
-  },
-  energyBadge: {
-    backgroundColor: '#6C63FF20',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-  },
-  energyLabel: {
-    fontSize: 12,
-    color: '#6C63FF',
-    fontWeight: '600',
+    fontSize: 32,
   },
   statsRow: {
     flexDirection: 'row',
     gap: 12,
-    marginBottom: 24,
+    marginBottom: 32,
   },
   statCard: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
-    padding: 16,
+    padding: 20,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   statNumber: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#fff',
-    marginTop: 8,
+    fontSize: 32,
+    fontWeight: '300',
+    color: '#4A4A4A',
   },
   statLabel: {
     fontSize: 12,
-    color: '#6a6a8a',
+    color: '#A0A090',
     marginTop: 4,
+    letterSpacing: 0.5,
   },
   menuContainer: {
     gap: 12,
-    marginBottom: 20,
+    marginBottom: 24,
   },
   menuItem: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
-    padding: 16,
+    padding: 20,
     flexDirection: 'row',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   menuIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 16,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#F5F0E8',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -349,12 +292,13 @@ const styles = StyleSheet.create({
   },
   menuTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#fff',
+    fontWeight: '500',
+    color: '#4A4A4A',
+    letterSpacing: 0.3,
   },
   menuSubtitle: {
     fontSize: 12,
-    color: '#6a6a8a',
+    color: '#A0A090',
     marginTop: 4,
   },
   viewAllButton: {
@@ -365,8 +309,9 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   viewAllText: {
-    fontSize: 14,
-    color: '#6C63FF',
-    fontWeight: '600',
+    fontSize: 13,
+    color: '#8B9A7D',
+    fontWeight: '500',
+    letterSpacing: 0.5,
   },
 });

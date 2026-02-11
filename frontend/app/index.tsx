@@ -12,7 +12,6 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, {
   FadeIn,
-  FadeInDown,
   FadeInUp,
   useSharedValue,
   useAnimatedStyle,
@@ -24,42 +23,27 @@ import Animated, {
 const { width } = Dimensions.get('window');
 
 const MOODS = [
-  { id: 'joyeux', label: 'Joyeux', icon: 'sunny', color: '#FFD700' },
-  { id: 'calme', label: 'Calme', icon: 'leaf', color: '#4ECDC4' },
-  { id: 'anxieux', label: 'Anxieux', icon: 'thunderstorm', color: '#9B59B6' },
-  { id: 'triste', label: 'Triste', icon: 'rainy', color: '#3498DB' },
-  { id: 'fatigue', label: 'Fatigué', icon: 'moon', color: '#7F8C8D' },
-  { id: 'energique', label: 'Énergique', icon: 'flash', color: '#E74C3C' },
-  { id: 'inspire', label: 'Inspiré', icon: 'sparkles', color: '#F39C12' },
-  { id: 'confus', label: 'Confus', icon: 'help-circle', color: '#8E44AD' },
+  { id: 'serein', label: 'Serein', icon: 'leaf-outline', color: '#8B9A7D' },
+  { id: 'joyeux', label: 'Joyeux', icon: 'sunny-outline', color: '#D4A574' },
+  { id: 'reveur', label: 'Rêveur', icon: 'cloud-outline', color: '#A8B4C4' },
+  { id: 'melancolique', label: 'Mélancolique', icon: 'water-outline', color: '#9B8B7D' },
+  { id: 'fatigue', label: 'Fatigué', icon: 'moon-outline', color: '#7D7D8B' },
+  { id: 'inspire', label: 'Inspiré', icon: 'sparkles-outline', color: '#C4A88B' },
 ];
-
-const ENERGY_LEVELS = [1, 2, 3, 4, 5];
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
 export default function MoodScreen() {
   const router = useRouter();
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
-  const [energyLevel, setEnergyLevel] = useState<number>(3);
-  const [step, setStep] = useState(1);
 
   const moonScale = useSharedValue(1);
-  const starsOpacity = useSharedValue(0.5);
 
   useEffect(() => {
     moonScale.value = withRepeat(
       withSequence(
-        withSpring(1.1, { damping: 2 }),
-        withSpring(1, { damping: 2 })
-      ),
-      -1,
-      true
-    );
-    starsOpacity.value = withRepeat(
-      withSequence(
-        withSpring(1, { damping: 2 }),
-        withSpring(0.3, { damping: 2 })
+        withSpring(1.05, { damping: 4 }),
+        withSpring(1, { damping: 4 })
       ),
       -1,
       true
@@ -70,21 +54,15 @@ export default function MoodScreen() {
     transform: [{ scale: moonScale.value }],
   }));
 
-  const handleMoodSelect = (moodId: string) => {
-    setSelectedMood(moodId);
-  };
-
   const handleContinue = async () => {
-    if (step === 1 && selectedMood) {
-      setStep(2);
-    } else if (step === 2) {
+    if (selectedMood) {
       try {
         await fetch(`${API_URL}/api/mood`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             mood: selectedMood,
-            energy_level: energyLevel,
+            energy_level: 3,
           }),
         });
       } catch (e) {
@@ -100,209 +78,84 @@ export default function MoodScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header with Moon */}
-        <Animated.View entering={FadeIn.duration(1000)} style={styles.header}>
+        {/* Header */}
+        <Animated.View entering={FadeIn.duration(1200)} style={styles.header}>
           <Animated.View style={[styles.moonContainer, moonStyle]}>
             <Text style={styles.moonEmoji}>🌙</Text>
           </Animated.View>
-          <Text style={styles.greeting}>Bonsoir, voyageur</Text>
-          <Text style={styles.subtitle}>
-            {step === 1
-              ? 'Comment te sens-tu ce soir ?'
-              : "Quel est ton niveau d'énergie ?"}
-          </Text>
+          <Text style={styles.greeting}>Bonsoir</Text>
+          <Text style={styles.subtitle}>Comment te sens-tu ce soir ?</Text>
         </Animated.View>
 
-        {step === 1 ? (
-          /* Mood Selection */
-          <Animated.View
-            entering={FadeInUp.duration(600).delay(300)}
-            style={styles.moodContainer}
-          >
-            <View style={styles.moodRow}>
-              {MOODS.slice(0, 2).map((mood, index) => (
+        {/* Mood Selection */}
+        <View style={styles.moodContainer}>
+          {[0, 1, 2].map((rowIndex) => (
+            <Animated.View
+              key={rowIndex}
+              entering={FadeInUp.duration(600).delay(300 + rowIndex * 100)}
+              style={styles.moodRow}
+            >
+              {MOODS.slice(rowIndex * 2, rowIndex * 2 + 2).map((mood) => (
                 <TouchableOpacity
                   key={mood.id}
                   style={[
                     styles.moodCard,
-                    selectedMood === mood.id && {
-                      borderColor: mood.color,
-                      backgroundColor: `${mood.color}20`,
-                    },
+                    selectedMood === mood.id && styles.moodCardSelected,
                   ]}
-                  onPress={() => handleMoodSelect(mood.id)}
+                  onPress={() => setSelectedMood(mood.id)}
                   activeOpacity={0.7}
                 >
                   <View
                     style={[
                       styles.moodIconContainer,
-                      { backgroundColor: `${mood.color}30` },
+                      { backgroundColor: `${mood.color}20` },
+                      selectedMood === mood.id && { backgroundColor: `${mood.color}40` },
                     ]}
                   >
                     <Ionicons
                       name={mood.icon as any}
-                      size={28}
-                      color={mood.color}
+                      size={24}
+                      color={selectedMood === mood.id ? mood.color : '#8B8B7D'}
                     />
                   </View>
-                  <Text style={styles.moodLabel}>{mood.label}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-            <View style={styles.moodRow}>
-              {MOODS.slice(2, 4).map((mood, index) => (
-                <TouchableOpacity
-                  key={mood.id}
-                  style={[
-                    styles.moodCard,
-                    selectedMood === mood.id && {
-                      borderColor: mood.color,
-                      backgroundColor: `${mood.color}20`,
-                    },
-                  ]}
-                  onPress={() => handleMoodSelect(mood.id)}
-                  activeOpacity={0.7}
-                >
-                  <View
-                    style={[
-                      styles.moodIconContainer,
-                      { backgroundColor: `${mood.color}30` },
-                    ]}
-                  >
-                    <Ionicons
-                      name={mood.icon as any}
-                      size={28}
-                      color={mood.color}
-                    />
-                  </View>
-                  <Text style={styles.moodLabel}>{mood.label}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-            <View style={styles.moodRow}>
-              {MOODS.slice(4, 6).map((mood, index) => (
-                <TouchableOpacity
-                  key={mood.id}
-                  style={[
-                    styles.moodCard,
-                    selectedMood === mood.id && {
-                      borderColor: mood.color,
-                      backgroundColor: `${mood.color}20`,
-                    },
-                  ]}
-                  onPress={() => handleMoodSelect(mood.id)}
-                  activeOpacity={0.7}
-                >
-                  <View
-                    style={[
-                      styles.moodIconContainer,
-                      { backgroundColor: `${mood.color}30` },
-                    ]}
-                  >
-                    <Ionicons
-                      name={mood.icon as any}
-                      size={28}
-                      color={mood.color}
-                    />
-                  </View>
-                  <Text style={styles.moodLabel}>{mood.label}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-            <View style={styles.moodRow}>
-              {MOODS.slice(6, 8).map((mood, index) => (
-                <TouchableOpacity
-                  key={mood.id}
-                  style={[
-                    styles.moodCard,
-                    selectedMood === mood.id && {
-                      borderColor: mood.color,
-                      backgroundColor: `${mood.color}20`,
-                    },
-                  ]}
-                  onPress={() => handleMoodSelect(mood.id)}
-                  activeOpacity={0.7}
-                >
-                  <View
-                    style={[
-                      styles.moodIconContainer,
-                      { backgroundColor: `${mood.color}30` },
-                    ]}
-                  >
-                    <Ionicons
-                      name={mood.icon as any}
-                      size={28}
-                      color={mood.color}
-                    />
-                  </View>
-                  <Text style={styles.moodLabel}>{mood.label}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </Animated.View>
-        ) : (
-          /* Energy Level Selection */
-          <Animated.View
-            entering={FadeInUp.duration(600)}
-            style={styles.energyContainer}
-          >
-            <Text style={styles.energyTitle}>Niveau d'énergie</Text>
-            <View style={styles.energyRow}>
-              {ENERGY_LEVELS.map((level) => (
-                <TouchableOpacity
-                  key={level}
-                  style={[
-                    styles.energyButton,
-                    energyLevel === level && styles.energyButtonActive,
-                  ]}
-                  onPress={() => setEnergyLevel(level)}
-                  activeOpacity={0.7}
-                >
                   <Text
                     style={[
-                      styles.energyText,
-                      energyLevel === level && styles.energyTextActive,
+                      styles.moodLabel,
+                      selectedMood === mood.id && { color: '#4A4A4A' },
                     ]}
                   >
-                    {level}
+                    {mood.label}
                   </Text>
                 </TouchableOpacity>
               ))}
-            </View>
-            <View style={styles.energyLabels}>
-              <Text style={styles.energyLabelText}>Épuisé</Text>
-              <Text style={styles.energyLabelText}>Plein d'énergie</Text>
-            </View>
-          </Animated.View>
-        )}
+            </Animated.View>
+          ))}
+        </View>
 
         {/* Continue Button */}
         <Animated.View
-          entering={FadeInUp.duration(600).delay(500)}
+          entering={FadeInUp.duration(600).delay(700)}
           style={styles.buttonContainer}
         >
           <TouchableOpacity
             style={[
               styles.continueButton,
-              (!selectedMood && step === 1) && styles.continueButtonDisabled,
+              !selectedMood && styles.continueButtonDisabled,
             ]}
             onPress={handleContinue}
-            disabled={!selectedMood && step === 1}
+            disabled={!selectedMood}
             activeOpacity={0.8}
           >
-            <Text style={styles.continueButtonText}>
-              {step === 1 ? 'Continuer' : 'Commencer le voyage'}
-            </Text>
-            <Ionicons name="arrow-forward" size={20} color="#fff" />
+            <Text style={styles.continueButtonText}>Continuer</Text>
           </TouchableOpacity>
         </Animated.View>
 
-        {/* Skip option */}
+        {/* Skip */}
         <TouchableOpacity
           style={styles.skipButton}
           onPress={() => router.push('/home')}
         >
-          <Text style={styles.skipText}>Passer cette étape</Text>
+          <Text style={styles.skipText}>Passer</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
@@ -312,37 +165,38 @@ export default function MoodScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a1a',
+    backgroundColor: '#F5F0E8',
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
     paddingBottom: 40,
   },
   header: {
     alignItems: 'center',
-    marginTop: 40,
-    marginBottom: 30,
+    marginTop: 60,
+    marginBottom: 40,
   },
   moonContainer: {
-    marginBottom: 20,
+    marginBottom: 24,
   },
   moonEmoji: {
-    fontSize: 60,
+    fontSize: 56,
   },
   greeting: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#fff',
+    fontSize: 32,
+    fontWeight: '300',
+    color: '#4A4A4A',
+    letterSpacing: 2,
     marginBottom: 8,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#a0a0c0',
-    textAlign: 'center',
+    fontSize: 15,
+    color: '#8B8B7D',
+    letterSpacing: 0.5,
   },
   moodContainer: {
-    marginBottom: 30,
+    marginBottom: 40,
   },
   moodRow: {
     flexDirection: 'row',
@@ -350,94 +204,54 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   moodCard: {
-    width: 150,
-    backgroundColor: '#1a1a2e',
+    width: (width - 72) / 2,
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
-    padding: 16,
+    padding: 20,
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: 'transparent',
     marginHorizontal: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  moodCardSelected: {
+    backgroundColor: '#FDF9F3',
+    borderWidth: 1,
+    borderColor: '#D4C4A8',
   },
   moodIconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 10,
+    marginBottom: 12,
   },
   moodLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#fff',
-  },
-  energyContainer: {
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  energyTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#fff',
-    marginBottom: 20,
-  },
-  energyRow: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  energyButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#1a1a2e',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: '#2a2a4e',
-  },
-  energyButtonActive: {
-    backgroundColor: '#6C63FF',
-    borderColor: '#6C63FF',
-  },
-  energyText: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#a0a0c0',
-  },
-  energyTextActive: {
-    color: '#fff',
-  },
-  energyLabels: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    paddingHorizontal: 10,
-    marginTop: 12,
-  },
-  energyLabelText: {
-    fontSize: 12,
-    color: '#6a6a8a',
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#8B8B7D',
+    letterSpacing: 0.3,
   },
   buttonContainer: {
     paddingHorizontal: 20,
   },
   continueButton: {
-    backgroundColor: '#6C63FF',
+    backgroundColor: '#8B9A7D',
     paddingVertical: 16,
     borderRadius: 30,
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
   },
   continueButtonDisabled: {
-    backgroundColor: '#3a3a5e',
+    backgroundColor: '#D4D4C4',
   },
   continueButtonText: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '500',
+    letterSpacing: 1,
   },
   skipButton: {
     alignItems: 'center',
@@ -445,7 +259,8 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   skipText: {
-    color: '#6a6a8a',
-    fontSize: 14,
+    color: '#A0A090',
+    fontSize: 13,
+    letterSpacing: 0.5,
   },
 });

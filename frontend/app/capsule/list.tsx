@@ -11,7 +11,7 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
-import { format, formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
@@ -37,8 +37,6 @@ export default function CapsuleListScreen() {
       const res = await fetch(`${API_URL}/api/capsules`);
       if (res.ok) {
         const data = await res.json();
-        
-        // Check each capsule's status
         const capsuleDetails = await Promise.all(
           data.map(async (c: Capsule) => {
             const detailRes = await fetch(`${API_URL}/api/capsule/${c.id}`);
@@ -48,7 +46,6 @@ export default function CapsuleListScreen() {
             return c;
           })
         );
-        
         setCapsules(capsuleDetails);
       }
     } catch (e) {
@@ -77,20 +74,19 @@ export default function CapsuleListScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
       <Animated.View entering={FadeInDown.duration(500)} style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => router.back()}
         >
-          <Ionicons name="arrow-back" size={24} color="#fff" />
+          <Ionicons name="arrow-back" size={24} color="#6B6B5B" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Mes Capsules</Text>
+        <Text style={styles.headerTitle}>Capsules</Text>
         <TouchableOpacity
           style={styles.addButton}
           onPress={() => router.push('/capsule/create')}
         >
-          <Ionicons name="add" size={24} color="#6C63FF" />
+          <Ionicons name="add" size={24} color="#8B9A7D" />
         </TouchableOpacity>
       </Animated.View>
 
@@ -98,23 +94,22 @@ export default function CapsuleListScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6C63FF" />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#8B9A7D" />
         }
       >
         {capsules.length === 0 ? (
           <Animated.View entering={FadeInUp.duration(600)} style={styles.emptyState}>
-            <Ionicons name="lock-closed" size={60} color="#3a3a5e" />
+            <Ionicons name="lock-closed-outline" size={48} color="#C4C4B4" />
             <Text style={styles.emptyTitle}>Aucune capsule</Text>
             <Text style={styles.emptyText}>
-              Crée ta première capsule temporelle pour sceller tes pensées
+              Dépose ta première pensée pour le futur
             </Text>
             <TouchableOpacity
               style={styles.createButton}
               onPress={() => router.push('/capsule/create')}
               activeOpacity={0.8}
             >
-              <Ionicons name="add" size={20} color="#fff" />
-              <Text style={styles.createButtonText}>Créer une capsule</Text>
+              <Text style={styles.createButtonText}>Déposer</Text>
             </TouchableOpacity>
           </Animated.View>
         ) : (
@@ -122,7 +117,7 @@ export default function CapsuleListScreen() {
             {capsules.map((capsule, index) => (
               <Animated.View
                 key={capsule.id}
-                entering={FadeInUp.duration(500).delay(index * 100)}
+                entering={FadeInUp.duration(500).delay(index * 80)}
               >
                 <TouchableOpacity
                   style={styles.capsuleCard}
@@ -130,28 +125,11 @@ export default function CapsuleListScreen() {
                   activeOpacity={0.7}
                 >
                   <View style={styles.capsuleHeader}>
-                    <View
-                      style={[
-                        styles.statusBadge,
-                        capsule.is_sealed
-                          ? styles.sealedBadge
-                          : styles.unlockedBadge,
-                      ]}
-                    >
-                      <Ionicons
-                        name={capsule.is_sealed ? 'lock-closed' : 'lock-open'}
-                        size={14}
-                        color={capsule.is_sealed ? '#FFD700' : '#4ECDC4'}
-                      />
-                      <Text
-                        style={[
-                          styles.statusText,
-                          { color: capsule.is_sealed ? '#FFD700' : '#4ECDC4' },
-                        ]}
-                      >
-                        {capsule.is_sealed ? 'Scellée' : 'Ouverte'}
-                      </Text>
-                    </View>
+                    <Ionicons
+                      name={capsule.is_sealed ? 'lock-closed-outline' : 'lock-open-outline'}
+                      size={18}
+                      color={capsule.is_sealed ? '#D4A574' : '#8B9A7D'}
+                    />
                     <Text style={styles.durationBadge}>
                       {getDurationLabel(capsule.duration_days)}
                     </Text>
@@ -160,30 +138,18 @@ export default function CapsuleListScreen() {
                   <Text style={styles.capsuleTitle}>{capsule.title}</Text>
 
                   <View style={styles.capsuleMeta}>
-                    <View style={styles.metaItem}>
-                      <Ionicons name="calendar-outline" size={14} color="#6a6a8a" />
-                      <Text style={styles.metaText}>
-                        Créée {formatDistanceToNow(new Date(capsule.created_at), {
-                          addSuffix: true,
-                          locale: fr,
-                        })}
-                      </Text>
-                    </View>
+                    <Text style={styles.metaText}>
+                      {formatDistanceToNow(new Date(capsule.created_at), {
+                        addSuffix: true,
+                        locale: fr,
+                      })}
+                    </Text>
                     {capsule.is_sealed && capsule.days_remaining !== undefined && (
-                      <View style={styles.metaItem}>
-                        <Ionicons name="time-outline" size={14} color="#9B59B6" />
-                        <Text style={[styles.metaText, { color: '#9B59B6' }]}>
-                          {capsule.days_remaining} jours restants
-                        </Text>
-                      </View>
+                      <Text style={styles.remainingText}>
+                        {capsule.days_remaining}j restants
+                      </Text>
                     )}
                   </View>
-
-                  {!capsule.is_sealed && capsule.content && (
-                    <Text style={styles.contentPreview} numberOfLines={2}>
-                      {capsule.content}
-                    </Text>
-                  )}
                 </TouchableOpacity>
               </Animated.View>
             ))}
@@ -197,7 +163,7 @@ export default function CapsuleListScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a1a',
+    backgroundColor: '#F5F0E8',
   },
   header: {
     flexDirection: 'row',
@@ -213,61 +179,62 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#fff',
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#4A4A4A',
+    letterSpacing: 0.5,
   },
   addButton: {
     width: 40,
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#6C63FF20',
-    borderRadius: 20,
   },
   scrollContent: {
-    padding: 20,
+    padding: 24,
     paddingBottom: 40,
   },
   emptyState: {
     alignItems: 'center',
-    paddingVertical: 60,
+    paddingVertical: 80,
   },
   emptyTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#fff',
+    fontSize: 18,
+    fontWeight: '500',
+    color: '#4A4A4A',
     marginTop: 20,
     marginBottom: 8,
   },
   emptyText: {
     fontSize: 14,
-    color: '#6a6a8a',
+    color: '#A0A090',
     textAlign: 'center',
     marginBottom: 24,
-    paddingHorizontal: 40,
   },
   createButton: {
-    backgroundColor: '#6C63FF',
+    backgroundColor: '#8B9A7D',
     paddingVertical: 14,
-    paddingHorizontal: 24,
+    paddingHorizontal: 32,
     borderRadius: 30,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
   },
   createButtonText: {
     color: '#fff',
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '500',
+    letterSpacing: 0.5,
   },
   capsuleList: {
-    gap: 16,
+    gap: 12,
   },
   capsuleCard: {
-    backgroundColor: '#1a1a2e',
-    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
     padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   capsuleHeader: {
     flexDirection: 'row',
@@ -275,54 +242,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 12,
   },
-  statusBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  sealedBadge: {
-    backgroundColor: '#FFD70020',
-  },
-  unlockedBadge: {
-    backgroundColor: '#4ECDC420',
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
   durationBadge: {
-    fontSize: 12,
-    color: '#6a6a8a',
-    backgroundColor: '#2a2a4e',
+    fontSize: 11,
+    color: '#A0A090',
+    backgroundColor: '#F5F0E8',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 10,
   },
   capsuleTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#fff',
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#4A4A4A',
     marginBottom: 12,
   },
   capsuleMeta: {
-    gap: 8,
-  },
-  metaItem: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
+    justifyContent: 'space-between',
   },
   metaText: {
     fontSize: 12,
-    color: '#6a6a8a',
+    color: '#A0A090',
   },
-  contentPreview: {
-    fontSize: 14,
-    color: '#a0a0c0',
-    marginTop: 12,
-    lineHeight: 20,
+  remainingText: {
+    fontSize: 12,
+    color: '#D4A574',
+    fontWeight: '500',
   },
 });

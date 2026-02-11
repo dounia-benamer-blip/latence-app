@@ -15,25 +15,23 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, {
   FadeIn,
-  FadeInDown,
   FadeInUp,
   useSharedValue,
   useAnimatedStyle,
   withTiming,
   withSequence,
   withSpring,
-  runOnJS,
   Easing,
 } from 'react-native-reanimated';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
 const DURATION_OPTIONS = [
-  { days: 7, label: '7 jours', icon: 'calendar-outline' },
-  { days: 30, label: '1 mois', icon: 'calendar' },
-  { days: 90, label: '3 mois', icon: 'calendar' },
-  { days: 180, label: '6 mois', icon: 'calendar' },
-  { days: 365, label: '1 an', icon: 'calendar' },
+  { days: 7, label: '7 jours' },
+  { days: 30, label: '1 mois' },
+  { days: 90, label: '3 mois' },
+  { days: 180, label: '6 mois' },
+  { days: 365, label: '1 an' },
 ];
 
 export default function CreateCapsuleScreen() {
@@ -47,7 +45,6 @@ export default function CreateCapsuleScreen() {
   const [isSealing, setIsSealing] = useState(false);
   const [isSealed, setIsSealed] = useState(false);
 
-  // Animation values for sealing
   const boxLidRotation = useSharedValue(0);
   const boxScale = useSharedValue(1);
   const glowOpacity = useSharedValue(0);
@@ -92,35 +89,30 @@ export default function CreateCapsuleScreen() {
   const playSealAnimation = async () => {
     setIsSealing(true);
     
-    // Lid closes
-    boxLidRotation.value = withTiming(-90, { duration: 800, easing: Easing.bezier(0.4, 0, 0.2, 1) });
+    boxLidRotation.value = withTiming(-90, { duration: 1000, easing: Easing.bezier(0.4, 0, 0.2, 1) });
     
-    // Wait then scale down slightly
     setTimeout(() => {
       boxScale.value = withSequence(
         withSpring(0.9, { damping: 10 }),
         withSpring(1, { damping: 8 })
       );
-    }, 600);
+    }, 800);
     
-    // Glow effect
     setTimeout(() => {
       glowOpacity.value = withSequence(
-        withTiming(1, { duration: 400 }),
-        withTiming(0.3, { duration: 600 })
+        withTiming(0.8, { duration: 500 }),
+        withTiming(0.2, { duration: 800 })
       );
-    }, 1000);
-    
-    // Lock appears
-    setTimeout(() => {
-      lockScale.value = withSpring(1, { damping: 8 });
     }, 1200);
     
-    // Mark as sealed
+    setTimeout(() => {
+      lockScale.value = withSpring(1, { damping: 8 });
+    }, 1500);
+    
     setTimeout(() => {
       setIsSealed(true);
       setIsSealing(false);
-    }, 1800);
+    }, 2200);
   };
 
   const handleSeal = async () => {
@@ -149,7 +141,8 @@ export default function CreateCapsuleScreen() {
 
   const renderStep1 = () => (
     <Animated.View entering={FadeIn.duration(500)} style={styles.stepContainer}>
-      <Text style={styles.stepTitle}>Choisis un prompt ou écris librement</Text>
+      <Text style={styles.stepTitle}>Écrire</Text>
+      <Text style={styles.stepSubtitle}>Choisis un prompt ou écris librement</Text>
       
       <ScrollView
         horizontal
@@ -157,7 +150,7 @@ export default function CreateCapsuleScreen() {
         style={styles.promptsScroll}
         contentContainerStyle={styles.promptsContent}
       >
-        {prompts.map((prompt, index) => (
+        {prompts.slice(0, 6).map((prompt, index) => (
           <TouchableOpacity
             key={index}
             style={[
@@ -170,18 +163,17 @@ export default function CreateCapsuleScreen() {
             }}
             activeOpacity={0.7}
           >
-            <Ionicons name="sparkles" size={16} color="#FFD700" />
             <Text style={styles.promptText}>{prompt}</Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
 
       <View style={styles.inputContainer}>
-        <Text style={styles.inputLabel}>Titre de ta capsule</Text>
+        <Text style={styles.inputLabel}>Titre</Text>
         <TextInput
           style={styles.titleInput}
-          placeholder="Donne un nom à ce souvenir..."
-          placeholderTextColor="#4a4a6a"
+          placeholder="Un nom pour ce souvenir..."
+          placeholderTextColor="#B0B0A0"
           value={title}
           onChangeText={setTitle}
         />
@@ -189,12 +181,12 @@ export default function CreateCapsuleScreen() {
 
       <View style={styles.inputContainer}>
         <Text style={styles.inputLabel}>
-          {selectedPrompt ? selectedPrompt : 'Tes pensées'}
+          {selectedPrompt || 'Tes pensées'}
         </Text>
         <TextInput
           style={styles.contentInput}
           placeholder="Écris ce que tu veux confier au temps..."
-          placeholderTextColor="#4a4a6a"
+          placeholderTextColor="#B0B0A0"
           value={content}
           onChangeText={setContent}
           multiline
@@ -212,21 +204,20 @@ export default function CreateCapsuleScreen() {
         activeOpacity={0.8}
       >
         <Text style={styles.nextButtonText}>Continuer</Text>
-        <Ionicons name="arrow-forward" size={20} color="#fff" />
       </TouchableOpacity>
     </Animated.View>
   );
 
   const renderStep2 = () => (
     <Animated.View entering={FadeIn.duration(500)} style={styles.stepContainer}>
-      <Text style={styles.stepTitle}>Quand veux-tu ouvrir cette capsule ?</Text>
-      <Text style={styles.stepSubtitle}>Choisis la durée du scellement</Text>
+      <Text style={styles.stepTitle}>Sceller</Text>
+      <Text style={styles.stepSubtitle}>Quand veux-tu ouvrir cette capsule ?</Text>
 
-      <View style={styles.durationGrid}>
+      <View style={styles.durationContainer}>
         {DURATION_OPTIONS.map((option, index) => (
           <Animated.View
             key={option.days}
-            entering={FadeInUp.duration(400).delay(index * 100)}
+            entering={FadeInUp.duration(400).delay(index * 80)}
           >
             <TouchableOpacity
               style={[
@@ -236,11 +227,6 @@ export default function CreateCapsuleScreen() {
               onPress={() => setDuration(option.days)}
               activeOpacity={0.7}
             >
-              <Ionicons
-                name={option.icon as any}
-                size={28}
-                color={duration === option.days ? '#6C63FF' : '#6a6a8a'}
-              />
               <Text
                 style={[
                   styles.durationLabel,
@@ -263,16 +249,15 @@ export default function CreateCapsuleScreen() {
         disabled={!duration || isSealing}
         activeOpacity={0.8}
       >
-        <Ionicons name="lock-closed" size={20} color="#fff" />
-        <Text style={styles.sealButtonText}>Sceller la capsule</Text>
+        <Ionicons name="lock-closed-outline" size={18} color="#fff" />
+        <Text style={styles.sealButtonText}>Sceller</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.backButton}
         onPress={() => setStep(1)}
       >
-        <Ionicons name="arrow-back" size={18} color="#6a6a8a" />
-        <Text style={styles.backButtonText}>Modifier le contenu</Text>
+        <Text style={styles.backButtonText}>Modifier</Text>
       </TouchableOpacity>
     </Animated.View>
   );
@@ -280,43 +265,38 @@ export default function CreateCapsuleScreen() {
   const renderSealingAnimation = () => (
     <Animated.View entering={FadeIn.duration(500)} style={styles.sealingContainer}>
       <Animated.View style={[styles.boxContainer, boxStyle]}>
-        {/* Glow effect */}
         <Animated.View style={[styles.glow, glowStyle]} />
         
-        {/* Box body */}
         <View style={styles.boxBody}>
-          <Ionicons name="document-text" size={40} color="#6C63FF" />
+          <Ionicons name="document-text-outline" size={32} color="#8B9A7D" />
         </View>
         
-        {/* Box lid */}
         <Animated.View style={[styles.boxLid, lidStyle]}>
           <View style={styles.lidInner} />
         </Animated.View>
         
-        {/* Lock icon */}
         <Animated.View style={[styles.lockContainer, lockStyle]}>
           <View style={styles.lockBadge}>
-            <Ionicons name="lock-closed" size={30} color="#FFD700" />
+            <Ionicons name="lock-closed" size={24} color="#D4A574" />
           </View>
         </Animated.View>
       </Animated.View>
 
       <Text style={styles.sealingText}>
-        {isSealed ? 'Capsule scellée !' : 'Scellement en cours...'}
+        {isSealed ? 'Scellée' : 'Scellement...'}
       </Text>
 
       {isSealed && (
         <Animated.View entering={FadeInUp.duration(500).delay(200)}>
           <Text style={styles.sealedInfo}>
-            Ta capsule sera déverrouillée dans{' '}
-            {DURATION_OPTIONS.find((d) => d.days === duration)?.label}
+            Ouverture dans {DURATION_OPTIONS.find((d) => d.days === duration)?.label}
           </Text>
           <TouchableOpacity
             style={styles.doneButton}
             onPress={() => router.push('/home')}
             activeOpacity={0.8}
           >
-            <Text style={styles.doneButtonText}>Retour à l'accueil</Text>
+            <Text style={styles.doneButtonText}>Terminé</Text>
           </TouchableOpacity>
         </Animated.View>
       )}
@@ -329,19 +309,17 @@ export default function CreateCapsuleScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
       >
-        {/* Header */}
-        <Animated.View entering={FadeInDown.duration(500)} style={styles.header}>
+        <Animated.View entering={FadeIn.duration(500)} style={styles.header}>
           <TouchableOpacity
             style={styles.headerButton}
             onPress={() => router.back()}
           >
-            <Ionicons name="close" size={24} color="#fff" />
+            <Ionicons name="close" size={24} color="#6B6B5B" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Nouvelle Capsule</Text>
+          <Text style={styles.headerTitle}>Déposer</Text>
           <View style={styles.headerButton} />
         </Animated.View>
 
-        {/* Progress */}
         {!isSealing && !isSealed && (
           <View style={styles.progressContainer}>
             <View style={[styles.progressDot, step >= 1 && styles.progressDotActive]} />
@@ -369,7 +347,7 @@ export default function CreateCapsuleScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a1a',
+    backgroundColor: '#F5F0E8',
   },
   keyboardView: {
     flex: 1,
@@ -388,9 +366,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#fff',
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#4A4A4A',
+    letterSpacing: 0.5,
   },
   progressContainer: {
     flexDirection: 'row',
@@ -399,250 +378,261 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   progressDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: '#2a2a4e',
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#D4D4C4',
   },
   progressDotActive: {
-    backgroundColor: '#6C63FF',
+    backgroundColor: '#8B9A7D',
   },
   progressLine: {
-    width: 60,
-    height: 3,
-    backgroundColor: '#2a2a4e',
+    width: 48,
+    height: 2,
+    backgroundColor: '#D4D4C4',
     marginHorizontal: 8,
   },
   progressLineActive: {
-    backgroundColor: '#6C63FF',
+    backgroundColor: '#8B9A7D',
   },
   scrollContent: {
     flexGrow: 1,
-    padding: 20,
+    padding: 24,
   },
   stepContainer: {
     flex: 1,
   },
   stepTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#fff',
+    fontSize: 28,
+    fontWeight: '300',
+    color: '#4A4A4A',
+    letterSpacing: 1,
     marginBottom: 8,
   },
   stepSubtitle: {
     fontSize: 14,
-    color: '#6a6a8a',
+    color: '#8B8B7D',
     marginBottom: 24,
   },
   promptsScroll: {
     marginBottom: 24,
-    marginHorizontal: -20,
+    marginHorizontal: -24,
   },
   promptsContent: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
     gap: 12,
   },
   promptCard: {
-    backgroundColor: '#1a1a2e',
-    borderRadius: 16,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
     padding: 16,
-    width: 200,
-    borderWidth: 2,
-    borderColor: 'transparent',
+    width: 180,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   promptCardSelected: {
-    borderColor: '#6C63FF',
-    backgroundColor: '#6C63FF10',
+    backgroundColor: '#FDF9F3',
+    borderWidth: 1,
+    borderColor: '#D4C4A8',
   },
   promptText: {
     fontSize: 13,
-    color: '#a0a0c0',
-    marginTop: 8,
+    color: '#6B6B5B',
     lineHeight: 18,
   },
   inputContainer: {
     marginBottom: 20,
   },
   inputLabel: {
-    fontSize: 14,
-    color: '#a0a0c0',
+    fontSize: 12,
+    color: '#8B8B7D',
     marginBottom: 8,
+    letterSpacing: 0.5,
   },
   titleInput: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 16,
-    fontSize: 16,
-    color: '#fff',
-    borderWidth: 1,
-    borderColor: '#2a2a4e',
+    fontSize: 15,
+    color: '#4A4A4A',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   contentInput: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 16,
-    fontSize: 16,
-    color: '#fff',
-    borderWidth: 1,
-    borderColor: '#2a2a4e',
-    minHeight: 150,
+    fontSize: 15,
+    color: '#4A4A4A',
+    minHeight: 140,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   nextButton: {
-    backgroundColor: '#6C63FF',
+    backgroundColor: '#8B9A7D',
+    paddingVertical: 16,
+    borderRadius: 30,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  nextButtonDisabled: {
+    backgroundColor: '#D4D4C4',
+  },
+  nextButtonText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '500',
+    letterSpacing: 0.5,
+  },
+  durationContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginBottom: 32,
+  },
+  durationCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  durationCardSelected: {
+    backgroundColor: '#FDF9F3',
+    borderWidth: 1,
+    borderColor: '#D4C4A8',
+  },
+  durationLabel: {
+    fontSize: 14,
+    color: '#8B8B7D',
+    fontWeight: '500',
+  },
+  durationLabelSelected: {
+    color: '#4A4A4A',
+  },
+  sealButton: {
+    backgroundColor: '#D4A574',
     paddingVertical: 16,
     borderRadius: 30,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 10,
-    marginTop: 20,
-  },
-  nextButtonDisabled: {
-    backgroundColor: '#3a3a5e',
-  },
-  nextButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  durationGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-    marginBottom: 30,
-  },
-  durationCard: {
-    backgroundColor: '#1a1a2e',
-    borderRadius: 16,
-    padding: 20,
-    alignItems: 'center',
-    width: 100,
-    borderWidth: 2,
-    borderColor: 'transparent',
-  },
-  durationCardSelected: {
-    borderColor: '#6C63FF',
-    backgroundColor: '#6C63FF10',
-  },
-  durationLabel: {
-    fontSize: 14,
-    color: '#6a6a8a',
-    marginTop: 8,
-    fontWeight: '600',
-  },
-  durationLabelSelected: {
-    color: '#6C63FF',
-  },
-  sealButton: {
-    backgroundColor: '#9B59B6',
-    paddingVertical: 18,
-    borderRadius: 30,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
+    gap: 8,
   },
   sealButtonDisabled: {
-    backgroundColor: '#3a3a5e',
+    backgroundColor: '#D4D4C4',
   },
   sealButtonText: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 15,
+    fontWeight: '500',
+    letterSpacing: 0.5,
   },
   backButton: {
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
     marginTop: 20,
     padding: 10,
   },
   backButtonText: {
-    color: '#6a6a8a',
-    fontSize: 14,
+    color: '#A0A090',
+    fontSize: 13,
   },
   sealingContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 40,
+    paddingVertical: 60,
   },
   boxContainer: {
-    width: 160,
-    height: 160,
+    width: 140,
+    height: 140,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 30,
+    marginBottom: 32,
   },
   glow: {
     position: 'absolute',
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    backgroundColor: '#6C63FF',
-    opacity: 0.3,
+    width: 180,
+    height: 180,
+    borderRadius: 90,
+    backgroundColor: '#D4A574',
+    opacity: 0.2,
   },
   boxBody: {
-    width: 120,
-    height: 100,
-    backgroundColor: '#1a1a2e',
-    borderRadius: 16,
-    borderWidth: 3,
-    borderColor: '#6C63FF',
+    width: 100,
+    height: 80,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#D4C4A8',
     alignItems: 'center',
     justifyContent: 'center',
   },
   boxLid: {
     position: 'absolute',
-    top: 20,
-    width: 130,
-    height: 30,
-    backgroundColor: '#2a2a4e',
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
-    borderWidth: 3,
-    borderColor: '#6C63FF',
+    top: 25,
+    width: 108,
+    height: 24,
+    backgroundColor: '#F5F0E8',
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+    borderWidth: 2,
+    borderColor: '#D4C4A8',
     transformOrigin: 'bottom',
   },
   lidInner: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 6,
+    borderTopRightRadius: 6,
   },
   lockContainer: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 15,
   },
   lockBadge: {
-    backgroundColor: '#1a1a2e',
-    borderRadius: 30,
-    padding: 10,
-    borderWidth: 3,
-    borderColor: '#FFD700',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 8,
+    borderWidth: 2,
+    borderColor: '#D4A574',
   },
   sealingText: {
     fontSize: 24,
-    fontWeight: '700',
-    color: '#fff',
-    marginBottom: 12,
+    fontWeight: '300',
+    color: '#4A4A4A',
+    letterSpacing: 1,
+    marginBottom: 8,
   },
   sealedInfo: {
     fontSize: 14,
-    color: '#a0a0c0',
+    color: '#8B8B7D',
     textAlign: 'center',
-    marginBottom: 30,
+    marginBottom: 32,
   },
   doneButton: {
-    backgroundColor: '#6C63FF',
-    paddingVertical: 16,
+    backgroundColor: '#8B9A7D',
+    paddingVertical: 14,
     paddingHorizontal: 40,
     borderRadius: 30,
   },
   doneButtonText: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '500',
+    letterSpacing: 0.5,
   },
 });

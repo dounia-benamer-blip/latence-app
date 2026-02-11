@@ -7,7 +7,6 @@ import {
   ScrollView,
   SafeAreaView,
   Share,
-  Alert,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -27,7 +26,6 @@ interface CapsuleDetail {
   unlock_at: string;
   is_sealed: boolean;
   days_remaining?: number;
-  share_link?: string;
 }
 
 export default function CapsuleDetailScreen() {
@@ -56,14 +54,13 @@ export default function CapsuleDetailScreen() {
 
   const handleShare = async () => {
     if (!capsule) return;
-    
     try {
       await Share.share({
-        message: `🔮 Ma capsule temporelle "${capsule.title}" sera ouverte ${format(
+        message: `Ma capsule "${capsule.title}" sera ouverte ${format(
           new Date(capsule.unlock_at),
           "'le' d MMMM yyyy",
           { locale: fr }
-        )}. Rejoins-moi sur Journal Astral !`,
+        )}.`,
       });
     } catch (e) {
       console.log('Error sharing:', e);
@@ -85,11 +82,8 @@ export default function CapsuleDetailScreen() {
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
           <Text style={styles.loadingText}>Capsule introuvable</Text>
-          <TouchableOpacity
-            style={styles.backLink}
-            onPress={() => router.back()}
-          >
-            <Text style={styles.backLinkText}>Retour</Text>
+          <TouchableOpacity onPress={() => router.back()}>
+            <Text style={styles.backLink}>Retour</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -98,16 +92,15 @@ export default function CapsuleDetailScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
       <Animated.View entering={FadeIn.duration(500)} style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => router.back()}
         >
-          <Ionicons name="arrow-back" size={24} color="#fff" />
+          <Ionicons name="arrow-back" size={24} color="#6B6B5B" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
-          <Ionicons name="share-outline" size={24} color="#6C63FF" />
+          <Ionicons name="share-outline" size={22} color="#8B9A7D" />
         </TouchableOpacity>
       </Animated.View>
 
@@ -116,16 +109,14 @@ export default function CapsuleDetailScreen() {
         showsVerticalScrollIndicator={false}
       >
         {capsule.is_sealed ? (
-          /* Sealed Capsule View */
           <Animated.View entering={FadeInUp.duration(600)} style={styles.sealedContainer}>
             <View style={styles.sealedIcon}>
-              <Ionicons name="lock-closed" size={50} color="#FFD700" />
+              <Ionicons name="lock-closed" size={40} color="#D4A574" />
             </View>
             
             <Text style={styles.sealedTitle}>{capsule.title}</Text>
             
             <View style={styles.sealedBadge}>
-              <Ionicons name="time" size={18} color="#9B59B6" />
               <Text style={styles.sealedBadgeText}>
                 {capsule.days_remaining} jours restants
               </Text>
@@ -133,14 +124,14 @@ export default function CapsuleDetailScreen() {
             
             <View style={styles.infoCard}>
               <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Créée le</Text>
+                <Text style={styles.infoLabel}>Déposée</Text>
                 <Text style={styles.infoValue}>
                   {format(new Date(capsule.created_at), "d MMMM yyyy", { locale: fr })}
                 </Text>
               </View>
               <View style={styles.infoDivider} />
               <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Ouverture le</Text>
+                <Text style={styles.infoLabel}>Ouverture</Text>
                 <Text style={styles.infoValue}>
                   {format(new Date(capsule.unlock_at), "d MMMM yyyy", { locale: fr })}
                 </Text>
@@ -148,27 +139,19 @@ export default function CapsuleDetailScreen() {
             </View>
             
             <Text style={styles.sealedMessage}>
-              Cette capsule est scellée et ne peut pas être ouverte avant la date prévue.
-              Patience, le temps fait son œuvre... ✨
+              Patience, le temps fait son œuvre...
             </Text>
           </Animated.View>
         ) : (
-          /* Unlocked Capsule View */
           <Animated.View entering={FadeInUp.duration(600)} style={styles.unlockedContainer}>
             <View style={styles.unlockedIcon}>
-              <Ionicons name="sparkles" size={50} color="#4ECDC4" />
+              <Ionicons name="lock-open" size={40} color="#8B9A7D" />
             </View>
             
             <Text style={styles.unlockedTitle}>{capsule.title}</Text>
             
-            <View style={styles.unlockedBadge}>
-              <Ionicons name="lock-open" size={18} color="#4ECDC4" />
-              <Text style={styles.unlockedBadgeText}>Déverrouillée</Text>
-            </View>
-            
             {capsule.prompt_used && (
               <View style={styles.promptCard}>
-                <Ionicons name="chatbubble-outline" size={16} color="#FFD700" />
                 <Text style={styles.promptText}>{capsule.prompt_used}</Text>
               </View>
             )}
@@ -177,17 +160,12 @@ export default function CapsuleDetailScreen() {
               <Text style={styles.contentText}>{capsule.content}</Text>
             </View>
             
-            <View style={styles.metaCard}>
-              <Text style={styles.metaText}>
-                Scellée le {format(new Date(capsule.created_at), "d MMMM yyyy", { locale: fr })}
-              </Text>
-              <Text style={styles.metaText}>
-                Ouverte {formatDistanceToNow(new Date(capsule.unlock_at), {
-                  addSuffix: true,
-                  locale: fr,
-                })}
-              </Text>
-            </View>
+            <Text style={styles.metaText}>
+              Déposée {formatDistanceToNow(new Date(capsule.created_at), {
+                addSuffix: true,
+                locale: fr,
+              })}
+            </Text>
           </Animated.View>
         )}
       </ScrollView>
@@ -198,7 +176,7 @@ export default function CapsuleDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a1a',
+    backgroundColor: '#F5F0E8',
   },
   loadingContainer: {
     flex: 1,
@@ -206,15 +184,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   loadingText: {
-    fontSize: 16,
-    color: '#6a6a8a',
+    fontSize: 14,
+    color: '#A0A090',
   },
   backLink: {
-    marginTop: 20,
-  },
-  backLinkText: {
-    color: '#6C63FF',
+    color: '#8B9A7D',
     fontSize: 14,
+    marginTop: 16,
   },
   header: {
     flexDirection: 'row',
@@ -234,53 +210,59 @@ const styles = StyleSheet.create({
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#6C63FF20',
-    borderRadius: 20,
   },
   scrollContent: {
-    padding: 20,
+    padding: 24,
     paddingBottom: 40,
   },
   sealedContainer: {
     alignItems: 'center',
   },
   sealedIcon: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: '#FFD70020',
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   sealedTitle: {
     fontSize: 24,
-    fontWeight: '700',
-    color: '#fff',
+    fontWeight: '300',
+    color: '#4A4A4A',
     textAlign: 'center',
     marginBottom: 16,
+    letterSpacing: 0.5,
   },
   sealedBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: '#9B59B620',
+    backgroundColor: '#D4A57420',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    marginBottom: 24,
+    marginBottom: 32,
   },
   sealedBadgeText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#9B59B6',
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#D4A574',
   },
   infoCard: {
-    backgroundColor: '#1a1a2e',
-    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
     padding: 20,
     width: '100%',
-    marginBottom: 24,
+    marginBottom: 32,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   infoRow: {
     flexDirection: 'row',
@@ -288,94 +270,82 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   infoLabel: {
-    fontSize: 14,
-    color: '#6a6a8a',
+    fontSize: 13,
+    color: '#A0A090',
   },
   infoValue: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#fff',
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#4A4A4A',
   },
   infoDivider: {
     height: 1,
-    backgroundColor: '#2a2a4e',
+    backgroundColor: '#F0EBE3',
     marginVertical: 16,
   },
   sealedMessage: {
     fontSize: 14,
-    color: '#a0a0c0',
-    textAlign: 'center',
-    lineHeight: 22,
-    paddingHorizontal: 20,
+    color: '#A0A090',
+    fontStyle: 'italic',
   },
   unlockedContainer: {
     alignItems: 'center',
   },
   unlockedIcon: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: '#4ECDC420',
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   unlockedTitle: {
     fontSize: 24,
-    fontWeight: '700',
-    color: '#fff',
+    fontWeight: '300',
+    color: '#4A4A4A',
     textAlign: 'center',
-    marginBottom: 16,
-  },
-  unlockedBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: '#4ECDC420',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
     marginBottom: 24,
-  },
-  unlockedBadgeText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#4ECDC4',
+    letterSpacing: 0.5,
   },
   promptCard: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 10,
-    backgroundColor: '#1a1a2e',
-    borderRadius: 16,
+    backgroundColor: '#FDF9F3',
+    borderRadius: 12,
     padding: 16,
     width: '100%',
     marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#E8E0D4',
   },
   promptText: {
-    flex: 1,
-    fontSize: 14,
-    color: '#FFD700',
+    fontSize: 13,
+    color: '#8B8B7D',
     fontStyle: 'italic',
   },
   contentCard: {
-    backgroundColor: '#1a1a2e',
-    borderRadius: 20,
-    padding: 20,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 24,
     width: '100%',
-    marginBottom: 16,
+    marginBottom: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   contentText: {
-    fontSize: 16,
-    color: '#fff',
-    lineHeight: 26,
-  },
-  metaCard: {
-    alignItems: 'center',
-    gap: 4,
+    fontSize: 15,
+    color: '#4A4A4A',
+    lineHeight: 24,
   },
   metaText: {
     fontSize: 12,
-    color: '#6a6a8a',
+    color: '#A0A090',
   },
 });
