@@ -584,9 +584,10 @@ export default function AstrologyScreen() {
             key={t}
             style={[styles.tab, tab === t ? ds.tabActive : ds.tabInactive]}
             onPress={() => { setTab(t); setSelectedItem(null); }}
+            data-testid={`tab-${t}`}
           >
             <Text style={[styles.tabText, tab === t ? ds.tabTextActive : ds.tabTextInactive]}>
-              {t === 'profile' ? 'Mon profil' : t.charAt(0).toUpperCase() + t.slice(1)}
+              {t === 'profile' ? 'Profil' : t.charAt(0).toUpperCase() + t.slice(1)}
             </Text>
           </TouchableOpacity>
         ))}
