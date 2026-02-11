@@ -303,50 +303,16 @@ export default function WelcomeScreen() {
         <Text style={[styles.poeticQuestion, dynamicStyles.textSecondary]}>{poeticGreeting.question}</Text>
       </View>
 
-      <ScrollView 
-        style={styles.moodScrollView}
+      <FlatList
+        data={MOODS}
+        renderItem={renderMoodItem}
+        keyExtractor={(item) => item.id}
+        numColumns={2}
+        columnWrapperStyle={styles.moodRow}
+        contentContainerStyle={styles.moodListContent}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.moodScrollContent}
-      >
-        <View style={styles.moodGrid}>
-          {MOODS.map((mood, index) => (
-            <TouchableOpacity
-              key={mood.id}
-              style={[
-                styles.moodCard,
-                dynamicStyles.card,
-                selectedMood === mood.id && dynamicStyles.cardSelected,
-                selectedMood === mood.id && { borderWidth: 1.5, borderColor: theme.accentWarm },
-              ]}
-              onPress={() => setSelectedMood(mood.id)}
-              activeOpacity={0.7}
-            >
-              <View
-                style={[
-                  styles.moodIconContainer,
-                  { backgroundColor: isDark ? `${theme.accentWarm}15` : `${mood.color}12` },
-                  selectedMood === mood.id && { backgroundColor: `${theme.accentWarm}25` },
-                ]}
-              >
-                <Ionicons 
-                  name={mood.icon as any} 
-                  size={24} 
-                  color={selectedMood === mood.id ? theme.accentWarm : (isDark ? theme.accentWarm : mood.color)} 
-                />
-              </View>
-              <Text
-                style={[
-                  styles.moodLabel,
-                  dynamicStyles.textSecondary,
-                  selectedMood === mood.id && { color: theme.text, fontWeight: '500' },
-                ]}
-              >
-                {mood.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </ScrollView>
+        style={styles.moodList}
+      />
 
       <TouchableOpacity
         style={[
