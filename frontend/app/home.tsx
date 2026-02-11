@@ -319,6 +319,13 @@ export default function HomeScreen() {
           <Text style={[styles.moonName, dynamicStyles.textSecondary]}>{moonPhase.name}</Text>
         </Animated.View>
 
+        {/* Daily Poetic Notification */}
+        {dailyNotification && (
+          <Animated.View entering={FadeInUp.duration(600).delay(120)} style={[styles.notificationCard, dynamicStyles.card, { borderLeftColor: theme.accentWarm }]} data-testid="daily-notification">
+            <Text style={[styles.notificationText, dynamicStyles.text]}>{dailyNotification.message}</Text>
+          </Animated.View>
+        )}
+
         {/* AI Companion Button */}
         <Animated.View entering={FadeInUp.duration(600).delay(150)}>
           <TouchableOpacity 
