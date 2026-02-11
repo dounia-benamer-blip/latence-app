@@ -569,6 +569,161 @@ async def get_celtic_sign(birth_date: str):
 async def get_dream_symbols():
     return {"symbols": DREAM_SYMBOLS_DATABASE}
 
+# --- Sacred Texts and Poetic AI Routes ---
+
+class SacredTextRequest(BaseModel):
+    mood: str
+
+class CompanionRequest(BaseModel):
+    mood: str
+    energy_level: int
+    message: Optional[str] = None
+
+class LunarReadingRequest(BaseModel):
+    moon_phase: str
+    mansion: Optional[str] = None
+    question: Optional[str] = None
+
+class JournalEntry(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    content: str
+    date: datetime = Field(default_factory=datetime.utcnow)
+    mood: Optional[str] = None
+    energy_level: Optional[int] = None
+
+class JournalCreate(BaseModel):
+    content: str
+    date: Optional[str] = None
+
+@api_router.get("/sacred-text/{mood}")
+async def get_sacred_text(mood: str):
+    """Get a random sacred text based on current mood"""
+    texts = SACRED_TEXTS.get(mood, SACRED_TEXTS.get("serein", []))
+    if not texts:
+        texts = SACRED_TEXTS["serein"]
+    selected = random.choice(texts)
+    return {"text": selected["text"], "source": selected["source"]}
+
+@api_router.get("/book-recommendations/{mood}")
+async def get_book_recommendations(mood: str):
+    """Get book recommendations based on mood"""
+    books = BOOK_RECOMMENDATIONS.get(mood, BOOK_RECOMMENDATIONS["default"])
+    return {"recommendations": books}
+
+@api_router.post("/companion/chat")
+async def companion_chat(request: CompanionRequest):
+    """AI companion that chats poetically about feelings - never medical"""
+    
+    system_prompt = """Tu es un compagnon poétique et bienveillant. Tu accompagnes les âmes dans leur voyage intérieur avec douceur et sagesse.
+
+RÈGLES ABSOLUES :
+- Tu n'es JAMAIS un thérapeute ou médecin
+- Tu ne donnes JAMAIS de conseils médicaux
+- Tu parles de manière poétique, métaphorique, comme un sage ou un poète
+- Tu poses des questions ouvertes qui invitent à l'introspection
+- Tu utilises des images de la nature, des étoiles, de la lune
+- Tu es comme un ami sage qui écoute sans juger
+- Tes réponses sont courtes et évocatrices (2-4 phrases)
+- Tu vouvoies avec respect mais chaleur
+
+STYLE :
+- Poétique mais accessible
+- Mystérieux mais réconfortant
+- Profond mais léger
+- Comme une conversation au clair de lune
+
+Tu accompagnes, tu écoutes, tu inspires - jamais tu ne soignes."""
+
+    chat = LlmChat(
+        api_key=EMERGENT_LLM_KEY,
+        session_id=f"companion-{uuid.uuid4()}",
+        system_message=system_prompt
+    ).with_model("openai", "gpt-4o")
+
+    mood_context = {
+        "serein": "apaisé et en paix",
+        "joyeux": "rayonnant de joie",
+        "reveur": "dans un état rêveur",
+        "melancolique": "traversant une mélancolie",
+        "fatigue": "en quête de repos",
+        "inspire": "porté par l'inspiration",
+        "anxieux": "agité par des inquiétudes",
+        "nostalgique": "bercé par la nostalgie",
+        "perdu": "en quête de direction",
+        "reconnaissant": "empli de gratitude",
+        "contemplatif": "dans la contemplation",
+        "eveille": "éveillé et conscient",
+    }
+    
+    mood_text = mood_context.get(request.mood, "dans un état particulier")
+    energy_text = "une énergie douce" if request.energy_level <= 2 else "une énergie équilibrée" if request.energy_level <= 4 else "une énergie vibrante"
+    
+    if request.message:
+        user_prompt = f"La personne se sent {mood_text} avec {energy_text}. Elle vous dit : '{request.message}'"
+    else:
+        user_prompt = f"La personne arrive, se sentant {mood_text} avec {energy_text}. Accueillez-la avec une question poétique qui l'invite à explorer ce qu'elle ressent."
+
+    try:
+        response = await chat.send_message(UserMessage(text=user_prompt))
+        return {"response": response}
+    except Exception as e:
+        logging.error(f"Companion chat error: {e}")
+        return {"response": "Les étoiles murmurent doucement ce soir... Que porte votre cœur en ce moment ?"}
+
+@api_router.post("/lunar-reading")
+async def get_lunar_reading(request: LunarReadingRequest):
+    """Get an AI-generated lunar reading based on moon phase"""
+    
+    system_prompt = """Tu es un oracle lunaire poétique. Tu interprètes les énergies de la lune et des étoiles avec sagesse et beauté.
+
+STYLE :
+- Poétique et évocateur
+- Connecté aux cycles de la nature
+- Mystérieux mais réconfortant
+- Références aux éléments (eau, feu, terre, air)
+- Métaphores de la nature, des saisons, des marées
+
+Tes réponses font 3-5 phrases poétiques qui parlent à l'âme.
+Tu ne prédis pas l'avenir, tu éclaires le présent."""
+
+    chat = LlmChat(
+        api_key=EMERGENT_LLM_KEY,
+        session_id=f"lunar-{uuid.uuid4()}",
+        system_message=system_prompt
+    ).with_model("openai", "gpt-4o")
+
+    prompt = f"La lune est en phase de {request.moon_phase}."
+    if request.mansion:
+        prompt += f" Elle traverse la demeure lunaire de {request.mansion}."
+    if request.question:
+        prompt += f" La personne demande guidance sur : {request.question}"
+    else:
+        prompt += " Offre une réflexion poétique sur l'énergie de ce moment."
+
+    try:
+        response = await chat.send_message(UserMessage(text=prompt))
+        return {"reading": response}
+    except Exception as e:
+        logging.error(f"Lunar reading error: {e}")
+        return {"reading": "La lune veille sur tes rêves cette nuit. Laisse-la te bercer de sa lumière argentée."}
+
+# --- Journal Routes ---
+@api_router.post("/journal")
+async def create_journal_entry(input: JournalCreate):
+    """Create a simple journal entry"""
+    entry = JournalEntry(
+        content=input.content,
+        date=datetime.fromisoformat(input.date) if input.date else datetime.utcnow()
+    )
+    await db.journals.insert_one(entry.dict())
+    return entry
+
+@api_router.get("/journals")
+async def get_journal_entries():
+    """Get all journal entries"""
+    entries = await db.journals.find().sort("date", -1).to_list(100)
+    return [JournalEntry(**e) for e in entries]
+
 app.include_router(api_router)
 
 app.add_middleware(
