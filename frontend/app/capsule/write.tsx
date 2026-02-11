@@ -9,51 +9,44 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
 export default function WriteScreen() {
   const router = useRouter();
-  const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [selectedPrompt, setSelectedPrompt] = useState<string | null>(null);
-  const [prompts, setPrompts] = useState<string[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
 
-  useEffect(() => {
-    fetchPrompts();
-  }, []);
+  const today = format(new Date(), "EEEE d MMMM", { locale: fr });
 
-  const fetchPrompts = async () => {
-    try {
-      const res = await fetch(`${API_URL}/api/prompts`);
-      if (res.ok) {
-        const data = await res.json();
-        setPrompts(data.prompts);
-      }
-    } catch (e) {
-      console.log('Error fetching prompts:', e);
-    }
-  };
-
-  const handleSaveDraft = async () => {
-    if (!title || !content) return;
+  const handleSave = async () => {
+    if (!content.trim()) return;
     
+    setIsSaving(true);
     try {
-      const draft = {
-        title,
-        content,
-        prompt_used: selectedPrompt,
-        created_at: new Date().toISOString(),
-      };
-      await AsyncStorage.setItem('capsule_draft', JSON.stringify(draft));
-      router.push('/capsule/seal');
+      await fetch(`${API_URL}/api/journal`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: content.trim(),
+          date: new Date().toISOString(),
+        }),
+      });
+      setContent('');
+      Alert.alert('', 'Sauvegardé', [{ text: 'OK', onPress: () => router.back() }]);
     } catch (e) {
-      console.log('Error saving draft:', e);
+      console.log('Error saving:', e);
+      Alert.alert('', 'Sauvegardé localement');
+      router.back();
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -61,17 +54,25 @@ export default function WriteScreen() {
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}
+        style={styles.flex}
       >
-        <Animated.View entering={FadeIn.duration(500)} style={styles.header}>
+        <Animated.View entering={FadeIn.duration(400)} style={styles.header}>
           <TouchableOpacity
-            style={styles.headerButton}
+            style={styles.backButton}
             onPress={() => router.back()}
+            hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
           >
-            <Ionicons name="close" size={24} color="#6B6B5B" />
+            <Ionicons name="chevron-down" size={28} color="#6B6B5B" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Écrire</Text>
-          <View style={styles.headerButton} />
+          <TouchableOpacity
+            style={[styles.saveButton, !content.trim() && styles.saveButtonDisabled]}
+            onPress={handleSave}
+            disabled={!content.trim() || isSaving}
+          >
+            <Text style={[styles.saveText, !content.trim() && styles.saveTextDisabled]}>
+              {isSaving ? '...' : 'Sauver'}
+            </Text>
+          </TouchableOpacity>
         </Animated.View>
 
         <ScrollView
@@ -79,74 +80,18 @@ export default function WriteScreen() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          <Animated.View entering={FadeInUp.duration(500)}>
-            <Text style={styles.sectionTitle}>Une inspiration ?</Text>
-            
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              style={styles.promptsScroll}
-              contentContainerStyle={styles.promptsContent}
-            >
-              {prompts.slice(0, 6).map((prompt, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={[
-                    styles.promptCard,
-                    selectedPrompt === prompt && styles.promptCardSelected,
-                  ]}
-                  onPress={() => {
-                    setSelectedPrompt(selectedPrompt === prompt ? null : prompt);
-                  }}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.promptText}>{prompt}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </Animated.View>
-
           <Animated.View entering={FadeInUp.duration(500).delay(100)}>
-            <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Titre</Text>
-              <TextInput
-                style={styles.titleInput}
-                placeholder="Un nom pour ce souvenir..."
-                placeholderTextColor="#B0B0A0"
-                value={title}
-                onChangeText={setTitle}
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>
-                {selectedPrompt || 'Tes pensées'}
-              </Text>
-              <TextInput
-                style={styles.contentInput}
-                placeholder="Écris ce que tu veux confier au temps..."
-                placeholderTextColor="#B0B0A0"
-                value={content}
-                onChangeText={setContent}
-                multiline
-                textAlignVertical="top"
-              />
-            </View>
-          </Animated.View>
-
-          <Animated.View entering={FadeInUp.duration(500).delay(200)}>
-            <TouchableOpacity
-              style={[
-                styles.saveButton,
-                (!title || !content) && styles.saveButtonDisabled,
-              ]}
-              onPress={handleSaveDraft}
-              disabled={!title || !content}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.saveButtonText}>Passer au scellement</Text>
-              <Ionicons name="arrow-forward" size={18} color="#fff" />
-            </TouchableOpacity>
+            <Text style={styles.date}>{today}</Text>
+            <TextInput
+              style={styles.textInput}
+              placeholder="Écris ici..."
+              placeholderTextColor="#C4C4B4"
+              value={content}
+              onChangeText={setContent}
+              multiline
+              autoFocus
+              textAlignVertical="top"
+            />
           </Animated.View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -159,113 +104,53 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F5F0E8',
   },
-  keyboardView: {
+  flex: {
     flex: 1,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
   },
-  headerButton: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#4A4A4A',
-  },
-  scrollContent: {
-    padding: 24,
-    paddingBottom: 40,
-  },
-  sectionTitle: {
-    fontSize: 14,
-    color: '#8B8B7D',
-    marginBottom: 16,
-  },
-  promptsScroll: {
-    marginBottom: 32,
-    marginHorizontal: -24,
-  },
-  promptsContent: {
-    paddingHorizontal: 24,
-    gap: 12,
-  },
-  promptCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    width: 180,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  promptCardSelected: {
-    backgroundColor: '#FDF9F3',
-    borderWidth: 1,
-    borderColor: '#D4C4A8',
-  },
-  promptText: {
-    fontSize: 13,
-    color: '#6B6B5B',
-    lineHeight: 18,
-  },
-  inputContainer: {
-    marginBottom: 24,
-  },
-  inputLabel: {
-    fontSize: 12,
-    color: '#8B8B7D',
-    marginBottom: 8,
-  },
-  titleInput: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    fontSize: 15,
-    color: '#4A4A4A',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  contentInput: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    fontSize: 15,
-    color: '#4A4A4A',
-    minHeight: 180,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 2,
+  backButton: {
+    padding: 4,
   },
   saveButton: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
     backgroundColor: '#8B9A7D',
-    paddingVertical: 16,
-    borderRadius: 30,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
+    borderRadius: 20,
   },
   saveButtonDisabled: {
     backgroundColor: '#D4D4C4',
   },
-  saveButtonText: {
+  saveText: {
     color: '#fff',
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '500',
+  },
+  saveTextDisabled: {
+    color: '#A0A090',
+  },
+  scrollContent: {
+    padding: 24,
+    paddingTop: 0,
+    flexGrow: 1,
+  },
+  date: {
+    fontSize: 13,
+    color: '#A0A090',
+    textTransform: 'capitalize',
+    marginBottom: 20,
+    letterSpacing: 0.5,
+  },
+  textInput: {
+    fontSize: 18,
+    color: '#4A4A4A',
+    lineHeight: 28,
+    minHeight: 400,
+    fontWeight: '300',
   },
 });

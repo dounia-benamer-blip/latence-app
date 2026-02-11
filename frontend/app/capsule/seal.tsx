@@ -4,9 +4,11 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  TextInput,
   ScrollView,
   SafeAreaView,
-  Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -18,9 +20,10 @@ import Animated, {
   withTiming,
   withSequence,
   withSpring,
+  withDelay,
   Easing,
+  runOnJS,
 } from 'react-native-reanimated';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
@@ -32,41 +35,29 @@ const DURATION_OPTIONS = [
   { days: 365, label: '1 an' },
 ];
 
+const PROMPTS = [
+  "Qu'est-ce qui t'a fait sourire aujourd'hui ?",
+  "Si tu pouvais envoyer un message à ton toi du futur ?",
+  "Quel rêve secret portes-tu en toi ?",
+  "Qu'est-ce que tu te pardonnes aujourd'hui ?",
+];
+
 export default function SealScreen() {
   const router = useRouter();
-  const [draft, setDraft] = useState<any>(null);
+  const [step, setStep] = useState<'write' | 'duration' | 'sealing' | 'done'>('write');
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
   const [duration, setDuration] = useState<number | null>(null);
-  const [isSealing, setIsSealing] = useState(false);
-  const [isSealed, setIsSealed] = useState(false);
 
-  const boxLidRotation = useSharedValue(0);
+  // Animation values
+  const lidRotation = useSharedValue(0);
   const boxScale = useSharedValue(1);
   const glowOpacity = useSharedValue(0);
   const lockScale = useSharedValue(0);
-
-  useEffect(() => {
-    loadDraft();
-  }, []);
-
-  const loadDraft = async () => {
-    try {
-      const draftData = await AsyncStorage.getItem('capsule_draft');
-      if (draftData) {
-        setDraft(JSON.parse(draftData));
-      } else {
-        Alert.alert('Aucun brouillon', 'Écris d\'abord une pensée.');
-        router.back();
-      }
-    } catch (e) {
-      console.log('Error loading draft:', e);
-    }
-  };
+  const lockOpacity = useSharedValue(0);
 
   const lidStyle = useAnimatedStyle(() => ({
-    transform: [
-      { perspective: 500 },
-      { rotateX: `${boxLidRotation.value}deg` },
-    ],
+    transform: [{ rotateX: `${lidRotation.value}deg` }],
   }));
 
   const boxStyle = useAnimatedStyle(() => ({
@@ -75,98 +66,127 @@ export default function SealScreen() {
 
   const glowStyle = useAnimatedStyle(() => ({
     opacity: glowOpacity.value,
+    transform: [{ scale: 1 + glowOpacity.value * 0.3 }],
   }));
 
   const lockStyle = useAnimatedStyle(() => ({
     transform: [{ scale: lockScale.value }],
-    opacity: lockScale.value,
+    opacity: lockOpacity.value,
   }));
 
-  const playSealAnimation = async () => {
-    setIsSealing(true);
+  const startSealAnimation = () => {
+    setStep('sealing');
     
-    boxLidRotation.value = withTiming(-90, { duration: 1200, easing: Easing.bezier(0.4, 0, 0.2, 1) });
+    // Lid closes slowly
+    lidRotation.value = withTiming(-95, { 
+      duration: 1500, 
+      easing: Easing.bezier(0.25, 0.1, 0.25, 1) 
+    });
     
+    // Box pulse
+    boxScale.value = withDelay(1200, withSequence(
+      withSpring(0.92, { damping: 8, stiffness: 100 }),
+      withSpring(1.02, { damping: 8, stiffness: 100 }),
+      withSpring(1, { damping: 10, stiffness: 100 })
+    ));
+    
+    // Glow appears
+    glowOpacity.value = withDelay(1400, withSequence(
+      withTiming(0.8, { duration: 400 }),
+      withTiming(0.2, { duration: 800 })
+    ));
+    
+    // Lock appears
+    lockOpacity.value = withDelay(1800, withTiming(1, { duration: 300 }));
+    lockScale.value = withDelay(1800, withSpring(1, { damping: 8, stiffness: 120 }));
+    
+    // Save to backend and transition
     setTimeout(() => {
-      boxScale.value = withSequence(
-        withSpring(0.85, { damping: 10 }),
-        withSpring(1, { damping: 8 })
-      );
-    }, 1000);
-    
-    setTimeout(() => {
-      glowOpacity.value = withSequence(
-        withTiming(0.8, { duration: 600 }),
-        withTiming(0.2, { duration: 800 })
-      );
-    }, 1400);
-    
-    setTimeout(() => {
-      lockScale.value = withSpring(1, { damping: 8 });
-    }, 1800);
-    
-    setTimeout(() => {
-      setIsSealed(true);
-      setIsSealing(false);
+      saveCapsule();
     }, 2500);
   };
 
-  const handleSeal = async () => {
-    if (!duration || !draft) {
-      Alert.alert('Incomplet', 'Choisis une durée.');
-      return;
-    }
-
-    await playSealAnimation();
-
+  const saveCapsule = async () => {
     try {
       await fetch(`${API_URL}/api/capsule`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: draft.title,
-          content: draft.content,
-          prompt_used: draft.prompt_used,
+          title: title || 'Sans titre',
+          content,
           duration_days: duration,
         }),
       });
-      
-      await AsyncStorage.removeItem('capsule_draft');
     } catch (e) {
-      console.log('Error creating capsule:', e);
+      console.log('Error saving capsule:', e);
     }
+    setStep('done');
   };
 
-  const renderDurationSelection = () => (
-    <Animated.View entering={FadeIn.duration(500)} style={styles.content}>
-      <View style={styles.draftPreview}>
-        <Text style={styles.draftTitle}>{draft?.title}</Text>
-        <Text style={styles.draftContent} numberOfLines={3}>{draft?.content}</Text>
+  const renderWrite = () => (
+    <Animated.View entering={FadeIn.duration(400)} style={styles.content}>
+      <Text style={styles.stepTitle}>Ta pensée</Text>
+      
+      <View style={styles.promptsRow}>
+        {PROMPTS.slice(0, 2).map((prompt, i) => (
+          <TouchableOpacity
+            key={i}
+            style={styles.promptChip}
+            onPress={() => setContent(prompt + '\n\n')}
+          >
+            <Text style={styles.promptText} numberOfLines={2}>{prompt}</Text>
+          </TouchableOpacity>
+        ))}
       </View>
 
-      <Text style={styles.sectionTitle}>Quand ouvrir cette capsule ?</Text>
+      <TextInput
+        style={styles.titleInput}
+        placeholder="Titre (optionnel)"
+        placeholderTextColor="#B0B0A0"
+        value={title}
+        onChangeText={setTitle}
+      />
 
-      <View style={styles.durationContainer}>
-        {DURATION_OPTIONS.map((option, index) => (
-          <Animated.View
-            key={option.days}
-            entering={FadeInUp.duration(400).delay(index * 60)}
-          >
+      <TextInput
+        style={styles.contentInput}
+        placeholder="Ce que tu veux confier au temps..."
+        placeholderTextColor="#B0B0A0"
+        value={content}
+        onChangeText={setContent}
+        multiline
+        textAlignVertical="top"
+      />
+
+      <TouchableOpacity
+        style={[styles.nextButton, !content.trim() && styles.buttonDisabled]}
+        onPress={() => setStep('duration')}
+        disabled={!content.trim()}
+      >
+        <Text style={styles.nextButtonText}>Choisir la durée</Text>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+
+  const renderDuration = () => (
+    <Animated.View entering={FadeIn.duration(400)} style={styles.content}>
+      <Text style={styles.stepTitle}>Quand l'ouvrir ?</Text>
+      <Text style={styles.stepSubtitle}>Cette capsule restera scellée jusqu'à la date choisie</Text>
+
+      <View style={styles.durationGrid}>
+        {DURATION_OPTIONS.map((opt, i) => (
+          <Animated.View key={opt.days} entering={FadeInUp.duration(300).delay(i * 60)}>
             <TouchableOpacity
               style={[
                 styles.durationCard,
-                duration === option.days && styles.durationCardSelected,
+                duration === opt.days && styles.durationCardSelected,
               ]}
-              onPress={() => setDuration(option.days)}
-              activeOpacity={0.7}
+              onPress={() => setDuration(opt.days)}
             >
-              <Text
-                style={[
-                  styles.durationLabel,
-                  duration === option.days && styles.durationLabelSelected,
-                ]}
-              >
-                {option.label}
+              <Text style={[
+                styles.durationText,
+                duration === opt.days && styles.durationTextSelected,
+              ]}>
+                {opt.label}
               </Text>
             </TouchableOpacity>
           </Animated.View>
@@ -174,89 +194,88 @@ export default function SealScreen() {
       </View>
 
       <TouchableOpacity
-        style={[
-          styles.sealButton,
-          !duration && styles.sealButtonDisabled,
-        ]}
-        onPress={handleSeal}
-        disabled={!duration || isSealing}
-        activeOpacity={0.8}
+        style={[styles.sealButton, !duration && styles.buttonDisabled]}
+        onPress={startSealAnimation}
+        disabled={!duration}
       >
-        <Ionicons name="lock-closed-outline" size={18} color="#fff" />
+        <Ionicons name="lock-closed" size={18} color="#fff" />
         <Text style={styles.sealButtonText}>Sceller</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.backLink}
-        onPress={() => router.back()}
-      >
+      <TouchableOpacity style={styles.backLink} onPress={() => setStep('write')}>
         <Text style={styles.backLinkText}>Modifier le texte</Text>
       </TouchableOpacity>
     </Animated.View>
   );
 
-  const renderSealingAnimation = () => (
-    <Animated.View entering={FadeIn.duration(500)} style={styles.sealingContainer}>
-      <Animated.View style={[styles.boxContainer, boxStyle]}>
-        <Animated.View style={[styles.glow, glowStyle]} />
-        
+  const renderSealing = () => (
+    <View style={styles.sealingContainer}>
+      <Animated.View style={[styles.glowCircle, glowStyle]} />
+      
+      <Animated.View style={[styles.boxWrapper, boxStyle]}>
         <View style={styles.boxBody}>
-          <Ionicons name="document-text-outline" size={32} color="#8B9A7D" />
+          <Ionicons name="document-text" size={28} color="#8B9A7D" />
         </View>
-        
-        <Animated.View style={[styles.boxLid, lidStyle]}>
-          <View style={styles.lidInner} />
-        </Animated.View>
-        
-        <Animated.View style={[styles.lockContainer, lockStyle]}>
-          <View style={styles.lockBadge}>
-            <Ionicons name="lock-closed" size={24} color="#D4A574" />
-          </View>
-        </Animated.View>
+        <Animated.View style={[styles.boxLid, lidStyle]} />
       </Animated.View>
+      
+      <Animated.View style={[styles.lockWrapper, lockStyle]}>
+        <Ionicons name="lock-closed" size={28} color="#D4A574" />
+      </Animated.View>
+      
+      <Text style={styles.sealingText}>Scellement...</Text>
+    </View>
+  );
 
-      <Text style={styles.sealingText}>
-        {isSealed ? 'Scellée' : 'Scellement en cours...'}
+  const renderDone = () => (
+    <Animated.View entering={FadeIn.duration(600)} style={styles.doneContainer}>
+      <View style={styles.doneIcon}>
+        <Ionicons name="checkmark" size={40} color="#8B9A7D" />
+      </View>
+      <Text style={styles.doneTitle}>Scellée</Text>
+      <Text style={styles.doneSubtitle}>
+        Ouverture dans {DURATION_OPTIONS.find(d => d.days === duration)?.label}
       </Text>
-
-      {isSealed && (
-        <Animated.View entering={FadeInUp.duration(500).delay(200)}>
-          <Text style={styles.sealedInfo}>
-            Ouverture dans {DURATION_OPTIONS.find((d) => d.days === duration)?.label}
-          </Text>
-          <TouchableOpacity
-            style={styles.doneButton}
-            onPress={() => router.push('/home')}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.doneButtonText}>Terminé</Text>
-          </TouchableOpacity>
-        </Animated.View>
-      )}
+      <TouchableOpacity
+        style={styles.doneButton}
+        onPress={() => router.replace('/home')}
+      >
+        <Text style={styles.doneButtonText}>Terminé</Text>
+      </TouchableOpacity>
     </Animated.View>
   );
 
   return (
     <SafeAreaView style={styles.container}>
-      <Animated.View entering={FadeIn.duration(500)} style={styles.header}>
-        <TouchableOpacity
-          style={styles.headerButton}
-          onPress={() => router.back()}
-        >
-          {!isSealing && !isSealed && (
-            <Ionicons name="arrow-back" size={24} color="#6B6B5B" />
-          )}
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Sceller</Text>
-        <View style={styles.headerButton} />
-      </Animated.View>
-
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.flex}
       >
-        {isSealing || isSealed ? renderSealingAnimation() : renderDurationSelection()}
-      </ScrollView>
+        {step !== 'sealing' && step !== 'done' && (
+          <View style={styles.header}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => router.back()}
+              hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+            >
+              <Ionicons name="chevron-down" size={28} color="#6B6B5B" />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>Sceller</Text>
+            <View style={styles.placeholder} />
+          </View>
+        )}
+
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          {step === 'write' && renderWrite()}
+          {step === 'duration' && renderDuration()}
+          {step === 'sealing' && renderSealing()}
+          {step === 'done' && renderDone()}
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -266,23 +285,26 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F5F0E8',
   },
+  flex: {
+    flex: 1,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
     paddingVertical: 12,
   },
-  headerButton: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
+  backButton: {
+    padding: 4,
   },
   headerTitle: {
     fontSize: 16,
     fontWeight: '500',
     color: '#4A4A4A',
+  },
+  placeholder: {
+    width: 36,
   },
   scrollContent: {
     flexGrow: 1,
@@ -291,34 +313,66 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
-  draftPreview: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 32,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  draftTitle: {
-    fontSize: 16,
-    fontWeight: '500',
+  stepTitle: {
+    fontSize: 26,
+    fontWeight: '200',
     color: '#4A4A4A',
+    letterSpacing: 1,
     marginBottom: 8,
   },
-  draftContent: {
+  stepSubtitle: {
     fontSize: 14,
     color: '#8B8B7D',
-    lineHeight: 20,
+    marginBottom: 28,
   },
-  sectionTitle: {
-    fontSize: 14,
+  promptsRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 24,
+  },
+  promptChip: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 14,
+  },
+  promptText: {
+    fontSize: 12,
     color: '#8B8B7D',
+    lineHeight: 16,
+  },
+  titleInput: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    fontSize: 16,
+    color: '#4A4A4A',
     marginBottom: 16,
   },
-  durationContainer: {
+  contentInput: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    fontSize: 16,
+    color: '#4A4A4A',
+    minHeight: 160,
+    marginBottom: 24,
+  },
+  nextButton: {
+    backgroundColor: '#8B9A7D',
+    paddingVertical: 16,
+    borderRadius: 28,
+    alignItems: 'center',
+  },
+  buttonDisabled: {
+    backgroundColor: '#D4D4C4',
+  },
+  nextButtonText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '500',
+  },
+  durationGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 10,
@@ -326,39 +380,29 @@ const styles = StyleSheet.create({
   },
   durationCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 2,
+    borderRadius: 14,
+    paddingVertical: 16,
+    paddingHorizontal: 22,
   },
   durationCardSelected: {
-    backgroundColor: '#FDF9F3',
-    borderWidth: 1,
-    borderColor: '#D4C4A8',
+    backgroundColor: '#4A4A4A',
   },
-  durationLabel: {
+  durationText: {
     fontSize: 14,
-    color: '#8B8B7D',
+    color: '#6B6B5B',
     fontWeight: '500',
   },
-  durationLabelSelected: {
-    color: '#4A4A4A',
+  durationTextSelected: {
+    color: '#FFFFFF',
   },
   sealButton: {
     backgroundColor: '#D4A574',
     paddingVertical: 16,
-    borderRadius: 30,
+    borderRadius: 28,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-  },
-  sealButtonDisabled: {
-    backgroundColor: '#D4D4C4',
+    gap: 10,
   },
   sealButtonText: {
     color: '#fff',
@@ -368,7 +412,6 @@ const styles = StyleSheet.create({
   backLink: {
     alignItems: 'center',
     marginTop: 20,
-    padding: 10,
   },
   backLinkText: {
     color: '#A0A090',
@@ -378,28 +421,26 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 60,
+    paddingVertical: 80,
   },
-  boxContainer: {
-    width: 160,
-    height: 160,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 40,
-  },
-  glow: {
+  glowCircle: {
     position: 'absolute',
-    width: 200,
-    height: 200,
-    borderRadius: 100,
+    width: 180,
+    height: 180,
+    borderRadius: 90,
     backgroundColor: '#D4A574',
-    opacity: 0.2,
+  },
+  boxWrapper: {
+    width: 120,
+    height: 100,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
   },
   boxBody: {
-    width: 110,
-    height: 90,
+    width: 100,
+    height: 70,
     backgroundColor: '#FFFFFF',
-    borderRadius: 14,
+    borderRadius: 12,
     borderWidth: 2,
     borderColor: '#D4C4A8',
     alignItems: 'center',
@@ -407,51 +448,66 @@ const styles = StyleSheet.create({
   },
   boxLid: {
     position: 'absolute',
-    top: 28,
-    width: 118,
-    height: 26,
-    backgroundColor: '#F5F0E8',
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    borderWidth: 2,
-    borderColor: '#D4C4A8',
-    transformOrigin: 'bottom',
-  },
-  lidInner: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
+    top: 0,
+    width: 104,
+    height: 20,
+    backgroundColor: '#EDE8E0',
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
+    borderWidth: 2,
+    borderBottomWidth: 0,
+    borderColor: '#D4C4A8',
   },
-  lockContainer: {
-    position: 'absolute',
-    bottom: 18,
-  },
-  lockBadge: {
+  lockWrapper: {
+    marginTop: 16,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     backgroundColor: '#FFFFFF',
-    borderRadius: 26,
-    padding: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
     borderWidth: 2,
     borderColor: '#D4A574',
   },
   sealingText: {
-    fontSize: 26,
+    marginTop: 32,
+    fontSize: 18,
+    fontWeight: '300',
+    color: '#6B6B5B',
+    letterSpacing: 2,
+  },
+  doneContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 80,
+  },
+  doneIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#8B9A7D20',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 24,
+  },
+  doneTitle: {
+    fontSize: 28,
     fontWeight: '200',
     color: '#4A4A4A',
     letterSpacing: 2,
     marginBottom: 8,
   },
-  sealedInfo: {
+  doneSubtitle: {
     fontSize: 14,
     color: '#8B8B7D',
-    textAlign: 'center',
-    marginBottom: 32,
+    marginBottom: 40,
   },
   doneButton: {
     backgroundColor: '#8B9A7D',
     paddingVertical: 14,
     paddingHorizontal: 40,
-    borderRadius: 30,
+    borderRadius: 28,
   },
   doneButtonText: {
     color: '#fff',
