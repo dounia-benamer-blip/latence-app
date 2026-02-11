@@ -17,6 +17,7 @@ import Animated, { FadeInDown, FadeInUp, FadeIn } from 'react-native-reanimated'
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTheme } from './components/ThemeContext';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
@@ -67,6 +68,7 @@ interface BookRecommendation {
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { theme, isDark, toggleTheme } = useTheme();
   const [userName, setUserName] = useState('');
   const [currentMood, setCurrentMood] = useState<any>(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -103,7 +105,6 @@ export default function HomeScreen() {
         const mood = await moodRes.json();
         setCurrentMood(mood);
         
-        // Fetch book recommendations based on mood
         if (mood?.mood) {
           try {
             const booksRes = await fetch(`${API_URL}/api/book-recommendations/${mood.mood}`);
@@ -196,7 +197,6 @@ export default function HomeScreen() {
     setCompanionResponse('');
     setCompanionMessage('');
     
-    // Get initial greeting
     if (currentMood) {
       setIsLoadingCompanion(true);
       try {
@@ -224,69 +224,114 @@ export default function HomeScreen() {
   const moonPhase = getMoonPhase();
   const today = format(new Date(), "EEEE d MMMM", { locale: fr });
 
+  // Dynamic styles based on theme
+  const dynamicStyles = {
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+    },
+    card: {
+      backgroundColor: theme.card,
+    },
+    text: {
+      color: theme.text,
+    },
+    textSecondary: {
+      color: theme.textSecondary,
+    },
+    textMuted: {
+      color: theme.textMuted,
+    },
+    input: {
+      backgroundColor: theme.inputBackground,
+      color: theme.text,
+    },
+    modalBg: {
+      backgroundColor: theme.background,
+    },
+    border: {
+      borderColor: theme.border,
+    },
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, dynamicStyles.container]}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#8B9A7D" />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.accent} />
         }
       >
         {/* Header */}
         <Animated.View entering={FadeInDown.duration(600)} style={styles.header}>
           <View>
-            <Text style={styles.date}>{today}</Text>
-            <Text style={styles.title}>Latence</Text>
-            <Text style={styles.byLine}>by Atelier Benamer</Text>
+            <Text style={[styles.date, dynamicStyles.textMuted]}>{today}</Text>
+            <Text style={[styles.title, dynamicStyles.text]}>Latence</Text>
+            <Text style={[styles.byLine, dynamicStyles.textMuted]}>by Atelier Benamer</Text>
           </View>
-          <TouchableOpacity 
-            style={styles.profileButton}
-            onPress={() => router.push('/profile')}
-          >
-            <Ionicons name="person-outline" size={22} color="#6B6B5B" />
-          </TouchableOpacity>
+          <View style={styles.headerButtons}>
+            {/* Theme Toggle Button */}
+            <TouchableOpacity 
+              style={[styles.themeButton, dynamicStyles.card]}
+              onPress={toggleTheme}
+              activeOpacity={0.7}
+            >
+              <Ionicons 
+                name={isDark ? 'sunny-outline' : 'moon-outline'} 
+                size={20} 
+                color={theme.accentWarm} 
+              />
+            </TouchableOpacity>
+            {/* Profile Button */}
+            <TouchableOpacity 
+              style={[styles.profileButton, dynamicStyles.card]}
+              onPress={() => router.push('/profile')}
+            >
+              <Ionicons name="person-outline" size={22} color={theme.iconColor} />
+            </TouchableOpacity>
+          </View>
         </Animated.View>
 
         {/* Moon Phase Card */}
-        <Animated.View entering={FadeInUp.duration(600).delay(100)} style={styles.moonCard}>
+        <Animated.View entering={FadeInUp.duration(600).delay(100)} style={[styles.moonCard, dynamicStyles.card]}>
           <Text style={styles.moonEmoji}>{moonPhase.emoji}</Text>
-          <Text style={styles.moonName}>{moonPhase.name}</Text>
+          <Text style={[styles.moonName, dynamicStyles.textSecondary]}>{moonPhase.name}</Text>
         </Animated.View>
 
         {/* AI Companion Button */}
         <Animated.View entering={FadeInUp.duration(600).delay(150)}>
           <TouchableOpacity 
-            style={styles.companionButton}
+            style={[styles.companionButton, dynamicStyles.card, { borderColor: `${theme.accentWarm}30` }]}
             onPress={openCompanion}
             activeOpacity={0.8}
           >
-            <View style={styles.companionIcon}>
+            <View style={[styles.companionIcon, { backgroundColor: `${theme.accentWarm}20` }]}>
               <Text style={styles.companionEmoji}>✨</Text>
             </View>
             <View style={styles.companionText}>
-              <Text style={styles.companionTitle}>Dialogue intérieur</Text>
-              <Text style={styles.companionSubtitle}>Parler avec ton compagnon poétique</Text>
+              <Text style={[styles.companionTitle, dynamicStyles.text]}>Dialogue intérieur</Text>
+              <Text style={[styles.companionSubtitle, dynamicStyles.textMuted]}>Parler avec ton compagnon poétique</Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color="#C4C4B4" />
+            <Ionicons name="chevron-forward" size={20} color={theme.textMuted} />
           </TouchableOpacity>
         </Animated.View>
 
         {/* Stats */}
         <Animated.View entering={FadeInUp.duration(600).delay(200)} style={styles.statsRow}>
           <TouchableOpacity 
-            style={styles.statCard}
+            style={[styles.statCard, dynamicStyles.card]}
             onPress={() => router.push('/capsule/list')}
           >
-            <Text style={styles.statNumber}>{capsuleCount}</Text>
-            <Text style={styles.statLabel}>capsules</Text>
+            <Text style={[styles.statNumber, dynamicStyles.text]}>{capsuleCount}</Text>
+            <Text style={[styles.statLabel, dynamicStyles.textMuted]}>capsules</Text>
           </TouchableOpacity>
           <TouchableOpacity 
-            style={styles.statCard}
+            style={[styles.statCard, dynamicStyles.card]}
             onPress={() => router.push('/dreams')}
           >
-            <Text style={styles.statNumber}>{dreamCount}</Text>
-            <Text style={styles.statLabel}>rêves</Text>
+            <Text style={[styles.statNumber, dynamicStyles.text]}>{dreamCount}</Text>
+            <Text style={[styles.statLabel, dynamicStyles.textMuted]}>rêves</Text>
           </TouchableOpacity>
         </Animated.View>
 
@@ -298,18 +343,18 @@ export default function HomeScreen() {
               entering={FadeInUp.duration(500).delay(300 + index * 80)}
             >
               <TouchableOpacity
-                style={styles.menuItem}
+                style={[styles.menuItem, dynamicStyles.card]}
                 onPress={() => router.push(item.route as any)}
                 activeOpacity={0.7}
               >
-                <View style={styles.menuIcon}>
-                  <Ionicons name={item.icon as any} size={24} color="#6B6B5B" />
+                <View style={[styles.menuIcon, { backgroundColor: theme.background }]}>
+                  <Ionicons name={item.icon as any} size={24} color={theme.iconColor} />
                 </View>
                 <View style={styles.menuText}>
-                  <Text style={styles.menuTitle}>{item.title}</Text>
-                  <Text style={styles.menuSubtitle}>{item.subtitle}</Text>
+                  <Text style={[styles.menuTitle, dynamicStyles.text]}>{item.title}</Text>
+                  <Text style={[styles.menuSubtitle, dynamicStyles.textMuted]}>{item.subtitle}</Text>
                 </View>
-                <Ionicons name="chevron-forward" size={20} color="#C4C4B4" />
+                <Ionicons name="chevron-forward" size={20} color={theme.textMuted} />
               </TouchableOpacity>
             </Animated.View>
           ))}
@@ -319,14 +364,14 @@ export default function HomeScreen() {
         {bookRecommendations.length > 0 && (
           <Animated.View entering={FadeInUp.duration(600).delay(600)}>
             <TouchableOpacity 
-              style={styles.booksSection}
+              style={[styles.booksSection, dynamicStyles.card]}
               onPress={() => setShowBooks(true)}
             >
               <View style={styles.booksHeader}>
-                <Text style={styles.booksTitle}>📚 Lectures suggérées</Text>
-                <Text style={styles.booksSubtitle}>Pour prolonger ce moment</Text>
+                <Text style={[styles.booksTitle, dynamicStyles.text]}>📚 Lectures suggérées</Text>
+                <Text style={[styles.booksSubtitle, dynamicStyles.textMuted]}>Pour prolonger ce moment</Text>
               </View>
-              <Ionicons name="chevron-forward" size={20} color="#C4C4B4" />
+              <Ionicons name="chevron-forward" size={20} color={theme.textMuted} />
             </TouchableOpacity>
           </Animated.View>
         )}
@@ -339,40 +384,40 @@ export default function HomeScreen() {
         presentationStyle="pageSheet"
         onRequestClose={() => setShowCompanion(false)}
       >
-        <SafeAreaView style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Dialogue intérieur</Text>
+        <SafeAreaView style={[styles.modalContainer, dynamicStyles.modalBg]}>
+          <View style={[styles.modalHeader, { borderBottomColor: theme.border }]}>
+            <Text style={[styles.modalTitle, dynamicStyles.text]}>Dialogue intérieur</Text>
             <TouchableOpacity onPress={() => setShowCompanion(false)}>
-              <Ionicons name="close" size={28} color="#6B6B5B" />
+              <Ionicons name="close" size={28} color={theme.iconColor} />
             </TouchableOpacity>
           </View>
 
           <ScrollView style={styles.modalContent} contentContainerStyle={styles.modalContentContainer}>
             <View style={styles.companionIntro}>
               <Text style={styles.companionIntroEmoji}>🌙</Text>
-              <Text style={styles.companionIntroText}>
+              <Text style={[styles.companionIntroText, dynamicStyles.textSecondary]}>
                 Un espace pour explorer tes pensées et émotions à travers un dialogue poétique et bienveillant.
               </Text>
             </View>
 
             {companionResponse && (
-              <Animated.View entering={FadeIn.duration(400)} style={styles.responseCard}>
-                <Text style={styles.responseText}>{companionResponse}</Text>
+              <Animated.View entering={FadeIn.duration(400)} style={[styles.responseCard, dynamicStyles.card]}>
+                <Text style={[styles.responseText, dynamicStyles.text]}>{companionResponse}</Text>
               </Animated.View>
             )}
 
             {isLoadingCompanion && (
               <View style={styles.loadingContainer}>
-                <ActivityIndicator size="small" color="#8B9A7D" />
+                <ActivityIndicator size="small" color={theme.accent} />
               </View>
             )}
           </ScrollView>
 
-          <View style={styles.inputContainer}>
+          <View style={[styles.inputContainer, { borderTopColor: theme.border }]}>
             <TextInput
-              style={styles.companionInput}
+              style={[styles.companionInput, dynamicStyles.input]}
               placeholder="Qu'habite ton esprit en ce moment ?"
-              placeholderTextColor="#B0B0A0"
+              placeholderTextColor={theme.textMuted}
               value={companionMessage}
               onChangeText={setCompanionMessage}
               multiline
@@ -396,16 +441,16 @@ export default function HomeScreen() {
         presentationStyle="pageSheet"
         onRequestClose={() => setShowBooks(false)}
       >
-        <SafeAreaView style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Lectures suggérées</Text>
+        <SafeAreaView style={[styles.modalContainer, dynamicStyles.modalBg]}>
+          <View style={[styles.modalHeader, { borderBottomColor: theme.border }]}>
+            <Text style={[styles.modalTitle, dynamicStyles.text]}>Lectures suggérées</Text>
             <TouchableOpacity onPress={() => setShowBooks(false)}>
-              <Ionicons name="close" size={28} color="#6B6B5B" />
+              <Ionicons name="close" size={28} color={theme.iconColor} />
             </TouchableOpacity>
           </View>
 
           <ScrollView style={styles.modalContent} contentContainerStyle={styles.booksContainer}>
-            <Text style={styles.booksIntro}>
+            <Text style={[styles.booksIntro, dynamicStyles.textSecondary]}>
               Basé sur ton humeur actuelle, voici quelques lectures qui pourraient résonner avec toi...
             </Text>
             
@@ -413,11 +458,11 @@ export default function HomeScreen() {
               <Animated.View 
                 key={index} 
                 entering={FadeInUp.duration(400).delay(index * 100)}
-                style={styles.bookCard}
+                style={[styles.bookCard, dynamicStyles.card]}
               >
-                <Text style={styles.bookTitle}>{book.title}</Text>
-                <Text style={styles.bookAuthor}>{book.author}</Text>
-                <Text style={styles.bookWhy}>{book.why}</Text>
+                <Text style={[styles.bookTitle, dynamicStyles.text]}>{book.title}</Text>
+                <Text style={[styles.bookAuthor, dynamicStyles.textSecondary]}>{book.author}</Text>
+                <Text style={[styles.bookWhy, dynamicStyles.textSecondary]}>{book.why}</Text>
               </Animated.View>
             ))}
           </ScrollView>
@@ -430,7 +475,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F0E8',
   },
   scrollContent: {
     padding: 24,
@@ -444,27 +488,39 @@ const styles = StyleSheet.create({
   },
   date: {
     fontSize: 12,
-    color: '#A0A090',
     textTransform: 'capitalize',
     letterSpacing: 0.5,
   },
   title: {
     fontSize: 32,
     fontWeight: '200',
-    color: '#4A4A4A',
     letterSpacing: 4,
   },
   byLine: {
     fontSize: 10,
-    color: '#A0A090',
     letterSpacing: 1,
     marginTop: 2,
+  },
+  headerButtons: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  themeButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   profileButton: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
@@ -474,7 +530,6 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   moonCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 20,
     padding: 24,
     alignItems: 'center',
@@ -491,11 +546,9 @@ const styles = StyleSheet.create({
   },
   moonName: {
     fontSize: 14,
-    color: '#6B6B5B',
     fontWeight: '500',
   },
   companionButton: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 16,
     flexDirection: 'row',
@@ -507,13 +560,11 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
     borderWidth: 1,
-    borderColor: '#D4A57430',
   },
   companionIcon: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#D4A57420',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -527,11 +578,9 @@ const styles = StyleSheet.create({
   companionTitle: {
     fontSize: 15,
     fontWeight: '500',
-    color: '#4A4A4A',
   },
   companionSubtitle: {
     fontSize: 12,
-    color: '#A0A090',
     marginTop: 2,
   },
   statsRow: {
@@ -541,7 +590,6 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 20,
     alignItems: 'center',
@@ -554,18 +602,15 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 32,
     fontWeight: '300',
-    color: '#4A4A4A',
   },
   statLabel: {
     fontSize: 12,
-    color: '#A0A090',
     marginTop: 4,
   },
   menuContainer: {
     gap: 12,
   },
   menuItem: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 20,
     flexDirection: 'row',
@@ -580,7 +625,6 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#F5F0E8',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -591,15 +635,12 @@ const styles = StyleSheet.create({
   menuTitle: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#4A4A4A',
   },
   menuSubtitle: {
     fontSize: 12,
-    color: '#A0A090',
     marginTop: 2,
   },
   booksSection: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 20,
     flexDirection: 'row',
@@ -617,18 +658,15 @@ const styles = StyleSheet.create({
   booksTitle: {
     fontSize: 15,
     fontWeight: '500',
-    color: '#4A4A4A',
   },
   booksSubtitle: {
     fontSize: 12,
-    color: '#A0A090',
     marginTop: 2,
   },
   
   // Modal Styles
   modalContainer: {
     flex: 1,
-    backgroundColor: '#F5F0E8',
   },
   modalHeader: {
     flexDirection: 'row',
@@ -636,12 +674,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#E8E0D4',
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: '500',
-    color: '#4A4A4A',
   },
   modalContent: {
     flex: 1,
@@ -659,19 +695,16 @@ const styles = StyleSheet.create({
   },
   companionIntroText: {
     fontSize: 14,
-    color: '#8B8B7D',
     textAlign: 'center',
     lineHeight: 22,
   },
   responseCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
   },
   responseText: {
     fontSize: 16,
-    color: '#4A4A4A',
     lineHeight: 26,
     fontStyle: 'italic',
   },
@@ -682,19 +715,16 @@ const styles = StyleSheet.create({
   inputContainer: {
     padding: 16,
     borderTopWidth: 1,
-    borderTopColor: '#E8E0D4',
     flexDirection: 'row',
     alignItems: 'flex-end',
     gap: 12,
   },
   companionInput: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 12,
     fontSize: 15,
-    color: '#4A4A4A',
     maxHeight: 100,
   },
   sendButton: {
@@ -715,12 +745,10 @@ const styles = StyleSheet.create({
   },
   booksIntro: {
     fontSize: 14,
-    color: '#8B8B7D',
     marginBottom: 20,
     lineHeight: 22,
   },
   bookCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 20,
     marginBottom: 12,
@@ -728,17 +756,14 @@ const styles = StyleSheet.create({
   bookTitle: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#4A4A4A',
     marginBottom: 4,
   },
   bookAuthor: {
     fontSize: 13,
-    color: '#8B8B7D',
     marginBottom: 12,
   },
   bookWhy: {
     fontSize: 13,
-    color: '#6B6B5B',
     fontStyle: 'italic',
   },
 });
