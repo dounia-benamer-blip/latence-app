@@ -397,7 +397,7 @@ export default function HomeScreen() {
 
           <ScrollView style={styles.modalContent} contentContainerStyle={styles.modalContentContainer}>
             <View style={styles.companionIntro}>
-              <Text style={styles.companionIntroEmoji}>🌙</Text>
+              <Ionicons name="moon-outline" size={48} color={theme.accentWarm} style={{ marginBottom: 16 }} />
               <Text style={[styles.companionIntroText, dynamicStyles.textSecondary]}>
                 Un espace pour explorer tes pensées et émotions à travers un dialogue poétique et bienveillant.
               </Text>
