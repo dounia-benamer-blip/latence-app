@@ -94,6 +94,9 @@ export default function HomeScreen() {
   // Book recommendations
   const [bookRecommendations, setBookRecommendations] = useState<BookRecommendation[]>([]);
   const [showBooks, setShowBooks] = useState(false);
+  
+  // Daily notification
+  const [dailyNotification, setDailyNotification] = useState<{message: string; moon_phase: string} | null>(null);
 
   const fetchData = async () => {
     try {
@@ -105,11 +108,17 @@ export default function HomeScreen() {
         }
       }
 
-      const [moodRes, capsulesRes, dreamsRes] = await Promise.all([
+      const [moodRes, capsulesRes, dreamsRes, notifRes] = await Promise.all([
         fetch(`${API_URL}/api/mood/latest`),
         fetch(`${API_URL}/api/capsules`),
         fetch(`${API_URL}/api/dreams`),
+        fetch(`${API_URL}/api/notifications/daily`),
       ]);
+      
+      if (notifRes.ok) {
+        const notifData = await notifRes.json();
+        setDailyNotification(notifData);
+      }
       
       if (moodRes.ok) {
         const mood = await moodRes.json();
