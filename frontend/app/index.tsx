@@ -25,9 +25,19 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useTheme } from '../src/context/ThemeContext';
+import { useTheme, ThemeMode } from '../src/context/ThemeContext';
 
 const { width } = Dimensions.get('window');
+
+// Get icon name for theme toggle
+const getThemeIcon = (mode: ThemeMode): string => {
+  switch (mode) {
+    case 'light': return 'moon-outline';      // Click to go to dark
+    case 'dark': return 'eye-outline';        // Click to go to silence (eye = night vision)
+    case 'silence': return 'sunny-outline';   // Click to go to light
+    default: return 'moon-outline';
+  }
+};
 
 // Extended moods with elegant Ionicons
 const MOODS = [
