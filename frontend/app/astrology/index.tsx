@@ -224,17 +224,44 @@ export default function AstrologyScreen() {
   };
 
   const saveBirthDate = async () => {
-    const date = parseDateInput(birthDateInput);
-    if (!date) return;
+    if (!birthDateInput || !userName.trim()) return;
     
-    setBirthDate(date);
-    setUserProfile(calculateLunarHouse(date));
-    setShowDateModal(false);
-    
+    setIsLoadingProfile(true);
     try {
-      await AsyncStorage.setItem('birth_date', date.toISOString());
+      const res = await fetch(`${API_URL}/api/astrology/profile`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: userName.trim(),
+          birth_date: birthDateInput,
+          birth_place: birthPlace.trim() || 'Non précisé',
+        }),
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        setUserProfile(data);
+        setShowDateModal(false);
+        
+        // Also save locally
+        const date = parseDateInput(birthDateInput);
+        if (date) {
+          setBirthDate(date);
+          await AsyncStorage.setItem('birth_date', date.toISOString());
+        }
+      }
     } catch (e) {
-      console.log('Error saving birth date:', e);
+      console.log('Error saving profile:', e);
+      // Fallback to local calculation
+      const date = parseDateInput(birthDateInput);
+      if (date) {
+        setBirthDate(date);
+        setUserProfile(calculateLunarHouse(date));
+        setShowDateModal(false);
+        await AsyncStorage.setItem('birth_date', date.toISOString());
+      }
+    } finally {
+      setIsLoadingProfile(false);
     }
   };
 
