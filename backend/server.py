@@ -1520,22 +1520,23 @@ async def create_astrology_profile(input: AstrologyProfileCreate):
     profile["created_at"] = profile["created_at"].isoformat()
     return profile
 
-async def generate_astrology_interpretation(name, birth_date, birth_place, birth_hour, moon_phase, celtic_tree, arabic_mansion, lunar_house, zodiac_sign, ascendant):
-    """Generate AI-powered astrological interpretation with GPT-5"""
+async def generate_astrology_interpretation(name, birth_date, birth_place, birth_hour, moon_phase, celtic_tree, arabic_mansion, lunar_house, zodiac_sign, ascendant, lunar_sign=None):
+    """Generate AI-powered astrological interpretation with GPT-4o"""
     system_prompt = """Tu es un astrologue-poète d'une érudition rare, maîtrisant les traditions occidentale, celtique et arabe.
 Tu composes des portraits astrologiques qui sont de véritables œuvres littéraires : précis, profonds et lumineux.
 
 STRUCTURE DE TON PORTRAIT :
-1. **Ouverture poétique** - Une image évocatrice liée au signe solaire et à la phase lunaire
+1. **Ouverture poétique** - Une image évocatrice liée au signe solaire et à la Lune
 2. **Le Soleil** - L'essence de l'être, sa mission de vie (signe solaire)
 3. **L'Ascendant** - Le masque et la manière d'aborder le monde (si disponible)
-4. **La Lune** - Le monde émotionnel, l'inconscient, les besoins profonds
-5. **L'Arbre Celtique** - La sagesse ancestrale et les forces de caractère
-6. **La Demeure Arabe** - L'influence subtile du destin lunaire
-7. **Fermeture** - Un message personnel, une phrase qui résonne
+4. **Le Signe Lunaire** - TRÈS IMPORTANT : Le monde émotionnel profond, l'inconscient, les besoins intimes. Développe en profondeur ce que signifie avoir la Lune dans ce signe.
+5. **L'Arbre Celtique** - La sagesse druidique : décris l'arbre, son symbolisme dans la tradition celte, comment il influence la personnalité. Mentionne l'ogham (alphabet sacré).
+6. **La Demeure Lunaire Arabe (Manzil)** - La tradition des 28 demeures : explique cette demeure spécifique, sa signification en astrologie arabe, son influence subtile sur le destin.
+7. **La Phase Lunaire de Naissance** - Comment la phase de la Lune au moment de la naissance colore la personnalité
+8. **Fermeture** - Un message personnel poétique
 
-STYLE : Poétique, précis, personnel (utilise le prénom). 5-6 paragraphes.
-Tu ne prédis pas l'avenir. Tu éclaires l'essence."""
+STYLE : Poétique, précis, personnel (utilise le prénom). 6-8 paragraphes riches et développés.
+Tu ne prédis pas l'avenir. Tu éclaires l'essence profonde."""
 
     chat = LlmChat(
         api_key=EMERGENT_LLM_KEY,
@@ -1545,28 +1546,44 @@ Tu ne prédis pas l'avenir. Tu éclaires l'essence."""
 
     hour_info = f"\n**Heure de naissance** : {birth_hour}" if birth_hour else ""
     asc_info = f"\n- Ascendant : {ascendant['name']} ({ascendant['element']})" if ascendant else "\n- Ascendant : non calculé (heure non fournie)"
+    
+    lunar_sign_info = ""
+    if lunar_sign:
+        lunar_sign_info = f"""
+- **SIGNE LUNAIRE** : {lunar_sign['name']} ({lunar_sign['element']})
+  - Nature émotionnelle : {lunar_sign['emotional_nature']}
+  - Instincts : {lunar_sign['instincts']}
+  - Moi intérieur : {lunar_sign['inner_self']}
+  - Besoins : {lunar_sign['needs']}
+  - Don : {lunar_sign['gift']}"""
 
-    prompt = f"""Compose un portrait astrologique complet pour :
+    prompt = f"""Compose un portrait astrologique complet et détaillé pour :
 
 **Prénom** : {name}
 **Date de naissance** : {birth_date}{hour_info}
 **Lieu de naissance** : {birth_place}
 
 **Données calculées** :
-- Signe solaire : {zodiac_sign['name']} ({zodiac_sign['element']}, planète {zodiac_sign['planet']}){asc_info}
+- Signe solaire : {zodiac_sign['name']} ({zodiac_sign['element']}, planète {zodiac_sign['planet']}, mode {zodiac_sign['mode']}){asc_info}{lunar_sign_info}
 - Phase lunaire de naissance : {moon_phase['name']} (jour {moon_phase['day_in_cycle']} du cycle)
 - Arbre celtique : {celtic_tree['tree']} ({celtic_tree['meaning']})
 - Demeure lunaire arabe : {arabic_mansion['name']} (demeure n°{arabic_mansion['number']})
 - Maison astrologique : {lunar_house['name']} ({lunar_house['theme']})
 
-Rédige un portrait qui tisse ces différentes traditions en un tout cohérent et lumineux."""
+IMPORTANT : Développe particulièrement :
+1. Le signe lunaire et ce qu'il révèle sur la vie émotionnelle et les besoins profonds
+2. L'arbre celtique avec son symbolisme druidique complet
+3. La demeure arabe et son influence sur le chemin de vie
+
+Rédige un portrait qui tisse ces différentes traditions en un tout cohérent, riche et profondément éclairant."""
 
     try:
         response = await chat.send_message(UserMessage(text=prompt))
         return response
     except Exception as e:
         logging.error(f"Astrology interpretation error: {e}")
-        return f"Les astres murmurent pour {name}... Né(e) sous le signe {zodiac_sign['name']}, en phase de {moon_phase['name']}, guidé(e) par l'arbre {celtic_tree['tree']} et la demeure de {arabic_mansion['name']}, ton chemin brille d'une lumière unique."
+        lunar_msg = f", avec ta Lune en {lunar_sign['name']}" if lunar_sign else ""
+        return f"Les astres murmurent pour {name}... Né(e) sous le signe {zodiac_sign['name']}{lunar_msg}, en phase de {moon_phase['name']}, guidé(e) par l'arbre {celtic_tree['tree']} et la demeure de {arabic_mansion['name']}, ton chemin brille d'une lumière unique."
 
 @api_router.get("/astrology/profile/latest")
 async def get_latest_astrology_profile():
