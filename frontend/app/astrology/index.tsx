@@ -979,12 +979,19 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 12 },
   backButton: { padding: 4 },
-  headerTitle: { fontSize: 16, fontWeight: '500' },
+  headerTitle: { fontSize: 18, fontWeight: '600', letterSpacing: 1 },
   placeholder: { width: 36 },
-  tabsScroll: { maxHeight: 50 },
-  tabs: { flexDirection: 'row', paddingHorizontal: 16, gap: 6, paddingVertical: 4 },
-  tab: { paddingVertical: 10, paddingHorizontal: 16, borderRadius: 20 },
-  tabText: { fontSize: 12, fontWeight: '500' },
+  
+  // Enhanced Tabs
+  tabsContainer: { borderBottomWidth: 1, paddingBottom: 12 },
+  tabsScroll: { maxHeight: 60 },
+  tabs: { flexDirection: 'row', paddingHorizontal: 16, gap: 8, paddingVertical: 8 },
+  tab: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, paddingHorizontal: 16, borderRadius: 24, borderWidth: 1 },
+  tabActive: { borderWidth: 0 },
+  tabInactive: { borderWidth: 1 },
+  tabText: { fontSize: 13, fontWeight: '600' },
+  tabTextActive: { color: '#fff' },
+  
   scrollContent: { padding: 20, paddingBottom: 40 },
   
   // Empty Profile
