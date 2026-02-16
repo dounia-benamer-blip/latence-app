@@ -40,9 +40,9 @@ Frontend: React Native (Expo) | Backend: FastAPI + MongoDB | AI: GPT-5 via Emerg
 
 ## Tests - iteration 4: Backend 100%, Frontend 100%
 
-## Probleme connu
-- Budget Emergent LLM depasse: Les interpretations AI (reves, journal, astrologie) retournent des messages de fallback au lieu de reponses GPT-5
-- Solution: Aller dans Profile -> Universal Key -> Add Balance pour ajouter du credit
+## Modele AI
+- Utilise GPT-4o (rapide et economique)
+- Temps de reponse: Reves ~12s, Journal ~7s, Astrologie ~19s
 
 ## Backlog P1
 - [ ] Suivi d'humeur graphiques
