@@ -168,6 +168,7 @@ export default function AstrologyScreen() {
   const [userName, setUserName] = useState('');
   const [birthDateInput, setBirthDateInput] = useState('');
   const [birthPlace, setBirthPlace] = useState('');
+  const [birthHour, setBirthHour] = useState('');
   const [showDateModal, setShowDateModal] = useState(false);
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
