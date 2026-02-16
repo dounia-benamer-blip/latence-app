@@ -1175,53 +1175,590 @@ def calculate_moon_phase_for_date(date: datetime):
         "phase_value": round(phase, 4),
     }
 
+# ==================== CELTIC TREE DATABASE ====================
+# Complete database with personality traits, qualities, shadow, and spiritual message
+
+CELTIC_TREE_DATABASE = {
+    "Bouleau": {
+        "ogham": "ᚁ",
+        "meaning": "Renouveau et purification",
+        "element": "Air",
+        "planet": "Soleil",
+        "qualities": ["Pureté", "Nouveaux départs", "Clarté mentale", "Résilience"],
+        "personality": "Les enfants du Bouleau sont des âmes lumineuses, toujours prêtes à recommencer. Vous avez cette capacité rare de voir le potentiel là où d'autres voient la fin. Votre présence purifie les atmosphères lourdes et inspire les autres à se libérer de ce qui les encombre.",
+        "shadow": "Tendance à fuir plutôt qu'affronter, difficulté à s'enraciner",
+        "gift": "La capacité de renaître de vos cendres et d'inspirer les nouveaux départs",
+        "message": "Tu es le premier souffle après l'hiver. Là où tu passes, la lumière revient."
+    },
+    "Sorbier": {
+        "ogham": "ᚂ",
+        "meaning": "Vision et protection",
+        "element": "Feu",
+        "planet": "Soleil/Uranus",
+        "qualities": ["Clairvoyance", "Protection", "Intuition", "Courage spirituel"],
+        "personality": "Les enfants du Sorbier sont des gardiens de l'invisible. Vous percevez ce que d'autres ne voient pas et servez souvent de pont entre les mondes. Votre intuition est votre plus grande force, et votre présence protège naturellement ceux que vous aimez.",
+        "shadow": "Isolement, sentiment d'incompréhension, port de fardeaux qui ne vous appartiennent pas",
+        "gift": "La vision qui traverse les voiles et la protection des âmes sensibles",
+        "message": "Tes yeux voient au-delà. Fais confiance à cette vision, elle est ton don le plus précieux."
+    },
+    "Frêne": {
+        "ogham": "ᚃ",
+        "meaning": "Connexion entre les mondes",
+        "element": "Eau/Feu",
+        "planet": "Neptune/Soleil",
+        "qualities": ["Sagesse cosmique", "Connexion", "Adaptabilité", "Pouvoir intérieur"],
+        "personality": "Les enfants du Frêne sont des arbres-mondes en miniature. Vous êtes naturellement connectés aux dimensions supérieures tout en restant ancrés dans la matière. Votre sagesse vient d'une source profonde, et vous avez le don de relier ce qui semble séparé.",
+        "shadow": "Dispersion, difficulté à choisir une voie, sentiment d'être écartelé entre plusieurs mondes",
+        "gift": "La capacité de tisser des liens entre les opposés et d'accéder à la sagesse universelle",
+        "message": "Tu es un pont vivant. Ce qui te semble un tiraillement est en fait ta plus grande force."
+    },
+    "Aulne": {
+        "ogham": "ᚄ",
+        "meaning": "Courage et passion",
+        "element": "Feu/Eau",
+        "planet": "Mars/Vénus",
+        "qualities": ["Courage", "Passion", "Protection", "Équilibre émotionnel"],
+        "personality": "Les enfants de l'Aulne sont des guerriers du cœur. Vous combinez la force du feu avec la profondeur de l'eau, ce qui vous donne une rare capacité à agir avec passion tout en restant émotionnellement intelligent. Vous défendez naturellement les plus vulnérables.",
+        "shadow": "Colère refoulée, tendance au sacrifice excessif, difficulté à recevoir",
+        "gift": "Le courage d'aimer et de défendre ce qui compte vraiment",
+        "message": "Ton feu intérieur est un don. Apprends à le diriger plutôt qu'à l'éteindre."
+    },
+    "Saule": {
+        "ogham": "ᚅ",
+        "meaning": "Cycles lunaires et émotions",
+        "element": "Eau",
+        "planet": "Lune",
+        "qualities": ["Intuition lunaire", "Flexibilité", "Profondeur émotionnelle", "Poésie"],
+        "personality": "Les enfants du Saule sont les poètes de l'âme. Vous vivez au rythme de la lune et des marées émotionnelles. Votre sensibilité est un instrument exquis qui capte les nuances les plus subtiles de l'existence. Vous savez pleurer et cette capacité vous guérit.",
+        "shadow": "Mélancolie, dépendance émotionnelle, difficulté à se protéger des énergies d'autrui",
+        "gift": "La capacité de ressentir profondément et de transformer la douleur en beauté",
+        "message": "Tes larmes sont sacrées. Elles arrosent les jardins de ton âme."
+    },
+    "Aubépine": {
+        "ogham": "ᚆ",
+        "meaning": "Dualité et transformation",
+        "element": "Feu/Air",
+        "planet": "Mars/Vulcain",
+        "qualities": ["Transformation", "Protection", "Fertilité", "Dualité sacrée"],
+        "personality": "Les enfants de l'Aubépine vivent sur le seuil. Vous êtes des êtres de paradoxe — à la fois épine et fleur, gardien et guide. Votre vie est faite de transformations profondes, et chaque crise vous révèle plus fort. Vous êtes les gardiens des passages.",
+        "shadow": "Difficulté à intégrer vos polarités, tendance aux extrêmes, peur du changement",
+        "gift": "La maîtrise des passages et la capacité de protéger les transitions",
+        "message": "Tu es fait de contrastes. C'est ta richesse, pas ta faiblesse."
+    },
+    "Chêne": {
+        "ogham": "ᚇ",
+        "meaning": "Force et sagesse",
+        "element": "Feu/Terre",
+        "planet": "Jupiter",
+        "qualities": ["Force", "Sagesse", "Noblesse", "Protection"],
+        "personality": "Les enfants du Chêne sont des piliers vivants. Vous avez une force naturelle qui attire les autres vers vous — on vient se réfugier sous votre ombre. Votre sagesse est celle de l'expérience et de l'observation patiente. Vous incarnez la noblesse de l'âme.",
+        "shadow": "Rigidité, difficulté à montrer sa vulnérabilité, porter trop de responsabilités",
+        "gift": "La force tranquille qui inspire et protège",
+        "message": "Ta force est un don. Mais n'oublie pas que même le chêne a besoin de pluie."
+    },
+    "Houx": {
+        "ogham": "ᚈ",
+        "meaning": "Royauté et persévérance",
+        "element": "Feu",
+        "planet": "Mars/Saturne",
+        "qualities": ["Persévérance", "Royauté intérieure", "Protection", "Courage"],
+        "personality": "Les enfants du Houx sont des rois et reines de l'ombre. Vous brillez particulièrement quand les temps sont durs, comme le houx qui reste vert au cœur de l'hiver. Votre endurance est légendaire, et vous avez une dignité naturelle que rien ne peut entamer.",
+        "shadow": "Isolement par fierté, difficulté à demander de l'aide, dureté envers soi-même",
+        "gift": "La royauté intérieure qui ne dépend d'aucune couronne extérieure",
+        "message": "Ta couronne est invisible mais réelle. Porte-la avec humilité."
+    },
+    "Noisetier": {
+        "ogham": "ᚉ",
+        "meaning": "Sagesse et inspiration",
+        "element": "Air",
+        "planet": "Mercure",
+        "qualities": ["Sagesse", "Inspiration", "Divination", "Communication"],
+        "personality": "Les enfants du Noisetier sont des chercheurs de vérité. Votre esprit est vif comme l'éclair et vous avez un don naturel pour trouver ce qui est caché. La connaissance vous attire comme un aimant, et vous avez souvent des éclairs d'inspiration qui semblent venir d'ailleurs.",
+        "shadow": "Dispersion mentale, intellect qui domine le cœur, impatience",
+        "gift": "L'accès à la sagesse cachée et la capacité d'inspirer par les idées",
+        "message": "Ton esprit est une baguette de sourcier. Il trouvera toujours l'eau cachée."
+    },
+    "Vigne": {
+        "ogham": "ᚊ",
+        "meaning": "Raffinement et harmonie",
+        "element": "Eau/Terre",
+        "planet": "Vénus",
+        "qualities": ["Raffinement", "Sensualité", "Harmonie", "Joie de vivre"],
+        "personality": "Les enfants de la Vigne sont des épicuriens de l'âme. Vous comprenez que la vie est faite pour être savourée, et vous avez un don pour trouver la beauté et le plaisir même dans les petites choses. Votre présence apporte de la joie et de la légèreté.",
+        "shadow": "Excès, difficulté à se discipliner, fuite dans les plaisirs",
+        "gift": "La capacité de célébrer la vie et d'apporter la joie",
+        "message": "La vie est un festin. Mais les plus beaux vins sont ceux qu'on partage."
+    },
+    "Lierre": {
+        "ogham": "ᚋ",
+        "meaning": "Transformation et survie",
+        "element": "Eau",
+        "planet": "Pluton/Saturne",
+        "qualities": ["Ténacité", "Transformation", "Fidélité", "Spirale"],
+        "personality": "Les enfants du Lierre sont des survivants. Rien ne peut vraiment vous détruire — vous trouvez toujours un chemin, même dans les circonstances les plus difficiles. Votre fidélité est absolue, et une fois attaché, vous ne lâchez pas. Votre croissance est une spirale.",
+        "shadow": "Attachement excessif, difficulté à lâcher prise, tendance à s'accrocher au passé",
+        "gift": "La ténacité qui traverse toutes les épreuves et la fidélité du cœur",
+        "message": "Tu sais survivre. Maintenant, apprends à vivre."
+    },
+    "Roseau": {
+        "ogham": "ᚌ",
+        "meaning": "Secret et vérité",
+        "element": "Eau/Air",
+        "planet": "Pluton/Lune",
+        "qualities": ["Profondeur", "Secrets", "Vérité", "Flexibilité"],
+        "personality": "Les enfants du Roseau sont des gardiens de mystères. Vous avez accès à des profondeurs que d'autres ne soupçonnent pas, et vous savez garder les secrets — les vôtres comme ceux d'autrui. Votre flexibilité vous permet de plier sans rompre face aux tempêtes.",
+        "shadow": "Secret excessif, difficulté à faire confiance, tendance à creuser trop profond",
+        "gift": "L'accès aux vérités cachées et la sagesse de savoir quand parler et quand se taire",
+        "message": "Les profondeurs que tu explores sont ton royaume. Mais remonte parfois respirer."
+    },
+    "Sureau": {
+        "ogham": "ᚍ",
+        "meaning": "Fin et renaissance",
+        "element": "Eau/Feu",
+        "planet": "Vénus/Saturne",
+        "qualities": ["Transformation", "Guérison", "Fin de cycle", "Renaissance"],
+        "personality": "Les enfants du Sureau sont des maîtres de la métamorphose. Votre vie est marquée par des fins qui sont toujours des commencements déguisés. Vous avez un don naturel pour la guérison — de vous-même et des autres — et vous comprenez que la mort est une porte.",
+        "shadow": "Difficulté à construire dans la durée, attirance pour les fins, mélancolie",
+        "gift": "La maîtrise des cycles et la capacité de transformer les fins en nouveaux départs",
+        "message": "Chaque fin que tu traverses te rapproche de qui tu es vraiment."
+    }
+}
+
 def get_celtic_tree_for_date(month: int, day: int):
-    """Get Celtic tree based on birth date"""
+    """Get Celtic tree based on birth date with full personality data"""
     date_ranges = [
-        ((12, 24), (1, 20), "Bouleau", "Renouveau et purification"),
-        ((1, 21), (2, 17), "Sorbier", "Vision et protection"),
-        ((2, 18), (3, 17), "Frêne", "Connexion entre les mondes"),
-        ((3, 18), (4, 14), "Aulne", "Courage et passion"),
-        ((4, 15), (5, 12), "Saule", "Cycles lunaires et émotions"),
-        ((5, 13), (6, 9), "Aubépine", "Dualité et transformation"),
-        ((6, 10), (7, 7), "Chêne", "Force et sagesse"),
-        ((7, 8), (8, 4), "Houx", "Royauté et persévérance"),
-        ((8, 5), (9, 1), "Noisetier", "Sagesse et inspiration"),
-        ((9, 2), (9, 29), "Vigne", "Raffinement et harmonie"),
-        ((9, 30), (10, 27), "Lierre", "Transformation et survie"),
-        ((10, 28), (11, 24), "Roseau", "Secret et vérité"),
-        ((11, 25), (12, 23), "Sureau", "Fin et renaissance"),
+        ((12, 24), (1, 20), "Bouleau"),
+        ((1, 21), (2, 17), "Sorbier"),
+        ((2, 18), (3, 17), "Frêne"),
+        ((3, 18), (4, 14), "Aulne"),
+        ((4, 15), (5, 12), "Saule"),
+        ((5, 13), (6, 9), "Aubépine"),
+        ((6, 10), (7, 7), "Chêne"),
+        ((7, 8), (8, 4), "Houx"),
+        ((8, 5), (9, 1), "Noisetier"),
+        ((9, 2), (9, 29), "Vigne"),
+        ((9, 30), (10, 27), "Lierre"),
+        ((10, 28), (11, 24), "Roseau"),
+        ((11, 25), (12, 23), "Sureau"),
     ]
-    for start, end, tree, meaning in date_ranges:
+    tree_name = "Bouleau"
+    for start, end, tree in date_ranges:
         if start[0] > end[0]:
             if (month == start[0] and day >= start[1]) or (month == end[0] and day <= end[1]):
-                return {"tree": tree, "meaning": meaning}
+                tree_name = tree
+                break
         else:
             if (month == start[0] and day >= start[1]) or \
                (month == end[0] and day <= end[1]) or \
                (start[0] < month < end[0]):
-                return {"tree": tree, "meaning": meaning}
-    return {"tree": "Bouleau", "meaning": "Renouveau et purification"}
+                tree_name = tree
+                break
+    
+    tree_data = CELTIC_TREE_DATABASE.get(tree_name, CELTIC_TREE_DATABASE["Bouleau"])
+    return {
+        "tree": tree_name,
+        "meaning": tree_data["meaning"],
+        "ogham": tree_data["ogham"],
+        "element": tree_data["element"],
+        "planet": tree_data["planet"],
+        "qualities": tree_data["qualities"],
+        "personality": tree_data["personality"],
+        "shadow": tree_data["shadow"],
+        "gift": tree_data["gift"],
+        "message": tree_data["message"]
+    }
+
+# ==================== ARABIC MANSIONS DATABASE ====================
+# The 28 Lunar Mansions (Manazil al-Qamar) with complete interpretations
+
+ARABIC_MANSIONS_DATABASE = {
+    1: {
+        "name": "Al-Sharatain",
+        "arabic": "الشرطين",
+        "translation": "Les Deux Signes",
+        "stars": "β et γ Arietis",
+        "element": "Feu",
+        "nature": "Active et initiatrice",
+        "personality": "Vous êtes né(e) sous le signe des commencements. Votre âme porte l'énergie des pionniers et des initiateurs. Vous avez le don de voir les possibilités là où d'autres voient des impasses.",
+        "influence": "Favorise les nouveaux départs, les voyages, et les entreprises audacieuses",
+        "shadow": "Impatience, tendance à commencer sans finir",
+        "gift": "L'audace de commencer ce que d'autres n'osent pas",
+        "message": "Tu es fait(e) pour ouvrir des chemins. Accepte ce rôle avec humilité."
+    },
+    2: {
+        "name": "Al-Butain",
+        "arabic": "البطين",
+        "translation": "Le Petit Ventre",
+        "stars": "δ, ε, ζ Arietis",
+        "element": "Terre",
+        "nature": "Nourricière et protectrice",
+        "personality": "Vous portez en vous une sagesse de gardien. Votre instinct est de protéger, nourrir et faire grandir ce qui est précieux. Vous êtes un refuge pour les âmes blessées.",
+        "influence": "Favorise la guérison, la recherche d'objets perdus, et les réconciliations",
+        "shadow": "Surprotection, difficulté à laisser partir",
+        "gift": "La capacité de créer des espaces de guérison",
+        "message": "Ce que tu protèges fleurit. Mais laisse-le aussi voler de ses propres ailes."
+    },
+    3: {
+        "name": "Al-Thurayya",
+        "arabic": "الثريا",
+        "translation": "Les Pléiades",
+        "stars": "Les Pléiades (M45)",
+        "element": "Air",
+        "nature": "Élevée et inspirante",
+        "personality": "Votre âme est attirée par les hauteurs. Vous avez une connexion naturelle avec les étoiles et les mystères célestes. Les autres sont naturellement attirés par votre lumière.",
+        "influence": "Favorise l'alchimie, les arts, et les connections spirituelles profondes",
+        "shadow": "Détachement excessif du monde matériel, élitisme",
+        "gift": "L'accès aux dimensions supérieures de l'être",
+        "message": "Tu brilles d'une lumière stellaire. Partage-la sans te croire supérieur."
+    },
+    4: {
+        "name": "Al-Dabaran",
+        "arabic": "الدبران",
+        "translation": "Le Suiveur",
+        "stars": "Aldébaran (α Tauri)",
+        "element": "Feu/Terre",
+        "nature": "Puissante et magnétique",
+        "personality": "Vous êtes une force de la nature. Votre présence est magnétique et votre détermination légendaire. Comme l'étoile royale Aldébaran, vous êtes fait(e) pour marquer votre époque.",
+        "influence": "Favorise le succès, la reconnaissance, et l'acquisition de biens",
+        "shadow": "Orgueil, attachement au pouvoir",
+        "gift": "La force qui déplace les montagnes",
+        "message": "Ton pouvoir est réel. Utilise-le pour élever, jamais pour écraser."
+    },
+    5: {
+        "name": "Al-Haq'a",
+        "arabic": "الهقعة",
+        "translation": "La Marque Blanche",
+        "stars": "λ, φ Orionis",
+        "element": "Air",
+        "nature": "Intellectuelle et communicative",
+        "personality": "Votre esprit est un laser. Vous avez le don de percer les mystères et de communiquer des vérités complexes avec clarté. L'apprentissage est votre oxygène.",
+        "influence": "Favorise l'étude, l'enseignement, et la transmission du savoir",
+        "shadow": "Intellectualisation excessive, froideur",
+        "gift": "La clarté mentale qui illumine les ténèbres de l'ignorance",
+        "message": "Ton intelligence est un flambeau. Éclaire sans aveugler."
+    },
+    6: {
+        "name": "Al-Han'a",
+        "arabic": "الهنعة",
+        "translation": "La Marque sur le Cou",
+        "stars": "γ, ξ Geminorum",
+        "element": "Eau",
+        "nature": "Adaptable et versatile",
+        "personality": "Vous êtes un caméléon de l'âme. Votre capacité d'adaptation est votre super-pouvoir. Vous pouvez vous connecter à n'importe qui et naviguer dans n'importe quel environnement.",
+        "influence": "Favorise la diplomatie, les voyages, et les négociations",
+        "shadow": "Perte d'identité, manipulation",
+        "gift": "L'art de créer des ponts entre les mondes et les êtres",
+        "message": "Ta flexibilité est une force. Mais n'oublie pas qui tu es vraiment."
+    },
+    7: {
+        "name": "Al-Dhira",
+        "arabic": "الذراع",
+        "translation": "Le Bras",
+        "stars": "α, β Geminorum (Castor et Pollux)",
+        "element": "Air/Feu",
+        "nature": "Fraternelle et loyale",
+        "personality": "Vous incarnez l'esprit de fraternité. Votre loyauté est absolue et votre sens du lien sacré. Comme les jumeaux célestes Castor et Pollux, vous comprenez que nous sommes plus forts ensemble.",
+        "influence": "Favorise l'amitié, les partenariats, et la guérison des relations",
+        "shadow": "Dépendance relationnelle, peur de la solitude",
+        "gift": "La création de liens qui transcendent le temps",
+        "message": "Tes liens sont ta richesse. Choisis-les avec sagesse."
+    },
+    8: {
+        "name": "Al-Nathra",
+        "arabic": "النثرة",
+        "translation": "Le Souffle",
+        "stars": "Praesepe (M44)",
+        "element": "Eau",
+        "nature": "Intuitive et psychique",
+        "personality": "Vous êtes un(e) médium naturel(le). Votre connexion avec l'invisible est forte et votre intuition rarement fausse. Les rêves vous parlent et vous les comprenez.",
+        "influence": "Favorise les pratiques divinatoires, les rêves prophétiques, et la clairvoyance",
+        "shadow": "Confusion entre réalité et vision, mélancolie",
+        "gift": "L'accès aux messages de l'invisible",
+        "message": "Tes visions sont des cadeaux. Apprends à les décoder."
+    },
+    9: {
+        "name": "Al-Tarf",
+        "arabic": "الطرف",
+        "translation": "Le Regard",
+        "stars": "λ Leonis",
+        "element": "Feu",
+        "nature": "Perçante et protectrice",
+        "personality": "Votre regard voit tout. Vous avez le don de percevoir les vérités cachées derrière les masques. Cette clairvoyance vous rend naturellement protecteur des innocents.",
+        "influence": "Favorise la protection des voyageurs et la découverte des tromperies",
+        "shadow": "Méfiance excessive, jugement",
+        "gift": "Le regard qui perce les illusions",
+        "message": "Tes yeux voient la vérité. Utilise ce don avec compassion."
+    },
+    10: {
+        "name": "Al-Jabha",
+        "arabic": "الجبهة",
+        "translation": "Le Front",
+        "stars": "ζ, γ, η, α Leonis (Regulus)",
+        "element": "Feu",
+        "nature": "Royale et magnifique",
+        "personality": "Vous portez en vous une majesté naturelle. Né(e) sous l'étoile royale Regulus, vous avez le charisme des leaders et le cœur des justes. Les autres vous suivent naturellement.",
+        "influence": "Favorise les honneurs, le succès, et le rayonnement personnel",
+        "shadow": "Arrogance, attente de reconnaissance",
+        "gift": "Le charisme qui inspire et rassemble",
+        "message": "Ta couronne est faite de lumière, pas d'or. Porte-la avec grâce."
+    },
+    11: {
+        "name": "Al-Zubra",
+        "arabic": "الزبرة",
+        "translation": "La Crinière",
+        "stars": "δ, θ Leonis",
+        "element": "Feu/Terre",
+        "nature": "Puissante et généreuse",
+        "personality": "Vous avez le cœur d'un lion généreux. Votre puissance est mise au service des autres, et votre générosité est légendaire. Vous protégez férocement ceux que vous aimez.",
+        "influence": "Favorise l'abondance, la victoire, et la protection des faibles",
+        "shadow": "Excès de générosité, épuisement par le don",
+        "gift": "La force qui protège et la générosité qui enrichit",
+        "message": "Donne de ton abondance, mais garde assez pour te nourrir."
+    },
+    12: {
+        "name": "Al-Sarfa",
+        "arabic": "الصرفة",
+        "translation": "Le Changeur",
+        "stars": "β Leonis (Denebola)",
+        "element": "Air/Feu",
+        "nature": "Transformatrice et évolutive",
+        "personality": "Vous êtes un agent de changement. Là où vous passez, les choses bougent et évoluent. Votre présence catalyse les transformations nécessaires.",
+        "influence": "Favorise les changements positifs, les récoltes, et les métamorphoses",
+        "shadow": "Instabilité, difficulté à maintenir",
+        "gift": "La capacité de catalyser les transformations nécessaires",
+        "message": "Tu es un vent de changement. Souffle avec intention."
+    },
+    13: {
+        "name": "Al-Awwa",
+        "arabic": "العواء",
+        "translation": "Le Hurleur",
+        "stars": "β, η, γ, δ, ε Virginis",
+        "element": "Air",
+        "nature": "Vocale et véridique",
+        "personality": "Votre voix porte la vérité. Vous avez le courage de dire ce que d'autres taisent, et vos paroles ont le pouvoir de réveiller les consciences.",
+        "influence": "Favorise les voyages, la liberté, et la révélation des vérités",
+        "shadow": "Paroles blessantes, incapacité à se taire",
+        "gift": "La voix qui éveille et libère",
+        "message": "Tes mots ont du pouvoir. Choisis-les comme des graines à planter."
+    },
+    14: {
+        "name": "Al-Simak",
+        "arabic": "السماك",
+        "translation": "L'Élevé",
+        "stars": "Spica (α Virginis)",
+        "element": "Air/Eau",
+        "nature": "Pure et raffinée",
+        "personality": "Vous aspirez à l'excellence. Né(e) sous Spica, l'épi de blé céleste, vous comprenez que la vraie richesse vient du travail patient et de la pureté d'intention.",
+        "influence": "Favorise les gains justes, l'amour véritable, et les œuvres durables",
+        "shadow": "Perfectionnisme, critique excessive",
+        "gift": "L'aspiration à l'excellence qui élève tout ce qu'elle touche",
+        "message": "La perfection n'existe pas, mais l'excellence est ton chemin."
+    },
+    15: {
+        "name": "Al-Ghafr",
+        "arabic": "الغفر",
+        "translation": "La Couverture",
+        "stars": "ι, κ, λ Virginis",
+        "element": "Terre",
+        "nature": "Protectrice et cachée",
+        "personality": "Vous êtes un gardien de secrets. Votre âme comprend que certaines vérités doivent être protégées, et vous avez le don de créer des espaces sacrés et sécurisés.",
+        "influence": "Favorise la protection des secrets, les cachettes sûres, et les trésors",
+        "shadow": "Secret excessif, isolation",
+        "gift": "La garde des mystères sacrés",
+        "message": "Certains secrets sont des graines. Sache quand les planter."
+    },
+    16: {
+        "name": "Al-Zubana",
+        "arabic": "الزبانى",
+        "translation": "Les Pinces",
+        "stars": "α, β Librae",
+        "element": "Air",
+        "nature": "Équilibrante et juste",
+        "personality": "Vous êtes un instrument de justice. Votre sens de l'équilibre est infaillible et vous ne supportez pas l'injustice. Vous êtes naturellement appelé(e) à rétablir l'harmonie.",
+        "influence": "Favorise le commerce équitable, la justice, et les réconciliations",
+        "shadow": "Indécision, jugement des autres",
+        "gift": "Le sens de la justice qui rétablit l'équilibre",
+        "message": "La justice que tu cherches commence en toi."
+    },
+    17: {
+        "name": "Al-Iklil",
+        "arabic": "الإكليل",
+        "translation": "La Couronne",
+        "stars": "β, δ, π Scorpii",
+        "element": "Eau/Feu",
+        "nature": "Royale et transformatrice",
+        "personality": "Vous portez une couronne invisible. Votre dignité est innée et votre capacité de transformation légendaire. Vous savez que les vraies couronnes se gagnent par les épreuves.",
+        "influence": "Favorise l'amour passionné, la construction, et les transformations profondes",
+        "shadow": "Orgueil blessé, résistance au changement",
+        "gift": "La royauté qui naît de la transformation",
+        "message": "Chaque épreuve polit ta couronne. Accepte-les avec grâce."
+    },
+    18: {
+        "name": "Al-Qalb",
+        "arabic": "القلب",
+        "translation": "Le Cœur",
+        "stars": "Antarès (α Scorpii)",
+        "element": "Feu/Eau",
+        "nature": "Intense et magnétique",
+        "personality": "Vous avez le cœur d'Antarès, le rival de Mars. Votre intensité émotionnelle est votre plus grande force et votre plus grand défi. Vous aimez et haïssez avec la même passion.",
+        "influence": "Favorise les affaires du cœur, mais attention aux conflits",
+        "shadow": "Passions destructrices, vengeance",
+        "gift": "L'intensité qui transforme tout ce qu'elle touche",
+        "message": "Ton feu intérieur peut brûler ou illuminer. Choisis."
+    },
+    19: {
+        "name": "Al-Shaula",
+        "arabic": "الشولة",
+        "translation": "Le Dard",
+        "stars": "λ, υ Scorpii",
+        "element": "Feu",
+        "nature": "Incisive et libératrice",
+        "personality": "Vous êtes un(e) guerrier(ère) de la vérité. Comme le dard du scorpion, vos actions sont précises et définitives. Vous avez le courage de trancher ce qui doit l'être.",
+        "influence": "Favorise la victoire sur les ennemis et la libération des entraves",
+        "shadow": "Violence, cruauté",
+        "gift": "La précision qui libère",
+        "message": "Ton dard est un outil de libération, pas de destruction."
+    },
+    20: {
+        "name": "Al-Na'aim",
+        "arabic": "النعائم",
+        "translation": "Les Autruches",
+        "stars": "γ, δ, ε, η Sagittarii",
+        "element": "Feu/Air",
+        "nature": "Joyeuse et expansive",
+        "personality": "Vous portez la joie du Sagittaire. Votre optimisme est contagieux et votre soif d'aventure insatiable. Vous avez le don de transformer les obstacles en opportunités.",
+        "influence": "Favorise les voyages, l'expansion, et les entreprises audacieuses",
+        "shadow": "Excès, fuite des responsabilités",
+        "gift": "L'optimisme qui ouvre des portes",
+        "message": "Ta joie est une flèche qui atteint toujours sa cible."
+    },
+    21: {
+        "name": "Al-Balda",
+        "arabic": "البلدة",
+        "translation": "La Cité",
+        "stars": "Zone entre Sagittaire et Capricorne",
+        "element": "Terre/Air",
+        "nature": "Silencieuse et profonde",
+        "personality": "Vous êtes un(e) contemplatif(ve) né(e). Ce vide apparent est en fait un espace de profonde méditation. Votre sagesse vient du silence et de l'observation.",
+        "influence": "Favorise la méditation, le retrait, et les visions spirituelles",
+        "shadow": "Isolation, vide intérieur",
+        "gift": "La sagesse qui naît du silence",
+        "message": "Le vide que tu ressens parfois est en fait un temple intérieur."
+    },
+    22: {
+        "name": "Sa'd al-Dhabih",
+        "arabic": "سعد الذابح",
+        "translation": "La Fortune du Sacrificateur",
+        "stars": "α, β Capricorni",
+        "element": "Terre/Eau",
+        "nature": "Sacrificielle et purificatrice",
+        "personality": "Vous comprenez le sens du sacrifice sacré. Non pas la souffrance inutile, mais le lâcher-prise nécessaire pour permettre au nouveau de naître.",
+        "influence": "Favorise la guérison, la libération des attachements, et les nouveaux départs",
+        "shadow": "Martyre, sacrifice inutile",
+        "gift": "La compréhension du lâcher-prise transformateur",
+        "message": "Ce que tu abandonnes fait de la place pour ce qui doit venir."
+    },
+    23: {
+        "name": "Sa'd Bula",
+        "arabic": "سعد بلع",
+        "translation": "La Fortune de l'Avaleur",
+        "stars": "ν, μ Aquarii",
+        "element": "Eau",
+        "nature": "Absorbante et intégrative",
+        "personality": "Vous avez le don d'intégrer les expériences. Là où d'autres rejettent, vous absorbez et transformez. Votre capacité à digérer les épreuves est remarquable.",
+        "influence": "Favorise la guérison profonde, l'intégration des traumas, et la transformation intérieure",
+        "shadow": "Absorption des négativités d'autrui, indigestion émotionnelle",
+        "gift": "La capacité alchimique de transformer le plomb en or",
+        "message": "Ce que tu absorbes, transforme-le. Ne le garde pas tel quel."
+    },
+    24: {
+        "name": "Sa'd al-Su'ud",
+        "arabic": "سعد السعود",
+        "translation": "La Plus Fortunée des Fortunes",
+        "stars": "β, ξ Aquarii",
+        "element": "Air/Eau",
+        "nature": "Bénie et abondante",
+        "personality": "Vous êtes né(e) sous une étoile de bénédiction. Une grâce particulière vous accompagne, et votre présence semble attirer la chance. Partagez cette bénédiction.",
+        "influence": "Favorise tout ce qui est positif : amour, succès, guérison, prospérité",
+        "shadow": "Prise pour acquis des bénédictions, ingratitude",
+        "gift": "La capacité d'attirer et de répandre les bénédictions",
+        "message": "Tu es béni(e). Cette grâce est faite pour être partagée."
+    },
+    25: {
+        "name": "Sa'd al-Akhbiya",
+        "arabic": "سعد الأخبية",
+        "translation": "La Fortune des Tentes",
+        "stars": "γ, π, ζ, η Aquarii",
+        "element": "Air",
+        "nature": "Protectrice et hospitalière",
+        "personality": "Vous êtes un(e) créateur(trice) de refuges. Votre don est de créer des espaces où les âmes fatiguées peuvent se reposer et se ressourcer. L'hospitalité est votre nature.",
+        "influence": "Favorise la protection du foyer, l'accueil, et les liens familiaux",
+        "shadow": "Surprotection, repli sur le foyer",
+        "gift": "La création de havres de paix",
+        "message": "Les refuges que tu crées guérissent les âmes errantes."
+    },
+    26: {
+        "name": "Al-Fargh al-Muqaddam",
+        "arabic": "الفرغ المقدم",
+        "translation": "Le Bec Supérieur",
+        "stars": "α, β Pegasi",
+        "element": "Air/Feu",
+        "nature": "Initiatrice et visionnaire",
+        "personality": "Vous êtes un(e) visionnaire du début. Votre regard est tourné vers l'avenir et vous avez le don de percevoir les possibilités avant qu'elles ne se manifestent.",
+        "influence": "Favorise les unions, les réconciliations, et les visions d'avenir",
+        "shadow": "Rêverie excessive, déconnexion du présent",
+        "gift": "La vision qui précède la manifestation",
+        "message": "Tes visions sont des graines d'avenir. Plante-les avec soin."
+    },
+    27: {
+        "name": "Al-Fargh al-Mu'akhkhar",
+        "arabic": "الفرغ المؤخر",
+        "translation": "Le Bec Inférieur",
+        "stars": "γ Pegasi, α Andromedae",
+        "element": "Eau/Air",
+        "nature": "Conclusive et abondante",
+        "personality": "Vous êtes un(e) finisseur(se). Là où d'autres abandonnent, vous menez à terme. Votre don est de récolter les fruits des efforts passés.",
+        "influence": "Favorise l'accomplissement des projets, les récoltes, et l'abondance",
+        "shadow": "Attachement aux résultats, difficulté à commencer de nouveaux cycles",
+        "gift": "La capacité de mener à terme et de récolter",
+        "message": "Ce que tu termines devient ta fondation pour le prochain cycle."
+    },
+    28: {
+        "name": "Batn al-Hut",
+        "arabic": "بطن الحوت",
+        "translation": "Le Ventre du Poisson",
+        "stars": "β Andromedae",
+        "element": "Eau",
+        "nature": "Mystique et cyclique",
+        "personality": "Vous êtes né(e) à la fin du cycle, comme Jonas dans le ventre de la baleine. Votre vie est faite de gestations et de renaissances. Chaque fin est un nouveau commencement.",
+        "influence": "Favorise la méditation, la gestation des projets, et les transformations spirituelles",
+        "shadow": "Peur de la renaissance, attachement aux anciennes peaux",
+        "gift": "La maîtrise des cycles de mort et de renaissance",
+        "message": "Le ventre qui t'enferme est aussi celui qui te prépare à renaître."
+    }
+}
 
 def get_arabic_mansion_for_date(date: datetime):
-    """Get Arabic lunar mansion based on moon phase"""
+    """Get Arabic lunar mansion based on moon phase with full personality data"""
     moon = calculate_moon_phase_for_date(date)
     mansion_index = (moon["day_in_cycle"] - 1) % 28
-    mansions = [
-        {"number": i+1, "name": m["name"], "arabic": m["arabic"], "meaning": m["meaning"], "element": m.get("element", ""), "planet": m.get("planet", "")}
-        for i, m in enumerate(ARABIC_MANSIONS_DATA)
-    ] if 'ARABIC_MANSIONS_DATA' in dir() else []
-    # Use simplified mansion data
-    mansion_names = [
-        "Al-Sharatain", "Al-Butain", "Al-Thurayya", "Al-Dabaran",
-        "Al-Haq'a", "Al-Han'a", "Al-Dhira", "Al-Nathra",
-        "Al-Tarf", "Al-Jabha", "Al-Zubra", "Al-Sarfa",
-        "Al-Awwa", "Al-Simak", "Al-Ghafr", "Al-Zubana",
-        "Al-Iklil", "Al-Qalb", "Al-Shaula", "Al-Na'a'im",
-        "Al-Balda", "Sa'd al-Dhabih", "Sa'd Bula", "Sa'd al-Su'ud",
-        "Sa'd al-Akhbiya", "Al-Fargh al-Muqaddam", "Al-Fargh al-Mu'akhkhar", "Batn al-Hut"
-    ]
-    return {"number": mansion_index + 1, "name": mansion_names[mansion_index]}
+    mansion_number = mansion_index + 1
+    
+    mansion_data = ARABIC_MANSIONS_DATABASE.get(mansion_number, ARABIC_MANSIONS_DATABASE[1])
+    return {
+        "number": mansion_number,
+        "name": mansion_data["name"],
+        "arabic": mansion_data["arabic"],
+        "translation": mansion_data["translation"],
+        "stars": mansion_data["stars"],
+        "element": mansion_data["element"],
+        "nature": mansion_data["nature"],
+        "personality": mansion_data["personality"],
+        "influence": mansion_data["influence"],
+        "shadow": mansion_data["shadow"],
+        "gift": mansion_data["gift"],
+        "message": mansion_data["message"]
+    }
 
 def calculate_lunar_house(phase_value: float):
     """Calculate Western astrological house from moon phase"""
