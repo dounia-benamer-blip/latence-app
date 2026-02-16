@@ -110,6 +110,9 @@ export default function HomeScreen() {
   
   // Daily notification
   const [dailyNotification, setDailyNotification] = useState<{message: string; moon_phase: string} | null>(null);
+  
+  // Astro profile for aura
+  const [astroProfile, setAstroProfile] = useState<{name: string} | null>(null);
 
   const fetchData = async () => {
     try {
@@ -121,16 +124,24 @@ export default function HomeScreen() {
         }
       }
 
-      const [moodRes, capsulesRes, dreamsRes, notifRes] = await Promise.all([
+      const [moodRes, capsulesRes, dreamsRes, notifRes, astroRes] = await Promise.all([
         fetch(`${API_URL}/api/mood/latest`),
         fetch(`${API_URL}/api/capsules`),
         fetch(`${API_URL}/api/dreams`),
         fetch(`${API_URL}/api/notifications/daily`),
+        fetch(`${API_URL}/api/astrology/profile/latest`),
       ]);
       
       if (notifRes.ok) {
         const notifData = await notifRes.json();
         setDailyNotification(notifData);
+      }
+      
+      if (astroRes.ok) {
+        const astroData = await astroRes.json();
+        if (astroData?.name) {
+          setAstroProfile(astroData);
+        }
       }
       
       if (moodRes.ok) {
