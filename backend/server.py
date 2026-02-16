@@ -961,11 +961,21 @@ async def create_astrology_profile(input: AstrologyProfileCreate):
     celtic_tree = get_celtic_tree_for_date(month, day)
     arabic_mansion = get_arabic_mansion_for_date(birth_dt)
     lunar_house = calculate_lunar_house(moon_phase["phase_value"])
+    zodiac_sign = get_zodiac_sign(month, day)
+    
+    # Calculate ascendant if birth hour provided
+    ascendant = None
+    if input.birth_hour:
+        try:
+            hour = int(input.birth_hour.split(':')[0])
+            ascendant = calculate_ascendant(hour, month, day)
+        except (ValueError, IndexError):
+            pass
 
     # Generate AI interpretation
     ai_interpretation = await generate_astrology_interpretation(
-        input.name, input.birth_date, input.birth_place,
-        moon_phase, celtic_tree, arabic_mansion, lunar_house
+        input.name, input.birth_date, input.birth_place, input.birth_hour,
+        moon_phase, celtic_tree, arabic_mansion, lunar_house, zodiac_sign, ascendant
     )
 
     profile_id = str(uuid.uuid4())
@@ -974,6 +984,9 @@ async def create_astrology_profile(input: AstrologyProfileCreate):
         "name": input.name,
         "birth_date": input.birth_date,
         "birth_place": input.birth_place,
+        "birth_hour": input.birth_hour,
+        "zodiac_sign": zodiac_sign,
+        "ascendant": ascendant,
         "celtic_tree": celtic_tree,
         "arabic_mansion": arabic_mansion,
         "lunar_house": lunar_house,
