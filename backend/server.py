@@ -1275,6 +1275,189 @@ def calculate_ascendant(hour: int, month: int, day: int):
                 "Sagittaire": "Feu", "Capricorne": "Terre", "Verseau": "Air", "Poissons": "Eau"}
     return {"name": asc_name, "element": elements.get(asc_name, "")}
 
+# ==================== LUNAR SIGN CALCULATION ====================
+# The lunar sign represents where the Moon was positioned in the zodiac at birth
+# This affects emotional nature, instincts, and inner self
+
+LUNAR_SIGN_DATABASE = {
+    "Bélier": {
+        "element": "Feu",
+        "ruler": "Mars",
+        "emotional_nature": "Réactive et passionnée",
+        "instincts": "Agir vite, instinct de pionnier",
+        "inner_self": "Un feu intérieur qui brûle d'indépendance",
+        "needs": "Liberté, action, stimulation",
+        "shadow": "Impatience émotionnelle, colère soudaine",
+        "gift": "Courage émotionnel, capacité à rebondir rapidement",
+        "description": "Ta Lune en Bélier te confère une vie émotionnelle intense et directe. Tu ressens tout avec une urgence qui te pousse à l'action. Ton monde intérieur est un terrain de conquête où chaque émotion devient un défi à relever. Tu as besoin de te sentir vivant(e) et tes réactions instinctives sont rapides comme l'éclair."
+    },
+    "Taureau": {
+        "element": "Terre",
+        "ruler": "Vénus",
+        "emotional_nature": "Stable et sensorielle",
+        "instincts": "Recherche de sécurité et de confort",
+        "inner_self": "Un jardin intérieur de paix et de beauté",
+        "needs": "Stabilité, plaisirs sensoriels, routine apaisante",
+        "shadow": "Résistance au changement, possessivité",
+        "gift": "Fidélité émotionnelle, ancrage profond",
+        "description": "Ta Lune en Taureau fait de ton monde intérieur un sanctuaire de paix. Tu as besoin de sentir la terre sous tes pieds pour te sentir en sécurité. Tes émotions sont profondes comme des racines et tu les nourris avec patience. Le toucher, les parfums, la beauté tangible apaisent ton âme comme rien d'autre."
+    },
+    "Gémeaux": {
+        "element": "Air",
+        "ruler": "Mercure",
+        "emotional_nature": "Curieuse et changeante",
+        "instincts": "Communiquer, comprendre, connecter",
+        "inner_self": "Un ciel rempli de pensées qui dansent",
+        "needs": "Stimulation mentale, variété, échanges",
+        "shadow": "Nervosité, dispersion émotionnelle",
+        "gift": "Adaptabilité, intelligence émotionnelle",
+        "description": "Ta Lune en Gémeaux colore ton monde émotionnel de mille nuances. Tu ressens en pensant et tu penses en ressentant. Ton âme a soif de connexion et de compréhension. Les mots sont ton refuge - écrire, parler, lire apaise les tempêtes de ton cœur et éclaire les zones d'ombre."
+    },
+    "Cancer": {
+        "element": "Eau",
+        "ruler": "Lune",
+        "emotional_nature": "Profonde et protectrice",
+        "instincts": "Nourrir, protéger, se souvenir",
+        "inner_self": "Un océan de tendresse et de mémoire",
+        "needs": "Sécurité émotionnelle, appartenance, intimité",
+        "shadow": "Hypersensibilité, attachement au passé",
+        "gift": "Empathie profonde, intuition maternelle",
+        "description": "Ta Lune en Cancer est chez elle - tu vis dans les vagues de l'émotion pure. Ton monde intérieur est un foyer où les souvenirs, les liens et les sentiments sont sacrés. Tu portes en toi une tendresse océanique et un besoin viscéral de te sentir appartenir. La famille - de sang ou de cœur - est ton ancre."
+    },
+    "Lion": {
+        "element": "Feu",
+        "ruler": "Soleil",
+        "emotional_nature": "Généreuse et dramatique",
+        "instincts": "Briller, créer, être reconnu(e)",
+        "inner_self": "Un soleil intérieur qui demande à rayonner",
+        "needs": "Reconnaissance, créativité, expression",
+        "shadow": "Orgueil blessé, besoin excessif d'attention",
+        "gift": "Générosité du cœur, chaleur rayonnante",
+        "description": "Ta Lune en Lion fait de ton cœur une scène où chaque émotion mérite d'être célébrée. Tu ressens avec grandeur et tu aimes avec noblesse. Ton âme a besoin de briller et d'être vue dans sa magnificence. Quand tu donnes, c'est sans compter - ton amour est un soleil qui réchauffe tous ceux qui l'approchent."
+    },
+    "Vierge": {
+        "element": "Terre",
+        "ruler": "Mercure",
+        "emotional_nature": "Analytique et serviable",
+        "instincts": "Améliorer, aider, perfectionner",
+        "inner_self": "Un atelier intérieur où tout peut être réparé",
+        "needs": "Ordre, utilité, santé émotionnelle",
+        "shadow": "Autocritique, anxiété de l'imperfection",
+        "gift": "Discernement, capacité d'aide concrète",
+        "description": "Ta Lune en Vierge fait de ton monde émotionnel un jardin à cultiver avec soin. Tu analyses tes sentiments pour mieux les comprendre et les apaiser. Le désordre intérieur te trouble, mais tu as le don de transformer le chaos en harmonie. Servir et aider sont tes façons d'aimer."
+    },
+    "Balance": {
+        "element": "Air",
+        "ruler": "Vénus",
+        "emotional_nature": "Harmonieuse et relationnelle",
+        "instincts": "Équilibrer, unir, embellir",
+        "inner_self": "Un salon intérieur où tout doit être beau et juste",
+        "needs": "Harmonie, relations, beauté",
+        "shadow": "Indécision, dépendance relationnelle",
+        "gift": "Diplomatie du cœur, sens de la justice",
+        "description": "Ta Lune en Balance fait de l'harmonie ta nourriture émotionnelle. Tu ressens à travers l'autre et les relations sont le miroir de ton âme. Les conflits te troublent profondément car tu cherches l'équilibre en tout. La beauté sous toutes ses formes - art, musique, amour - apaise ton cœur."
+    },
+    "Scorpion": {
+        "element": "Eau",
+        "ruler": "Pluton",
+        "emotional_nature": "Intense et transformatrice",
+        "instincts": "Sonder, transformer, renaître",
+        "inner_self": "Un volcan sous-marin de passions profondes",
+        "needs": "Intensité, vérité, transformation",
+        "shadow": "Obsession, méfiance, rancune",
+        "gift": "Puissance de régénération, loyauté absolue",
+        "description": "Ta Lune en Scorpion fait de toi un(e) plongeur/plongeuse des profondeurs. Tes émotions sont des courants souterrains puissants qui transforment tout ce qu'ils touchent. Tu ne connais pas la demi-mesure - tu aimes ou tu te détaches, tu fais confiance totalement ou pas du tout. Chaque crise émotionnelle est une mort et une renaissance."
+    },
+    "Sagittaire": {
+        "element": "Feu",
+        "ruler": "Jupiter",
+        "emotional_nature": "Optimiste et aventurière",
+        "instincts": "Explorer, croire, s'élever",
+        "inner_self": "Un horizon intérieur toujours plus loin",
+        "needs": "Liberté, sens, aventure spirituelle",
+        "shadow": "Fuite émotionnelle, exagération",
+        "gift": "Foi inébranlable, joie contagieuse",
+        "description": "Ta Lune en Sagittaire donne des ailes à ton âme. Tu ressens à travers le prisme de la quête - chaque émotion est une aventure, chaque expérience une leçon. La routine émotionnelle t'étouffe, tu as besoin d'horizons nouveaux pour te sentir vivant(e). Ta joie est une flèche qui monte toujours vers le ciel."
+    },
+    "Capricorne": {
+        "element": "Terre",
+        "ruler": "Saturne",
+        "emotional_nature": "Réservée et ambitieuse",
+        "instincts": "Construire, endurer, accomplir",
+        "inner_self": "Une montagne intérieure à gravir",
+        "needs": "Respect, accomplissement, structure",
+        "shadow": "Froideur apparente, mélancolie",
+        "gift": "Maturité émotionnelle, force tranquille",
+        "description": "Ta Lune en Capricorne fait de ton monde émotionnel une forteresse. Tu protèges tes sentiments comme des trésors précieux qu'on ne montre pas au premier venu. La maîtrise de soi est ta force, mais sous cette surface calme coule une rivière de sensibilité profonde. Tu aimes dans la durée, avec loyauté et constance."
+    },
+    "Verseau": {
+        "element": "Air",
+        "ruler": "Uranus",
+        "emotional_nature": "Indépendante et humaniste",
+        "instincts": "Innover, libérer, relier l'humanité",
+        "inner_self": "Un ciel étoilé d'idées et d'idéaux",
+        "needs": "Liberté, originalité, connexion collective",
+        "shadow": "Détachement, froideur intellectuelle",
+        "gift": "Vision universelle, amitié authentique",
+        "description": "Ta Lune en Verseau fait de toi un(e) observateur/observatrice du cœur humain. Tu ressens pour l'humanité autant que pour les individus. Ton monde émotionnel est un laboratoire où tu expérimentes des façons nouvelles d'aimer et de vivre. La liberté émotionnelle est ton oxygène - tu refuses les chaînes du conventionnel."
+    },
+    "Poissons": {
+        "element": "Eau",
+        "ruler": "Neptune",
+        "emotional_nature": "Mystique et compassionnelle",
+        "instincts": "Rêver, fusionner, transcender",
+        "inner_self": "Un océan cosmique sans frontières",
+        "needs": "Connexion spirituelle, art, évasion créative",
+        "shadow": "Confusion, victimisation, fuite",
+        "gift": "Compassion infinie, créativité visionnaire",
+        "description": "Ta Lune en Poissons fait de ton âme une éponge cosmique. Tu absorbes les émotions du monde comme la mer absorbe les rivières. Tes rêves sont aussi réels que la réalité, et ta sensibilité n'a pas de frontières. L'art, la musique, la spiritualité sont tes refuges - là où ton âme peut enfin danser librement."
+    }
+}
+
+def calculate_lunar_sign(birth_date: datetime) -> dict:
+    """
+    Calculate the lunar sign (where the Moon was in the zodiac at birth).
+    This is a simplified calculation based on the lunar cycle.
+    The Moon spends approximately 2.5 days in each zodiac sign.
+    """
+    # Reference point: New Moon in Aries (a known astronomical event)
+    # We use March 21, 2023 as a reference where Moon was in Aries
+    reference_date = datetime(2023, 3, 21)
+    
+    # Calculate days since reference
+    days_diff = (birth_date - reference_date).days
+    
+    # Lunar cycle is approximately 27.32 days (sidereal month)
+    # The Moon moves through all 12 signs in this period
+    # So each sign takes about 2.28 days
+    sidereal_month = 27.32
+    days_per_sign = sidereal_month / 12
+    
+    # Calculate position in the cycle
+    position_in_cycle = (days_diff % sidereal_month)
+    sign_index = int(position_in_cycle / days_per_sign) % 12
+    
+    zodiac_order = [
+        "Bélier", "Taureau", "Gémeaux", "Cancer", "Lion", "Vierge",
+        "Balance", "Scorpion", "Sagittaire", "Capricorne", "Verseau", "Poissons"
+    ]
+    
+    sign_name = zodiac_order[sign_index]
+    sign_data = LUNAR_SIGN_DATABASE.get(sign_name, LUNAR_SIGN_DATABASE["Bélier"])
+    
+    return {
+        "name": sign_name,
+        "element": sign_data["element"],
+        "ruler": sign_data["ruler"],
+        "emotional_nature": sign_data["emotional_nature"],
+        "instincts": sign_data["instincts"],
+        "inner_self": sign_data["inner_self"],
+        "needs": sign_data["needs"],
+        "shadow": sign_data["shadow"],
+        "gift": sign_data["gift"],
+        "description": sign_data["description"]
+    }
+
 @api_router.post("/astrology/profile")
 async def create_astrology_profile(input: AstrologyProfileCreate):
     """Create astrology profile with full calculations and AI interpretation"""
