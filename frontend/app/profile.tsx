@@ -13,18 +13,52 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTheme } from '../src/context/ThemeContext';
+import AuraAvatar, { AURA_DATABASE } from './components/AuraAvatar';
+
+const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
 export default function ProfileScreen() {
   const router = useRouter();
+  const { theme } = useTheme();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [birthDate, setBirthDate] = useState('');
   const [email, setEmail] = useState('');
   const [isEditing, setIsEditing] = useState(false);
+  const [currentMood, setCurrentMood] = useState<string>('serein');
+  const [astroProfile, setAstroProfile] = useState<any>(null);
 
   useEffect(() => {
     loadProfile();
+    fetchCurrentMood();
   }, []);
+
+  const fetchCurrentMood = async () => {
+    try {
+      const [moodRes, astroRes] = await Promise.all([
+        fetch(`${API_URL}/api/mood/latest`),
+        fetch(`${API_URL}/api/astrology/profile/latest`),
+      ]);
+      
+      if (moodRes.ok) {
+        const moodData = await moodRes.json();
+        if (moodData?.mood) {
+          setCurrentMood(moodData.mood);
+        }
+      }
+      
+      if (astroRes.ok) {
+        const astroData = await astroRes.json();
+        if (astroData?.name) {
+          setAstroProfile(astroData);
+          if (astroData.name) setFirstName(astroData.name);
+        }
+      }
+    } catch (e) {
+      console.log('Error fetching mood:', e);
+    }
+  };
 
   const loadProfile = async () => {
     try {
