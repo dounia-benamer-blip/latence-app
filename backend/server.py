@@ -626,6 +626,105 @@ async def save_dream_interpretation(dream_id: str, interpretation: str):
     return {"success": True}
 
 # --- Astrology Routes ---
+
+# Database of major world cities for birth place selection
+WORLD_CITIES = [
+    # France
+    {"city": "Paris", "country": "France", "lat": 48.8566, "lng": 2.3522},
+    {"city": "Lyon", "country": "France", "lat": 45.7640, "lng": 4.8357},
+    {"city": "Marseille", "country": "France", "lat": 43.2965, "lng": 5.3698},
+    {"city": "Bordeaux", "country": "France", "lat": 44.8378, "lng": -0.5792},
+    {"city": "Toulouse", "country": "France", "lat": 43.6047, "lng": 1.4442},
+    {"city": "Nice", "country": "France", "lat": 43.7102, "lng": 7.2620},
+    {"city": "Strasbourg", "country": "France", "lat": 48.5734, "lng": 7.7521},
+    {"city": "Nantes", "country": "France", "lat": 47.2184, "lng": -1.5536},
+    {"city": "Lille", "country": "France", "lat": 50.6292, "lng": 3.0573},
+    {"city": "Montpellier", "country": "France", "lat": 43.6108, "lng": 3.8767},
+    # Europe
+    {"city": "Londres", "country": "Royaume-Uni", "lat": 51.5074, "lng": -0.1278},
+    {"city": "Berlin", "country": "Allemagne", "lat": 52.5200, "lng": 13.4050},
+    {"city": "Madrid", "country": "Espagne", "lat": 40.4168, "lng": -3.7038},
+    {"city": "Rome", "country": "Italie", "lat": 41.9028, "lng": 12.4964},
+    {"city": "Amsterdam", "country": "Pays-Bas", "lat": 52.3676, "lng": 4.9041},
+    {"city": "Bruxelles", "country": "Belgique", "lat": 50.8503, "lng": 4.3517},
+    {"city": "Genève", "country": "Suisse", "lat": 46.2044, "lng": 6.1432},
+    {"city": "Barcelone", "country": "Espagne", "lat": 41.3851, "lng": 2.1734},
+    {"city": "Lisbonne", "country": "Portugal", "lat": 38.7223, "lng": -9.1393},
+    {"city": "Vienne", "country": "Autriche", "lat": 48.2082, "lng": 16.3738},
+    {"city": "Prague", "country": "Tchéquie", "lat": 50.0755, "lng": 14.4378},
+    {"city": "Dublin", "country": "Irlande", "lat": 53.3498, "lng": -6.2603},
+    {"city": "Stockholm", "country": "Suède", "lat": 59.3293, "lng": 18.0686},
+    {"city": "Copenhague", "country": "Danemark", "lat": 55.6761, "lng": 12.5683},
+    {"city": "Oslo", "country": "Norvège", "lat": 59.9139, "lng": 10.7522},
+    {"city": "Helsinki", "country": "Finlande", "lat": 60.1699, "lng": 24.9384},
+    {"city": "Varsovie", "country": "Pologne", "lat": 52.2297, "lng": 21.0122},
+    {"city": "Budapest", "country": "Hongrie", "lat": 47.4979, "lng": 19.0402},
+    {"city": "Athènes", "country": "Grèce", "lat": 37.9838, "lng": 23.7275},
+    {"city": "Istanbul", "country": "Turquie", "lat": 41.0082, "lng": 28.9784},
+    {"city": "Moscou", "country": "Russie", "lat": 55.7558, "lng": 37.6173},
+    # Afrique du Nord et Moyen-Orient
+    {"city": "Casablanca", "country": "Maroc", "lat": 33.5731, "lng": -7.5898},
+    {"city": "Rabat", "country": "Maroc", "lat": 34.0209, "lng": -6.8416},
+    {"city": "Marrakech", "country": "Maroc", "lat": 31.6295, "lng": -7.9811},
+    {"city": "Alger", "country": "Algérie", "lat": 36.7538, "lng": 3.0588},
+    {"city": "Tunis", "country": "Tunisie", "lat": 36.8065, "lng": 10.1815},
+    {"city": "Le Caire", "country": "Égypte", "lat": 30.0444, "lng": 31.2357},
+    {"city": "Dubaï", "country": "Émirats Arabes Unis", "lat": 25.2048, "lng": 55.2708},
+    {"city": "Beyrouth", "country": "Liban", "lat": 33.8938, "lng": 35.5018},
+    {"city": "Tel Aviv", "country": "Israël", "lat": 32.0853, "lng": 34.7818},
+    {"city": "Dakar", "country": "Sénégal", "lat": 14.7167, "lng": -17.4677},
+    {"city": "Abidjan", "country": "Côte d'Ivoire", "lat": 5.3600, "lng": -4.0083},
+    # Amériques
+    {"city": "New York", "country": "États-Unis", "lat": 40.7128, "lng": -74.0060},
+    {"city": "Los Angeles", "country": "États-Unis", "lat": 34.0522, "lng": -118.2437},
+    {"city": "Chicago", "country": "États-Unis", "lat": 41.8781, "lng": -87.6298},
+    {"city": "Miami", "country": "États-Unis", "lat": 25.7617, "lng": -80.1918},
+    {"city": "San Francisco", "country": "États-Unis", "lat": 37.7749, "lng": -122.4194},
+    {"city": "Montréal", "country": "Canada", "lat": 45.5017, "lng": -73.5673},
+    {"city": "Toronto", "country": "Canada", "lat": 43.6532, "lng": -79.3832},
+    {"city": "Vancouver", "country": "Canada", "lat": 49.2827, "lng": -123.1207},
+    {"city": "Mexico", "country": "Mexique", "lat": 19.4326, "lng": -99.1332},
+    {"city": "Buenos Aires", "country": "Argentine", "lat": -34.6037, "lng": -58.3816},
+    {"city": "São Paulo", "country": "Brésil", "lat": -23.5505, "lng": -46.6333},
+    {"city": "Rio de Janeiro", "country": "Brésil", "lat": -22.9068, "lng": -43.1729},
+    {"city": "Lima", "country": "Pérou", "lat": -12.0464, "lng": -77.0428},
+    {"city": "Bogotá", "country": "Colombie", "lat": 4.7110, "lng": -74.0721},
+    # Asie
+    {"city": "Tokyo", "country": "Japon", "lat": 35.6762, "lng": 139.6503},
+    {"city": "Pékin", "country": "Chine", "lat": 39.9042, "lng": 116.4074},
+    {"city": "Shanghai", "country": "Chine", "lat": 31.2304, "lng": 121.4737},
+    {"city": "Hong Kong", "country": "Chine", "lat": 22.3193, "lng": 114.1694},
+    {"city": "Séoul", "country": "Corée du Sud", "lat": 37.5665, "lng": 126.9780},
+    {"city": "Bangkok", "country": "Thaïlande", "lat": 13.7563, "lng": 100.5018},
+    {"city": "Singapour", "country": "Singapour", "lat": 1.3521, "lng": 103.8198},
+    {"city": "Mumbai", "country": "Inde", "lat": 19.0760, "lng": 72.8777},
+    {"city": "New Delhi", "country": "Inde", "lat": 28.6139, "lng": 77.2090},
+    # Océanie
+    {"city": "Sydney", "country": "Australie", "lat": -33.8688, "lng": 151.2093},
+    {"city": "Melbourne", "country": "Australie", "lat": -37.8136, "lng": 144.9631},
+    {"city": "Auckland", "country": "Nouvelle-Zélande", "lat": -36.8509, "lng": 174.7645},
+]
+
+@api_router.get("/cities")
+async def search_cities(q: str = ""):
+    """Search cities for birth place selection"""
+    if not q or len(q) < 2:
+        # Return popular cities
+        popular = ["Paris", "Lyon", "Marseille", "Londres", "New York", "Casablanca", "Alger", "Montréal"]
+        return [c for c in WORLD_CITIES if c["city"] in popular]
+    
+    q_lower = q.lower()
+    results = [c for c in WORLD_CITIES if q_lower in c["city"].lower() or q_lower in c["country"].lower()]
+    return results[:15]
+
+@api_router.get("/hours")
+async def get_hours():
+    """Get list of hours for birth time selection"""
+    hours = []
+    for h in range(24):
+        for m in [0, 15, 30, 45]:
+            hours.append(f"{h:02d}:{m:02d}")
+    return hours
 @api_router.get("/astrology/houses")
 async def get_astrology_houses():
     return {"houses": ASTROLOGY_HOUSES}
