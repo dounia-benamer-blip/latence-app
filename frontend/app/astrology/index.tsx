@@ -717,6 +717,18 @@ export default function AstrologyScreen() {
               onChangeText={setBirthPlace}
               data-testid="profile-birthplace-input"
             />
+
+            <Text style={[styles.inputLabel, ds.textMuted]}>Heure de naissance (optionnel)</Text>
+            <TextInput
+              style={[styles.dateInput, ds.input, { borderColor: theme.border }]}
+              placeholder="HH:MM (ex: 14:30)"
+              placeholderTextColor={theme.textMuted}
+              value={birthHour}
+              onChangeText={setBirthHour}
+              keyboardType="numeric"
+              maxLength={5}
+              data-testid="profile-birthhour-input"
+            />
             
             <TouchableOpacity
               style={[styles.saveButton, { backgroundColor: theme.accentWarm }, isLoadingProfile && { opacity: 0.6 }]}
