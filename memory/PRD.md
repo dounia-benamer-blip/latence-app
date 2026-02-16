@@ -73,4 +73,4 @@ Frontend: React Native (Expo) | Backend: FastAPI + MongoDB | AI: GPT-4o via Emer
 ```
 
 ## URL de l'app
-**https://dream-astro.preview.emergentagent.com**
+**https://aura-astro.preview.emergentagent.com**
