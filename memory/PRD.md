@@ -12,11 +12,8 @@ Frontend: React Native (Expo) | Backend: FastAPI + MongoDB | AI: GPT-4o via Emer
 - Compagnon poétique AI, notification quotidienne lunaire
 
 ### Phase 2 - Astrologie AI
-- Profil astral complet avec :
-  - Prénom
-  - Date de naissance (sélecteurs Jour/Mois/Année)
-  - Lieu de naissance (recherche parmi 80+ villes mondiales)
-  - Heure de naissance (sélection horizontale intuitive)
+- Profil astral complet avec sélecteurs intuitifs
+- Base de données 80+ villes mondiales
 - Calculs précis : signe zodiacal (⭐), ascendant, phase lunaire, arbre celtique, demeure arabe
 - Portrait astral AI par GPT-4o - texte poétique personnalisé
 
@@ -31,56 +28,49 @@ Frontend: React Native (Expo) | Backend: FastAPI + MongoDB | AI: GPT-4o via Emer
   - **Question** : Pose LA question profonde qui peut tout éclairer
 - [x] **Bibliothèque de penseurs** - 100+ citations de tous horizons
 
-### Phase 5 - Amélioration Profil Astral (16/02/2026)
-- [x] **Base de données de villes mondiales** (80+ villes) :
-  - France (Paris, Lyon, Marseille, Bordeaux, Toulouse, Nice...)
-  - Europe (Londres, Berlin, Madrid, Rome, Amsterdam, Bruxelles...)
-  - Afrique du Nord (Casablanca, Rabat, Marrakech, Alger, Tunis, Le Caire...)
-  - Amériques (New York, Los Angeles, Montréal, São Paulo, Buenos Aires...)
-  - Asie (Tokyo, Pékin, Shanghai, Séoul, Bangkok, Mumbai...)
-  - Océanie (Sydney, Melbourne, Auckland)
-- [x] **Sélecteur de date intuitif** (Jour | Mois | Année en colonnes)
-- [x] **Sélecteur d'heure horizontal** (00:00 à 23:00)
-- [x] **Recherche de ville** avec autocomplétion
-- [x] **Calcul astral précis** via GPT-4o avec :
-  - Signe solaire avec élément et planète
-  - Ascendant avec élément
-  - Phase lunaire de naissance
-  - Arbre celtique et ses qualités
-  - Demeure lunaire arabe
-  - Portrait astral poétique personnalisé
+### Phase 5 - AURA AVATAR (16/02/2026) ✨ NOUVEAU
+- [x] **Avatar Aura Dynamique** qui change selon l'humeur :
+  - **12 types d'auras** avec couleurs et significations uniques
+  - Animation pulsante organique (3 couches qui respirent)
+  - Rotation lente pour un effet vivant
+  - Affichage de l'initiale de l'utilisateur au centre
+
+- [x] **Base de données des Auras** :
+  | Humeur | Aura | Couleurs | Élément |
+  |--------|------|----------|---------|
+  | Serein | Sérénité | Bleu-vert | Eau calme |
+  | Joyeux | Joie | Or lumineux | Lumière solaire |
+  | Rêveur | Onirique | Violet/lavande | Brume éthérée |
+  | Mélancolique | Profondeur | Bleu-gris | Brume marine |
+  | Fatigué | Repos | Terre/sable | Terre apaisée |
+  | Inspiré | Inspiration | Rose/corail | Flamme créatrice |
+  | Anxieux | Mouvement | Bleu électrique | Vent d'orage |
+  | Nostalgique | Mémoire | Sépia/ambre | Sable du temps |
+  | Perdu | Quête | Gris argenté | Brouillard sacré |
+  | Reconnaissant | Gratitude | Vert printemps | Forêt vivante |
+  | Contemplatif | Sagesse | Bleu profond | Ciel nocturne |
+  | Éveillé | Éveil | Blanc pur | Lumière pure |
+
+- [x] **Affichage de la signification** sur la page profil
+- [x] **Avatar miniature** dans le header de l'accueil
 
 ## Modèle AI
 - GPT-4o (rapide et de qualité)
-- Temps de réponse: ~5-20 secondes selon la complexité
-
-## Backlog P1
-- [ ] Suivi d'humeur avec graphiques
-- [ ] Micro-animations sur les interactions
-
-## Backlog P2
-- [ ] Mode hors-ligne
-- [ ] Partage de capsules
+- Temps de réponse: ~5-20 secondes
 
 ## Architecture
 ```
 /app/frontend/app/
-├── index.tsx         # Onboarding/Mood
-├── home.tsx          # Dashboard avec Miroir
-├── mirror/           # IA MIROIR
-├── astrology/        # Module astrologie AMÉLIORÉ
-├── capsule/          # Journal et scellement
-├── dreams/           # Carnet des rêves
-└── profile.tsx       # Profil utilisateur
-
-/app/backend/
-└── server.py         # API complète avec :
-    - /api/cities?q=xxx - Recherche de villes
-    - /api/hours - Liste des heures
-    - /api/astrology/profile - Calcul astral complet
-    - /api/mirror/reflect - IA Miroir
-    - /api/dream/interpret - Interprétation des rêves
+├── components/
+│   └── AuraAvatar.tsx    # Composant Aura animé + Database
+├── index.tsx             # Onboarding/Mood
+├── home.tsx              # Dashboard avec Aura Avatar
+├── profile.tsx           # Profil avec Aura + signification
+├── mirror/               # IA MIROIR
+├── astrology/            # Module astrologie
+├── capsule/              # Journal et scellement
+└── dreams/               # Carnet des rêves
 ```
 
-## Base de données des villes
-80+ villes mondiales avec coordonnées GPS (lat/lng) pour le calcul astrologique précis.
+## URL de l'app
+**https://dream-astro.preview.emergentagent.com**
