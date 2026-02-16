@@ -337,11 +337,43 @@ export default function AstrologyScreen() {
             <View style={styles.dateInfo}>
               <Text style={[styles.dateLabel, ds.textMuted]}>{userProfile.name}</Text>
               <Text style={[styles.dateValue, ds.text]}>
-                {userProfile.birth_date} - {userProfile.birth_place}
+                {userProfile.birth_date}{userProfile.birth_hour ? ` à ${userProfile.birth_hour}` : ''} - {userProfile.birth_place}
               </Text>
             </View>
             <Ionicons name="create-outline" size={20} color={theme.textMuted} />
           </TouchableOpacity>
+
+          {/* Zodiac Sign */}
+          {userProfile.zodiac_sign && (
+            <Animated.View entering={FadeInUp.duration(400).delay(50)} style={[styles.profileCard, ds.card]}>
+              <View style={[styles.profileIconContainer, { backgroundColor: `${theme.accentWarm}20` }]}>
+                <Ionicons name="sunny" size={28} color={theme.accentWarm} />
+              </View>
+              <Text style={[styles.profileCardTitle, ds.text]}>Signe solaire</Text>
+              <Text style={[styles.profileCardValue, ds.textSecondary]}>
+                {userProfile.zodiac_sign.name}
+              </Text>
+              <Text style={[styles.profileCardTheme, { color: theme.accentWarm }]}>
+                {userProfile.zodiac_sign.element} - Planète {userProfile.zodiac_sign.planet}
+              </Text>
+            </Animated.View>
+          )}
+
+          {/* Ascendant */}
+          {userProfile.ascendant && (
+            <Animated.View entering={FadeInUp.duration(400).delay(100)} style={[styles.profileCard, ds.card]}>
+              <View style={[styles.profileIconContainer, { backgroundColor: `${theme.accent}20` }]}>
+                <Ionicons name="arrow-up-circle-outline" size={28} color={theme.accent} />
+              </View>
+              <Text style={[styles.profileCardTitle, ds.text]}>Ascendant</Text>
+              <Text style={[styles.profileCardValue, ds.textSecondary]}>
+                {userProfile.ascendant.name}
+              </Text>
+              <Text style={[styles.profileCardTheme, { color: theme.accent }]}>
+                {userProfile.ascendant.element}
+              </Text>
+            </Animated.View>
+          )}
 
           {/* AI Interpretation */}
           {userProfile.ai_interpretation && (
