@@ -46,6 +46,13 @@ interface MenuItem {
 
 const MENU_ITEMS: MenuItem[] = [
   {
+    id: 'mirror',
+    title: 'Miroir',
+    subtitle: 'IA qui reflète ton âme',
+    icon: 'eye-outline',
+    route: '/mirror',
+  },
+  {
     id: 'ecrire',
     title: 'Écrire',
     subtitle: 'Déposer une pensée',
