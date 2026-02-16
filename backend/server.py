@@ -862,6 +862,193 @@ async def get_journal_entries():
     entries = await db.journals.find().sort("date", -1).to_list(100)
     return [JournalEntry(**e) for e in entries]
 
+# --- IA MIROIR - Deep Soul Reflection ---
+
+class MirrorRequest(BaseModel):
+    message: str
+    context: Optional[str] = None  # previous messages for continuity
+    mood: Optional[str] = None
+
+class MirrorSession(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    messages: List[dict] = []
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+@api_router.post("/mirror/reflect")
+async def mirror_reflect(request: MirrorRequest):
+    """IA Miroir - Deep psychoanalytic reflection that's poetic, never clinical"""
+    
+    system_prompt = """Tu es l'IA Miroir — un compagnon d'âme qui pratique une forme de psychanalyse poétique, jamais clinique.
+
+TES TROIS DIMENSIONS :
+
+1. **LE MIROIR** - Tu reflètes ce que tu perçois dans les mots :
+   - Les émotions cachées derrière les mots
+   - Les métaphores inconscientes utilisées
+   - Les thèmes récurrents
+   - Ce qui est dit ET ce qui n'est pas dit
+
+2. **LE QUESTIONNEUR** - Tu poses des questions profondes :
+   - Questions ouvertes qui invitent à l'introspection
+   - Questions qui dévoilent sans brusquer
+   - Questions comme des clés pour des portes intérieures
+   - Jamais de questions fermées (oui/non)
+
+3. **L'INTERPRÈTE DOUX** - Tu analyses avec bienveillance :
+   - Tu fais des liens avec les archétypes (Jung)
+   - Tu explores les désirs cachés (sans être Freudien clinique)
+   - Tu utilises la métaphore et la poésie
+   - Tu parles de l'âme, pas du mental
+
+RÈGLES ABSOLUES :
+- Tu n'es JAMAIS un thérapeute ou un médecin
+- Tu ne diagnostiques JAMAIS
+- Tu ne donnes JAMAIS de conseils directs
+- Tu utilises "tu" avec chaleur et proximité
+- Tes réponses sont poétiques, profondes, littéraires
+- Tu cites parfois les grands penseurs (Rumi, Jung, Pessoa, Gibran, Nietzsche, Camus, Ibn Arabi)
+- Tu fais des références subtiles à la nature, aux cycles, aux éléments
+
+FORMAT :
+- 2-3 paragraphes maximum
+- Une réflexion miroir
+- Une ou deux questions profondes
+- Parfois une citation qui résonne
+
+Tu es comme un ami sage au coin du feu, sous les étoiles."""
+
+    chat = LlmChat(
+        api_key=EMERGENT_LLM_KEY,
+        session_id=f"mirror-{uuid.uuid4()}",
+        system_message=system_prompt
+    ).with_model("openai", "gpt-4o")
+
+    context_text = ""
+    if request.context:
+        context_text = f"\n\n[Contexte de la conversation précédente : {request.context}]"
+    
+    mood_text = ""
+    if request.mood:
+        mood_map = {
+            "serein": "apaisé", "joyeux": "joyeux", "reveur": "rêveur",
+            "melancolique": "mélancolique", "fatigue": "fatigué",
+            "inspire": "inspiré", "anxieux": "anxieux", "nostalgique": "nostalgique",
+            "perdu": "en quête", "reconnaissant": "reconnaissant",
+            "contemplatif": "contemplatif", "eveille": "éveillé"
+        }
+        mood_text = f"\n[L'âme qui s'exprime se sent actuellement : {mood_map.get(request.mood, request.mood)}]"
+
+    prompt = f"""{mood_text}{context_text}
+
+Voici ce que cette âme te confie :
+
+"{request.message}"
+
+Offre-lui ton miroir, tes questions, ta lumière."""
+
+    try:
+        response = await chat.send_message(UserMessage(text=prompt))
+        return {"reflection": response}
+    except Exception as e:
+        logging.error(f"Mirror reflection error: {e}")
+        return {"reflection": "Le miroir se trouble un instant... Que ressens-tu vraiment en ce moment ? Parfois, les mots ont besoin de temps pour trouver leur chemin vers la surface."}
+
+@api_router.post("/mirror/analyze-writing")
+async def analyze_writing_style(request: MirrorRequest):
+    """Analyze what someone's writing reveals about them"""
+    
+    system_prompt = """Tu es un graphologue de l'âme — tu lis ce que l'écriture révèle sur celui qui écrit.
+
+TU ANALYSES :
+- Le choix des mots (vocabulaire émotionnel vs rationnel)
+- La structure des phrases (courtes = urgence, longues = contemplation)
+- Les images et métaphores utilisées
+- Ce qui est répété (obsessions, thèmes)
+- Ce qui est évité (les silences parlent)
+- Le rythme de l'écriture
+- Les contradictions intérieures
+
+TU RÉVÈLES avec délicatesse :
+- Les forces cachées de la personne
+- Les peurs qui transparaissent
+- Les désirs inavoués
+- Les archétypes dominants (le Héros, l'Orphelin, le Sage, l'Amoureux, le Créateur...)
+- Le rapport au temps (passé/présent/futur)
+
+STYLE :
+- Poétique et bienveillant
+- Jamais clinique ou froid
+- Comme un oracle doux qui lit dans les lignes de l'âme
+- 2-3 paragraphes riches
+
+Tu termines toujours par une question qui invite à aller plus loin."""
+
+    chat = LlmChat(
+        api_key=EMERGENT_LLM_KEY,
+        session_id=f"analyze-{uuid.uuid4()}",
+        system_message=system_prompt
+    ).with_model("openai", "gpt-4o")
+
+    prompt = f"""Analyse ce que cette écriture révèle sur son auteur :
+
+---
+{request.message}
+---
+
+Que vois-tu dans ces lignes ? Que disent-elles de l'âme qui les a tracées ?"""
+
+    try:
+        response = await chat.send_message(UserMessage(text=prompt))
+        return {"analysis": response}
+    except Exception as e:
+        logging.error(f"Writing analysis error: {e}")
+        return {"analysis": "Chaque mot que tu écris porte une empreinte de ton âme. Même dans le silence entre les lignes, je perçois quelque chose qui cherche à s'exprimer. Qu'est-ce qui, en toi, demande à être entendu ?"}
+
+@api_router.post("/mirror/deep-question")
+async def get_deep_question(request: MirrorRequest):
+    """Generate a deep introspective question based on context"""
+    
+    system_prompt = """Tu es un maître des questions profondes — tu poses LA question qui peut transformer.
+
+TES QUESTIONS :
+- Ouvrent des portes intérieures
+- Font réfléchir pendant des heures
+- Touchent l'essentiel sans brusquer
+- Sont poétiques et évocatrices
+- N'ont pas de "bonne" réponse
+
+INSPIRATIONS :
+- Socrate et la maïeutique
+- Les koans zen
+- Les questions des mystiques soufis
+- La profondeur de Jung
+- La clarté de Krishnamurti
+
+FORMAT :
+- Une seule question, parfaitement ciselée
+- Éventuellement une phrase d'introduction poétique
+- Maximum 2-3 phrases au total"""
+
+    chat = LlmChat(
+        api_key=EMERGENT_LLM_KEY,
+        session_id=f"question-{uuid.uuid4()}",
+        system_message=system_prompt
+    ).with_model("openai", "gpt-4o")
+
+    context = request.message if request.message else "Cette âme cherche une question pour s'éveiller."
+    mood_hint = f" (Son état actuel : {request.mood})" if request.mood else ""
+
+    prompt = f"""Contexte : {context}{mood_hint}
+
+Pose UNE question profonde qui pourrait illuminer cette âme."""
+
+    try:
+        response = await chat.send_message(UserMessage(text=prompt))
+        return {"question": response}
+    except Exception as e:
+        logging.error(f"Deep question error: {e}")
+        return {"question": "Si tu pouvais murmurer un secret à l'enfant que tu étais, que lui dirais-tu ?"}
+
 # --- Astrology Profile Routes ---
 
 def calculate_moon_phase_for_date(date: datetime):
