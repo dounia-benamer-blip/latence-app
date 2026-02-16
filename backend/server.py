@@ -835,6 +835,85 @@ async def get_sacred_text(mood: str):
     selected = random.choice(texts)
     return {"text": selected["text"], "source": selected["source"]}
 
+@api_router.post("/sacred-text-personalized")
+async def get_personalized_sacred_text(request: dict):
+    """Get a personalized sacred text based on mood AND astral profile"""
+    mood = request.get("mood", "serein")
+    astral_profile = request.get("astral_profile", None)
+    
+    # Get base texts for mood
+    texts = SACRED_TEXTS.get(mood, SACRED_TEXTS.get("serein", []))
+    if not texts:
+        texts = SACRED_TEXTS["serein"]
+    
+    # If we have an astral profile, use AI to personalize the quote
+    if astral_profile and astral_profile.get("zodiac_sign"):
+        system_prompt = """Tu es un sage qui connaît les textes sacrés de toutes les traditions.
+Tu sélectionnes et adaptes des citations selon le profil astral et l'humeur de la personne.
+
+RÈGLES :
+- Choisis une citation qui résonne avec le profil astral ET l'humeur
+- La citation doit être authentique (d'un auteur connu)
+- Ajoute une courte explication de pourquoi cette citation est parfaite pour cette personne
+- Maximum 2-3 phrases
+
+FORMAT DE RÉPONSE (exactement) :
+"[Citation]" — [Auteur]
+
+[Courte explication personnalisée]"""
+
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"sacred-{uuid.uuid4()}",
+            system_message=system_prompt
+        ).with_model("openai", "gpt-4o")
+
+        zodiac = astral_profile.get("zodiac_sign", {}).get("name", "")
+        lunar = astral_profile.get("lunar_sign", {}).get("name", "")
+        tree = astral_profile.get("celtic_tree", {}).get("tree", "")
+        mansion = astral_profile.get("arabic_mansion", {}).get("name", "")
+        
+        prompt = f"""Profil de la personne :
+- Signe solaire : {zodiac}
+- Signe lunaire : {lunar}  
+- Arbre celtique : {tree}
+- Demeure arabe : {mansion}
+- Humeur actuelle : {mood}
+
+Trouve une citation parfaite pour cette personne, qui parle à son essence profonde."""
+
+        try:
+            response = await chat.send_message(UserMessage(text=prompt))
+            # Parse the response to extract quote and explanation
+            lines = response.strip().split('\n')
+            quote_line = lines[0] if lines else ""
+            explanation = '\n'.join(lines[2:]) if len(lines) > 2 else ""
+            
+            # Try to extract author
+            if '—' in quote_line:
+                parts = quote_line.rsplit('—', 1)
+                text = parts[0].strip().strip('"')
+                source = parts[1].strip()
+            else:
+                text = quote_line.strip('"')
+                source = "Sagesse ancienne"
+            
+            return {
+                "text": text,
+                "source": source,
+                "explanation": explanation.strip(),
+                "personalized": True
+            }
+        except Exception as e:
+            logging.error(f"Personalized sacred text error: {e}")
+            # Fallback to random quote
+            selected = random.choice(texts)
+            return {"text": selected["text"], "source": selected["source"], "personalized": False}
+    else:
+        # No profile, use random quote
+        selected = random.choice(texts)
+        return {"text": selected["text"], "source": selected["source"], "personalized": False}
+
 @api_router.get("/book-recommendations/{mood}")
 async def get_book_recommendations(mood: str):
     """Get book recommendations based on mood"""
