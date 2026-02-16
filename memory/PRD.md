@@ -12,38 +12,47 @@ Frontend: React Native (Expo) | Backend: FastAPI + MongoDB | AI: GPT-4o via Emer
 - Compagnon poétique AI, notification quotidienne lunaire
 
 ### Phase 2 - Astrologie AI
-- Profil astral : prénom, date/heure de naissance, lieu
-- Calculs : signe zodiacal (étoile, pas soleil), ascendant, phase lunaire, arbre celtique, demeure arabe, maison lunaire
-- Portrait astral AI par GPT-4o
+- Profil astral complet avec :
+  - Prénom
+  - Date de naissance (sélecteurs Jour/Mois/Année)
+  - Lieu de naissance (recherche parmi 80+ villes mondiales)
+  - Heure de naissance (sélection horizontale intuitive)
+- Calculs précis : signe zodiacal (⭐), ascendant, phase lunaire, arbre celtique, demeure arabe
+- Portrait astral AI par GPT-4o - texte poétique personnalisé
 
-### Phase 3 - AI partout + Bug fixes
-- [x] Écrire : auto-interprétation AI après sauvegarde
+### Phase 3 - AI partout
+- [x] Écrire : auto-interprétation AI après sauvegarde (texte visible)
 - [x] Carnet des rêves : type, 10 émotions, interprétation Freud/Jung GPT-4o
-- [x] Fix: texte visible dans "Écrire" (couleur #2A2A2A)
-- [x] Fix: date-fns crashes → fonctions safe
-- [x] Fix: capsule badge "undefined jours" → "Xj restants"
-- [x] Fix: bouton "Continuer" sticky en bas
 
 ### Phase 4 - IA Miroir + Littérature (16/02/2026)
 - [x] **IA MIROIR** - 3 modes de psychanalyse poétique :
   - **Reflet** : Reflète tes pensées/émotions avec douceur
   - **Analyse** : Analyse ce que ton écriture révèle de toi
   - **Question** : Pose LA question profonde qui peut tout éclairer
-- [x] **Bibliothèque de penseurs élargie** - 100+ citations de :
-  - Rumi, Khalil Gibran, Marc Aurèle, Lao Tseu, Bouddha, Sénèque, Confucius
-  - Ibn Arabi, Thich Nhat Hanh, Jung, Nietzsche, Camus, Dostoïevski
-  - Pessoa, Victor Hugo, Platon, Gandhi, Einstein, et bien d'autres
-- [x] Animation de scellement élégante en 9 phases
-- [x] Icône étoile au lieu de soleil pour l'astrologie
+- [x] **Bibliothèque de penseurs** - 100+ citations de tous horizons
+
+### Phase 5 - Amélioration Profil Astral (16/02/2026)
+- [x] **Base de données de villes mondiales** (80+ villes) :
+  - France (Paris, Lyon, Marseille, Bordeaux, Toulouse, Nice...)
+  - Europe (Londres, Berlin, Madrid, Rome, Amsterdam, Bruxelles...)
+  - Afrique du Nord (Casablanca, Rabat, Marrakech, Alger, Tunis, Le Caire...)
+  - Amériques (New York, Los Angeles, Montréal, São Paulo, Buenos Aires...)
+  - Asie (Tokyo, Pékin, Shanghai, Séoul, Bangkok, Mumbai...)
+  - Océanie (Sydney, Melbourne, Auckland)
+- [x] **Sélecteur de date intuitif** (Jour | Mois | Année en colonnes)
+- [x] **Sélecteur d'heure horizontal** (00:00 à 23:00)
+- [x] **Recherche de ville** avec autocomplétion
+- [x] **Calcul astral précis** via GPT-4o avec :
+  - Signe solaire avec élément et planète
+  - Ascendant avec élément
+  - Phase lunaire de naissance
+  - Arbre celtique et ses qualités
+  - Demeure lunaire arabe
+  - Portrait astral poétique personnalisé
 
 ## Modèle AI
-- Utilise GPT-4o (rapide et de qualité)
-- Temps de réponse: ~5-15 secondes selon la complexité
-
-## Tests
-- Backend: 100% fonctionnel
-- Frontend: 100% fonctionnel
-- IA Miroir: Testé et opérationnel
+- GPT-4o (rapide et de qualité)
+- Temps de réponse: ~5-20 secondes selon la complexité
 
 ## Backlog P1
 - [ ] Suivi d'humeur avec graphiques
@@ -52,41 +61,26 @@ Frontend: React Native (Expo) | Backend: FastAPI + MongoDB | AI: GPT-4o via Emer
 ## Backlog P2
 - [ ] Mode hors-ligne
 - [ ] Partage de capsules
-- [ ] Approfondissement des traditions astrologiques avec AI
 
 ## Architecture
 ```
 /app/frontend/app/
 ├── index.tsx         # Onboarding/Mood
 ├── home.tsx          # Dashboard avec Miroir
-├── _layout.tsx       # Tab navigator
-├── mirror/           # IA MIROIR (NOUVEAU)
-│   └── index.tsx     # Chat avec 3 modes
-├── astrology/        # Module astrologie
-├── capsule/
-│   ├── seal.tsx      # Animation élégante
-│   ├── write.tsx     # Écriture (texte visible)
-│   └── list.tsx      # Liste capsules
-├── dreams/           # Journal des rêves
+├── mirror/           # IA MIROIR
+├── astrology/        # Module astrologie AMÉLIORÉ
+├── capsule/          # Journal et scellement
+├── dreams/           # Carnet des rêves
 └── profile.tsx       # Profil utilisateur
 
 /app/backend/
-└── server.py         # API avec :
-    - /api/mirror/reflect
-    - /api/mirror/analyze-writing
-    - /api/mirror/deep-question
-    - /api/dream/interpret
-    - /api/journal/interpret
-    - /api/astrology/profile
+└── server.py         # API complète avec :
+    - /api/cities?q=xxx - Recherche de villes
+    - /api/hours - Liste des heures
+    - /api/astrology/profile - Calcul astral complet
+    - /api/mirror/reflect - IA Miroir
+    - /api/dream/interpret - Interprétation des rêves
 ```
 
-## Penseurs et Sagesses
-L'app puise dans les traditions :
-- Soufisme (Rumi, Ibn Arabi)
-- Bouddhisme (Bouddha, Thich Nhat Hanh)
-- Taoïsme (Lao Tseu)
-- Stoïcisme (Marc Aurèle, Sénèque, Épictète)
-- Philosophie grecque (Platon, Socrate)
-- Sagesses africaines, celtiques, arabes, indiennes, japonaises
-- Littérature (Hugo, Camus, Pessoa, Dostoïevski, Gibran)
-- Psychanalyse poétique (Jung - non clinique)
+## Base de données des villes
+80+ villes mondiales avec coordonnées GPS (lat/lng) pour le calcul astrologique précis.
