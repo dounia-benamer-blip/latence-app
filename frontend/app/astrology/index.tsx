@@ -741,23 +741,40 @@ export default function AstrologyScreen() {
         <View style={styles.placeholder} />
       </View>
 
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false} 
-        style={styles.tabsScroll}
-        contentContainerStyle={styles.tabs}
-      >
-        {['profile', 'lune', 'celtique', 'arabe', 'maisons'].map((t) => (
-          <TouchableOpacity
-            key={t}
-            style={[styles.tab, tab === t ? ds.tabActive : ds.tabInactive]}
-            onPress={() => { setTab(t); setSelectedItem(null); }}
-            data-testid={`tab-${t}`}
-          >
-            <Text style={[styles.tabText, tab === t ? ds.tabTextActive : ds.tabTextInactive]}>
-              {t === 'profile' ? 'Profil' : t.charAt(0).toUpperCase() + t.slice(1)}
-            </Text>
-          </TouchableOpacity>
+      {/* Enhanced Tabs Navigation */}
+      <View style={[styles.tabsContainer, { backgroundColor: theme.card, borderBottomColor: theme.border }]}>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false} 
+          style={styles.tabsScroll}
+          contentContainerStyle={styles.tabs}
+        >
+          {[
+            { key: 'profile', label: 'Mon Profil', icon: 'person-outline' },
+            { key: 'lune', label: 'Lune', icon: 'moon-outline' },
+            { key: 'celtique', label: 'Celtique', icon: 'leaf-outline' },
+            { key: 'arabe', label: 'Arabe', icon: 'star-outline' },
+            { key: 'maisons', label: 'Maisons', icon: 'home-outline' },
+          ].map((t) => (
+            <TouchableOpacity
+              key={t.key}
+              style={[
+                styles.tab, 
+                tab === t.key ? [styles.tabActive, { backgroundColor: theme.accentWarm }] : [styles.tabInactive, { backgroundColor: theme.background, borderColor: theme.border }]
+              ]}
+              onPress={() => { setTab(t.key); setSelectedItem(null); }}
+              data-testid={`tab-${t.key}`}
+            >
+              <Ionicons 
+                name={t.icon as any} 
+                size={16} 
+                color={tab === t.key ? '#fff' : theme.textMuted} 
+                style={{ marginRight: 6 }}
+              />
+              <Text style={[styles.tabText, tab === t.key ? styles.tabTextActive : { color: theme.textMuted }]}>
+                {t.label}
+              </Text>
+            </TouchableOpacity>
         ))}
       </ScrollView>
 
