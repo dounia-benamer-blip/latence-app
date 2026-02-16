@@ -151,10 +151,7 @@ export default function CapsuleListScreen() {
 
                   <View style={styles.capsuleMeta}>
                     <Text style={styles.metaText}>
-                      {formatDistanceToNow(new Date(capsule.created_at), {
-                        addSuffix: true,
-                        locale: fr,
-                      })}
+                      {timeAgo(capsule.created_at)}
                     </Text>
                     {capsule.is_sealed && capsule.days_remaining !== undefined && (
                       <Text style={styles.remainingText}>
