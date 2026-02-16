@@ -4,53 +4,57 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  TextInput,
   ScrollView,
   SafeAreaView,
-  TextInput,
-  RefreshControl,
   ActivityIndicator,
+  Switch,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
-import { formatDistanceToNow } from 'date-fns';
+import Animated, { FadeIn, FadeInUp, FadeInDown } from 'react-native-reanimated';
+import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
-const DREAM_TYPES = [
-  { id: 'reve', label: 'Rêve', icon: 'cloudy-night-outline' },
-  { id: 'cauchemar', label: 'Cauchemar', icon: 'thunderstorm-outline' },
-  { id: 'lucide', label: 'Lucide', icon: 'eye-outline' },
-  { id: 'recurrent', label: 'Récurrent', icon: 'repeat-outline' },
-];
-
 const EMOTIONS = [
-  'Peur', 'Joie', 'Tristesse', 'Paix', 'Confusion', 
-  'Colère', 'Nostalgie', 'Curiosité'
+  { id: 'peur', label: 'Peur', icon: 'alert-circle-outline' },
+  { id: 'joie', label: 'Joie', icon: 'happy-outline' },
+  { id: 'tristesse', label: 'Tristesse', icon: 'water-outline' },
+  { id: 'colere', label: 'Colère', icon: 'flame-outline' },
+  { id: 'confusion', label: 'Confusion', icon: 'help-circle-outline' },
+  { id: 'paix', label: 'Paix', icon: 'leaf-outline' },
+  { id: 'angoisse', label: 'Angoisse', icon: 'thunderstorm-outline' },
+  { id: 'nostalgie', label: 'Nostalgie', icon: 'time-outline' },
+  { id: 'emerveillement', label: 'Émerveillement', icon: 'sparkles-outline' },
+  { id: 'desir', label: 'Désir', icon: 'heart-outline' },
 ];
 
-interface Dream {
+type Dream = {
   id: string;
-  title: string;
   content: string;
   dream_type: string;
+  is_recurring: boolean;
+  is_nightmare: boolean;
   emotions: string[];
   interpretation?: string;
-  date: string;
-}
+  created_at: string;
+};
 
 export default function DreamsScreen() {
   const router = useRouter();
+  const [view, setView] = useState<'list' | 'new'>('list');
   const [dreams, setDreams] = useState<Dream[]>([]);
-  const [showNewDream, setShowNewDream] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
-  
-  const [title, setTitle] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  // New dream form
   const [content, setContent] = useState('');
-  const [dreamType, setDreamType] = useState('');
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [isNightmare, setIsNightmare] = useState(false);
   const [selectedEmotions, setSelectedEmotions] = useState<string[]>([]);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isInterpreting, setIsInterpreting] = useState(false);
   const [interpretation, setInterpretation] = useState('');
 
   useEffect(() => {
@@ -66,545 +70,440 @@ export default function DreamsScreen() {
       }
     } catch (e) {
       console.log('Error fetching dreams:', e);
-    }
-  };
-
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await fetchDreams();
-    setRefreshing(false);
-  };
-
-  const toggleEmotion = (emotion: string) => {
-    if (selectedEmotions.includes(emotion)) {
-      setSelectedEmotions(selectedEmotions.filter(e => e !== emotion));
-    } else if (selectedEmotions.length < 3) {
-      setSelectedEmotions([...selectedEmotions, emotion]);
-    }
-  };
-
-  const handleAnalyze = async () => {
-    if (!content || !dreamType || selectedEmotions.length === 0) return;
-    
-    setIsAnalyzing(true);
-    try {
-      const res = await fetch(`${API_URL}/api/dream/interpret`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          dream_content: content,
-          dream_type: dreamType,
-          emotions: selectedEmotions,
-        }),
-      });
-      
-      if (res.ok) {
-        const data = await res.json();
-        setInterpretation(data.interpretation);
-      }
-    } catch (e) {
-      console.log('Error interpreting dream:', e);
     } finally {
-      setIsAnalyzing(false);
+      setLoading(false);
     }
   };
 
-  const handleSaveDream = async () => {
-    if (!title || !content || !dreamType) return;
-    
+  const toggleEmotion = (id: string) => {
+    setSelectedEmotions(prev =>
+      prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id]
+    );
+  };
+
+  const getDreamType = () => {
+    if (isNightmare) return 'cauchemar';
+    if (isRecurring) return 'recurrent';
+    return 'reve';
+  };
+
+  const handleSaveAndInterpret = async () => {
+    if (!content.trim()) return;
+
+    setIsSaving(true);
+    setIsInterpreting(true);
+
     try {
-      const res = await fetch(`${API_URL}/api/dream`, {
+      // Save dream
+      const dreamData = {
+        content: content.trim(),
+        dream_type: getDreamType(),
+        is_recurring: isRecurring,
+        is_nightmare: isNightmare,
+        emotions: selectedEmotions,
+      };
+
+      const saveRes = await fetch(`${API_URL}/api/dream`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dreamData),
+      });
+
+      // Request interpretation
+      const interpretRes = await fetch(`${API_URL}/api/dream/interpret`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title,
-          content,
-          dream_type: dreamType,
-          emotions: selectedEmotions,
+          content: content.trim(),
+          dream_type: getDreamType(),
+          emotions: selectedEmotions.length > 0 ? selectedEmotions : ['non précisé'],
         }),
       });
-      
-      if (res.ok) {
-        const dream = await res.json();
-        
-        if (interpretation) {
-          await fetch(`${API_URL}/api/dream/${dream.id}/interpretation`, {
+
+      if (interpretRes.ok) {
+        const interpData = await interpretRes.json();
+        setInterpretation(interpData.interpretation);
+
+        // Save interpretation to the dream
+        if (saveRes.ok) {
+          const savedDream = await saveRes.json();
+          await fetch(`${API_URL}/api/dream/${savedDream.id}/interpretation`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(interpretation),
+            body: JSON.stringify(interpData.interpretation),
           });
         }
-        
-        resetForm();
-        setShowNewDream(false);
-        fetchDreams();
       }
     } catch (e) {
-      console.log('Error saving dream:', e);
+      console.log('Error:', e);
+    } finally {
+      setIsSaving(false);
+      setIsInterpreting(false);
     }
   };
 
   const resetForm = () => {
-    setTitle('');
     setContent('');
-    setDreamType('');
+    setIsRecurring(false);
+    setIsNightmare(false);
     setSelectedEmotions([]);
     setInterpretation('');
+    setView('list');
+    fetchDreams();
   };
 
-  const getDreamTypeInfo = (typeId: string) => {
-    return DREAM_TYPES.find(t => t.id === typeId);
-  };
-
-  const renderNewDreamForm = () => (
-    <Animated.View entering={FadeInDown.duration(500)} style={styles.formContainer}>
-      <View style={styles.formHeader}>
-        <Text style={styles.formTitle}>Nouveau rêve</Text>
-        <TouchableOpacity onPress={() => { resetForm(); setShowNewDream(false); }}>
-          <Ionicons name="close" size={24} color="#6B6B5B" />
+  const renderList = () => (
+    <Animated.View entering={FadeIn.duration(400)}>
+      <View style={styles.listHeader}>
+        <Text style={styles.title}>Carnet des rêves</Text>
+        <TouchableOpacity
+          style={styles.newDreamBtn}
+          onPress={() => setView('new')}
+          data-testid="new-dream-btn"
+        >
+          <Ionicons name="add" size={22} color="#fff" />
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.sectionLabel}>Type</Text>
-      <View style={styles.typeRow}>
-        {DREAM_TYPES.map((type) => (
-          <TouchableOpacity
-            key={type.id}
-            style={[
-              styles.typeChip,
-              dreamType === type.id && styles.typeChipSelected,
-            ]}
-            onPress={() => setDreamType(type.id)}
-            activeOpacity={0.7}
+      <Text style={styles.subtitle}>Tes rêves, interprétés par Freud, Jung et les anciens.</Text>
+
+      {loading ? (
+        <ActivityIndicator style={{ marginTop: 40 }} color="#C4A87C" />
+      ) : dreams.length === 0 ? (
+        <View style={styles.emptyState}>
+          <Ionicons name="moon-outline" size={48} color="#C4A87C" />
+          <Text style={styles.emptyText}>Aucun rêve enregistré</Text>
+          <Text style={styles.emptySubtext}>Commence ton carnet onirique</Text>
+        </View>
+      ) : (
+        dreams.map((dream, i) => (
+          <Animated.View
+            key={dream.id}
+            entering={FadeInUp.duration(400).delay(i * 80)}
           >
-            <Ionicons
-              name={type.icon as any}
-              size={18}
-              color={dreamType === type.id ? '#4A4A4A' : '#A0A090'}
-            />
-            <Text
-              style={[
-                styles.typeLabel,
-                dreamType === type.id && styles.typeLabelSelected,
-              ]}
+            <TouchableOpacity
+              style={styles.dreamCard}
+              onPress={() => router.push(`/dreams/${dream.id}`)}
+              data-testid={`dream-card-${dream.id}`}
             >
-              {type.label}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      <Text style={styles.sectionLabel}>Titre</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Un nom pour ce rêve..."
-        placeholderTextColor="#B0B0A0"
-        value={title}
-        onChangeText={setTitle}
-      />
-
-      <Text style={styles.sectionLabel}>Récit</Text>
-      <TextInput
-        style={[styles.input, styles.textArea]}
-        placeholder="Décris ton rêve en détail..."
-        placeholderTextColor="#B0B0A0"
-        value={content}
-        onChangeText={setContent}
-        multiline
-        textAlignVertical="top"
-      />
-
-      <Text style={styles.sectionLabel}>Émotions (max 3)</Text>
-      <View style={styles.emotionsGrid}>
-        {EMOTIONS.map((emotion) => (
-          <TouchableOpacity
-            key={emotion}
-            style={[
-              styles.emotionChip,
-              selectedEmotions.includes(emotion) && styles.emotionChipSelected,
-            ]}
-            onPress={() => toggleEmotion(emotion)}
-            activeOpacity={0.7}
-          >
-            <Text
-              style={[
-                styles.emotionText,
-                selectedEmotions.includes(emotion) && styles.emotionTextSelected,
-              ]}
-            >
-              {emotion}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      <TouchableOpacity
-        style={[
-          styles.analyzeButton,
-          (!content || !dreamType || selectedEmotions.length === 0) && styles.buttonDisabled,
-        ]}
-        onPress={handleAnalyze}
-        disabled={!content || !dreamType || selectedEmotions.length === 0 || isAnalyzing}
-        activeOpacity={0.8}
-      >
-        {isAnalyzing ? (
-          <ActivityIndicator color="#fff" size="small" />
-        ) : (
-          <Text style={styles.analyzeButtonText}>Interpréter</Text>
-        )}
-      </TouchableOpacity>
-
-      {interpretation && (
-        <Animated.View entering={FadeInUp.duration(500)} style={styles.interpretationCard}>
-          <Text style={styles.interpretationTitle}>Interprétation</Text>
-          <ScrollView style={styles.interpretationScroll} nestedScrollEnabled>
-            <Text style={styles.interpretationText}>{interpretation}</Text>
-          </ScrollView>
-        </Animated.View>
+              <View style={styles.dreamMeta}>
+                <Ionicons
+                  name={dream.is_nightmare ? 'thunderstorm-outline' : 'cloud-outline'}
+                  size={18}
+                  color={dream.is_nightmare ? '#C47C7C' : '#A8B4C4'}
+                />
+                <Text style={styles.dreamDate}>
+                  {format(new Date(dream.created_at), 'd MMM yyyy', { locale: fr })}
+                </Text>
+                {dream.is_recurring && (
+                  <View style={styles.recurringBadge}>
+                    <Ionicons name="repeat-outline" size={12} color="#8B9A7D" />
+                    <Text style={styles.recurringText}>Récurrent</Text>
+                  </View>
+                )}
+              </View>
+              <Text style={styles.dreamPreview} numberOfLines={2}>
+                {dream.content}
+              </Text>
+              {dream.interpretation && (
+                <View style={styles.hasInterpretation}>
+                  <Ionicons name="sparkles" size={12} color="#C4A87C" />
+                  <Text style={styles.hasInterpretationText}>Interprété</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          </Animated.View>
+        ))
       )}
-
-      <TouchableOpacity
-        style={[
-          styles.saveButton,
-          (!title || !content || !dreamType) && styles.buttonDisabled,
-        ]}
-        onPress={handleSaveDream}
-        disabled={!title || !content || !dreamType}
-        activeOpacity={0.8}
-      >
-        <Text style={styles.saveButtonText}>Enregistrer</Text>
-      </TouchableOpacity>
     </Animated.View>
   );
 
-  const renderDreamList = () => (
-    <>
-      {dreams.length === 0 ? (
-        <Animated.View entering={FadeInUp.duration(600)} style={styles.emptyState}>
-          <Ionicons name="cloudy-night-outline" size={48} color="#C4C4B4" />
-          <Text style={styles.emptyTitle}>Aucun rêve</Text>
-          <Text style={styles.emptyText}>
-            Enregistre tes rêves pour découvrir leurs significations
+  const renderNewDream = () => (
+    <Animated.View entering={FadeIn.duration(400)}>
+      {!interpretation ? (
+        <>
+          <Text style={styles.formTitle}>Raconte ton rêve</Text>
+          <Text style={styles.formSubtitle}>
+            Décris-le avec le plus de détails possible. Couleurs, sensations, personnages...
           </Text>
-        </Animated.View>
-      ) : (
-        <View style={styles.dreamList}>
-          {dreams.map((dream, index) => {
-            const typeInfo = getDreamTypeInfo(dream.dream_type);
-            return (
-              <Animated.View
-                key={dream.id}
-                entering={FadeInUp.duration(500).delay(index * 80)}
+
+          <TextInput
+            style={styles.dreamInput}
+            placeholder="J'ai rêvé que..."
+            placeholderTextColor="#C4C4B4"
+            value={content}
+            onChangeText={setContent}
+            multiline
+            autoFocus
+            textAlignVertical="top"
+            data-testid="dream-content-input"
+          />
+
+          {/* Dream type toggles */}
+          <View style={styles.toggleSection}>
+            <View style={styles.toggleRow}>
+              <View style={styles.toggleInfo}>
+                <Ionicons name="repeat-outline" size={20} color="#8B9A7D" />
+                <Text style={styles.toggleLabel}>Rêve récurrent</Text>
+              </View>
+              <Switch
+                value={isRecurring}
+                onValueChange={setIsRecurring}
+                trackColor={{ false: '#E0E0D8', true: '#8B9A7D' }}
+                thumbColor="#fff"
+                data-testid="dream-recurring-switch"
+              />
+            </View>
+            <View style={styles.toggleRow}>
+              <View style={styles.toggleInfo}>
+                <Ionicons name="thunderstorm-outline" size={20} color="#C47C7C" />
+                <Text style={styles.toggleLabel}>Cauchemar</Text>
+              </View>
+              <Switch
+                value={isNightmare}
+                onValueChange={setIsNightmare}
+                trackColor={{ false: '#E0E0D8', true: '#C47C7C' }}
+                thumbColor="#fff"
+                data-testid="dream-nightmare-switch"
+              />
+            </View>
+          </View>
+
+          {/* Emotions */}
+          <Text style={styles.sectionTitle}>Émotions ressenties</Text>
+          <View style={styles.emotionsGrid}>
+            {EMOTIONS.map(emo => (
+              <TouchableOpacity
+                key={emo.id}
+                style={[
+                  styles.emotionChip,
+                  selectedEmotions.includes(emo.id) && styles.emotionChipActive,
+                ]}
+                onPress={() => toggleEmotion(emo.id)}
+                data-testid={`emotion-${emo.id}`}
               >
-                <TouchableOpacity
-                  style={styles.dreamCard}
-                  onPress={() => router.push(`/dreams/${dream.id}`)}
-                  activeOpacity={0.7}
+                <Ionicons
+                  name={emo.icon as any}
+                  size={14}
+                  color={selectedEmotions.includes(emo.id) ? '#fff' : '#8B8B7B'}
+                />
+                <Text
+                  style={[
+                    styles.emotionText,
+                    selectedEmotions.includes(emo.id) && styles.emotionTextActive,
+                  ]}
                 >
-                  <View style={styles.dreamHeader}>
-                    <Ionicons
-                      name={typeInfo?.icon as any}
-                      size={18}
-                      color="#8B8B7D"
-                    />
-                    <Text style={styles.dreamDate}>
-                      {formatDistanceToNow(new Date(dream.date), {
-                        addSuffix: true,
-                        locale: fr,
-                      })}
-                    </Text>
-                  </View>
-                  
-                  <Text style={styles.dreamTitle}>{dream.title}</Text>
-                  <Text style={styles.dreamPreview} numberOfLines={2}>
-                    {dream.content}
-                  </Text>
-                  
-                  {dream.interpretation && (
-                    <View style={styles.analyzedBadge}>
-                      <Text style={styles.analyzedText}>Interprété</Text>
-                    </View>
-                  )}
-                </TouchableOpacity>
-              </Animated.View>
-            );
-          })}
-        </View>
+                  {emo.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <TouchableOpacity
+            style={[styles.interpretBtn, !content.trim() && styles.interpretBtnDisabled]}
+            onPress={handleSaveAndInterpret}
+            disabled={!content.trim() || isSaving}
+            data-testid="dream-interpret-btn"
+          >
+            {isSaving ? (
+              <ActivityIndicator color="#fff" size="small" />
+            ) : (
+              <>
+                <Ionicons name="sparkles" size={18} color="#fff" />
+                <Text style={styles.interpretBtnText}>Interpréter mon rêve</Text>
+              </>
+            )}
+          </TouchableOpacity>
+        </>
+      ) : (
+        <Animated.View entering={FadeInDown.duration(600)}>
+          <View style={styles.interpretationHeader}>
+            <Ionicons name="sparkles" size={24} color="#C4A87C" />
+            <Text style={styles.interpretationTitle}>Interprétation</Text>
+          </View>
+
+          <ScrollView style={styles.interpretationScroll} showsVerticalScrollIndicator={false}>
+            <Text style={styles.interpretationText}>{interpretation}</Text>
+          </ScrollView>
+
+          <TouchableOpacity
+            style={styles.doneBtn}
+            onPress={resetForm}
+            data-testid="dream-done-btn"
+          >
+            <Text style={styles.doneBtnText}>Retour au carnet</Text>
+          </TouchableOpacity>
+        </Animated.View>
       )}
-    </>
+    </Animated.View>
   );
 
   return (
     <SafeAreaView style={styles.container}>
-      <Animated.View entering={FadeInDown.duration(500)} style={styles.header}>
+      <View style={styles.nav}>
         <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
+          onPress={() => view === 'new' ? resetForm() : router.back()}
+          hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+          data-testid="dreams-back-btn"
         >
-          <Ionicons name="arrow-back" size={24} color="#6B6B5B" />
+          <Ionicons name={view === 'new' ? 'arrow-back' : 'chevron-down'} size={26} color="#6B6B5B" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Rêves</Text>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => setShowNewDream(true)}
-        >
-          <Ionicons name="add" size={24} color="#8B9A7D" />
-        </TouchableOpacity>
-      </Animated.View>
+        <Text style={styles.navTitle}>
+          {view === 'new' ? 'Nouveau rêve' : 'Carnet des rêves'}
+        </Text>
+        <View style={{ width: 26 }} />
+      </View>
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#8B9A7D" />
-        }
+        keyboardShouldPersistTaps="handled"
       >
-        {showNewDream ? renderNewDreamForm() : renderDreamList()}
+        {view === 'list' ? renderList() : renderNewDream()}
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F5F0E8',
-  },
-  header: {
+  container: { flex: 1, backgroundColor: '#F5F0E8' },
+  nav: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
   },
-  backButton: {
-    width: 40,
-    height: 40,
+  navTitle: { fontSize: 17, fontWeight: '500', color: '#4A4A4A', letterSpacing: 0.3 },
+  scrollContent: { padding: 24, paddingTop: 8, paddingBottom: 40 },
+  listHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#4A4A4A',
-    letterSpacing: 0.5,
-  },
-  addButton: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  scrollContent: {
-    padding: 24,
-    paddingBottom: 40,
-  },
-  emptyState: {
-    alignItems: 'center',
-    paddingVertical: 80,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: '500',
-    color: '#4A4A4A',
-    marginTop: 20,
     marginBottom: 8,
   },
-  emptyText: {
-    fontSize: 14,
-    color: '#A0A090',
-    textAlign: 'center',
-  },
-  dreamList: {
-    gap: 12,
-  },
-  dreamCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  dreamHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  title: { fontSize: 26, fontWeight: '300', color: '#2A2A2A', letterSpacing: -0.5 },
+  subtitle: { fontSize: 13, color: '#A0A090', marginBottom: 28, lineHeight: 18 },
+  newDreamBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#8B9A7D',
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyState: { alignItems: 'center', marginTop: 60, gap: 12 },
+  emptyText: { fontSize: 16, color: '#6B6B5B', fontWeight: '400' },
+  emptySubtext: { fontSize: 13, color: '#A0A090' },
+  dreamCard: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 18,
     marginBottom: 12,
   },
-  dreamDate: {
-    fontSize: 12,
-    color: '#A0A090',
-  },
-  dreamTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#4A4A4A',
-    marginBottom: 8,
-  },
-  dreamPreview: {
-    fontSize: 14,
-    color: '#8B8B7D',
-    lineHeight: 20,
-  },
-  analyzedBadge: {
-    marginTop: 12,
-    alignSelf: 'flex-start',
-    backgroundColor: '#8B9A7D20',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+  dreamMeta: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
+  dreamDate: { fontSize: 12, color: '#A0A090' },
+  recurringBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#8B9A7D15',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
     borderRadius: 10,
   },
-  analyzedText: {
-    fontSize: 11,
-    color: '#8B9A7D',
-    fontWeight: '500',
-  },
-  formContainer: {
-    gap: 16,
-  },
-  formHeader: {
+  recurringText: { fontSize: 11, color: '#8B9A7D' },
+  dreamPreview: { fontSize: 14, color: '#4A4A4A', lineHeight: 20 },
+  hasInterpretation: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    gap: 4,
+    marginTop: 10,
   },
-  formTitle: {
-    fontSize: 24,
-    fontWeight: '300',
+  hasInterpretationText: { fontSize: 11, color: '#C4A87C' },
+  formTitle: { fontSize: 22, fontWeight: '300', color: '#2A2A2A', marginBottom: 8 },
+  formSubtitle: { fontSize: 13, color: '#A0A090', lineHeight: 18, marginBottom: 24 },
+  dreamInput: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 20,
+    fontSize: 16,
     color: '#4A4A4A',
-    letterSpacing: 0.5,
+    lineHeight: 24,
+    minHeight: 160,
+    fontWeight: '300',
+    marginBottom: 20,
   },
-  sectionLabel: {
-    fontSize: 12,
-    color: '#8B8B7D',
-    letterSpacing: 0.5,
-    marginBottom: -8,
+  toggleSection: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 4,
+    marginBottom: 24,
   },
-  typeRow: {
+  toggleRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 14,
   },
-  typeChip: {
+  toggleInfo: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  toggleLabel: { fontSize: 15, color: '#4A4A4A' },
+  sectionTitle: {
+    fontSize: 13,
+    color: '#A0A090',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    marginBottom: 12,
+  },
+  emotionsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 32 },
+  emotionChip: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#fff',
     paddingHorizontal: 14,
     paddingVertical: 10,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  typeChipSelected: {
-    backgroundColor: '#FDF9F3',
-    borderWidth: 1,
-    borderColor: '#D4C4A8',
-  },
-  typeLabel: {
-    fontSize: 13,
-    color: '#A0A090',
-  },
-  typeLabelSelected: {
-    color: '#4A4A4A',
-    fontWeight: '500',
-  },
-  input: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    fontSize: 15,
-    color: '#4A4A4A',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  textArea: {
-    minHeight: 100,
-  },
-  emotionsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  emotionChip: {
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
     borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.03,
-    shadowRadius: 4,
-    elevation: 1,
   },
-  emotionChipSelected: {
-    backgroundColor: '#FDF9F3',
-    borderWidth: 1,
-    borderColor: '#D4C4A8',
-  },
-  emotionText: {
-    fontSize: 13,
-    color: '#A0A090',
-  },
-  emotionTextSelected: {
-    color: '#4A4A4A',
-    fontWeight: '500',
-  },
-  analyzeButton: {
-    backgroundColor: '#A8B4C4',
-    paddingVertical: 14,
-    borderRadius: 25,
+  emotionChipActive: { backgroundColor: '#8B9A7D' },
+  emotionText: { fontSize: 13, color: '#8B8B7B' },
+  emotionTextActive: { color: '#fff' },
+  interpretBtn: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#C4A87C',
+    borderRadius: 24,
+    paddingVertical: 16,
+    marginBottom: 20,
   },
-  buttonDisabled: {
-    backgroundColor: '#D4D4C4',
-  },
-  analyzeButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '500',
-    letterSpacing: 0.5,
-  },
-  interpretationCard: {
-    backgroundColor: '#FDF9F3',
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: '#E8E0D4',
+  interpretBtnDisabled: { opacity: 0.5 },
+  interpretBtnText: { color: '#fff', fontSize: 15, fontWeight: '500' },
+  interpretationHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 20,
   },
   interpretationTitle: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#4A4A4A',
-    marginBottom: 12,
+    fontSize: 20,
+    fontWeight: '400',
+    color: '#C4A87C',
+    letterSpacing: 0.3,
   },
-  interpretationScroll: {
-    maxHeight: 180,
-  },
+  interpretationScroll: { marginBottom: 24 },
   interpretationText: {
-    fontSize: 13,
-    color: '#6B6B5B',
-    lineHeight: 20,
+    fontSize: 15,
+    color: '#4A4A4A',
+    lineHeight: 26,
+    fontWeight: '300',
   },
-  saveButton: {
+  doneBtn: {
     backgroundColor: '#8B9A7D',
+    borderRadius: 24,
     paddingVertical: 16,
-    borderRadius: 25,
     alignItems: 'center',
   },
-  saveButtonText: {
-    color: '#fff',
-    fontSize: 15,
-    fontWeight: '500',
-    letterSpacing: 0.5,
-  },
+  doneBtnText: { color: '#fff', fontSize: 15, fontWeight: '500' },
 });
