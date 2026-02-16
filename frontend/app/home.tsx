@@ -76,7 +76,7 @@ const MENU_ITEMS: MenuItem[] = [
   },
   {
     id: 'astro',
-    title: 'Astres',
+    title: 'Cosmos',
     subtitle: 'Lune, Celtique, Arabe, Maisons',
     icon: 'moon-outline',
     route: '/astrology',
