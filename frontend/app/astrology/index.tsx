@@ -173,6 +173,35 @@ export default function AstrologyScreen() {
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [birthDate, setBirthDate] = useState<Date | null>(null);
+  
+  // New picker states
+  const [selectedDay, setSelectedDay] = useState(15);
+  const [selectedMonth, setSelectedMonth] = useState(6);
+  const [selectedYear, setSelectedYear] = useState(1995);
+  const [cityResults, setCityResults] = useState<any[]>([]);
+
+  // Update birth date from pickers
+  const updateBirthDate = (day: number, month: number, year: number) => {
+    const formatted = `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
+    setBirthDateInput(formatted);
+  };
+
+  // Search cities
+  const searchCities = async (query: string) => {
+    if (query.length < 2) {
+      setCityResults([]);
+      return;
+    }
+    try {
+      const res = await fetch(`${API_URL}/api/cities?q=${encodeURIComponent(query)}`);
+      if (res.ok) {
+        const data = await res.json();
+        setCityResults(data);
+      }
+    } catch (e) {
+      setCityResults([]);
+    }
+  };
 
   useEffect(() => {
     loadBirthDate();
