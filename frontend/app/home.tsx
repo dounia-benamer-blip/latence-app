@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown, FadeInUp, FadeIn } from 'react-native-reanimated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme, ThemeMode } from '../src/context/ThemeContext';
+import AuraAvatar, { AURA_DATABASE } from './components/AuraAvatar';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
