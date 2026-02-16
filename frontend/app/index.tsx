@@ -414,6 +414,20 @@ export default function WelcomeScreen() {
         {step === 'energy' && renderEnergy()}
         {step === 'wisdom' && renderWisdom()}
       </ScrollView>
+
+      {/* Sticky bottom button for mood step */}
+      {step === 'mood' && (
+        <View style={[styles.stickyBottom, dynamicStyles.container]}>
+          <TouchableOpacity
+            style={[styles.continueButton, !selectedMood && styles.continueButtonDisabled]}
+            onPress={handleMoodContinue}
+            disabled={!selectedMood}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.continueButtonText}>Continuer</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
