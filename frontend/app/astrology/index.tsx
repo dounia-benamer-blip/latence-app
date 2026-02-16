@@ -1218,6 +1218,7 @@ const styles = StyleSheet.create({
   lunarDetailLabel: { fontSize: 10, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 },
   lunarDetailValue: { fontSize: 14, lineHeight: 20 },
   lunarDescription: { fontSize: 13, lineHeight: 22, marginTop: 16, fontStyle: 'italic', textAlign: 'center' },
+  celticMessage: { fontSize: 13, lineHeight: 22, marginTop: 16, fontStyle: 'italic', textAlign: 'center', padding: 16, borderRadius: 12, width: '100%' },
   
   // Modal
   modalContainer: { flex: 1 },
