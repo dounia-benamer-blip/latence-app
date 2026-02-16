@@ -246,7 +246,7 @@ export default function HomeScreen() {
   };
 
   const moonPhase = getMoonPhase();
-  const today = format(new Date(), "EEEE d MMMM", { locale: fr });
+  const today = formatToday();
 
   // Dynamic styles based on theme
   const dynamicStyles = {
