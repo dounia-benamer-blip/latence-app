@@ -438,7 +438,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: 24,
     paddingBottom: 40,
-    justifyContent: 'center',
   },
   themeToggle: {
     position: 'absolute',
