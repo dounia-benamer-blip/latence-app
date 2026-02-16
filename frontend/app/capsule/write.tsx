@@ -241,11 +241,11 @@ const styles = StyleSheet.create({
     borderBottomColor: '#E8E0D4',
   },
   interpretCard: {
-    backgroundColor: '#FDF9F3',
+    backgroundColor: '#FFFFFF',
     borderRadius: 20,
     padding: 24,
-    borderWidth: 1,
-    borderColor: '#E8E0D4',
+    borderLeftWidth: 3,
+    borderLeftColor: '#C4A87C',
   },
   interpretHeader: {
     flexDirection: 'row',
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
   },
   interpretText: {
     fontSize: 15,
-    color: '#5A5A4A',
+    color: '#3A3A3A',
     lineHeight: 26,
     fontStyle: 'italic',
   },
