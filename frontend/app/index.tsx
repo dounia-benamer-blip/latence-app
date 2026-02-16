@@ -441,6 +441,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingBottom: 40,
   },
+  stickyBottom: {
+    paddingHorizontal: 24,
+    paddingBottom: 16,
+    paddingTop: 8,
+  },
   themeToggle: {
     position: 'absolute',
     top: 20,
