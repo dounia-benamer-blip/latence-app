@@ -117,8 +117,8 @@ export default function AuraAvatar({
     // Pulsing animation for each layer
     pulse1.value = withRepeat(
       withSequence(
-        withTiming(1.15, { duration: 2000, easing: Easing.inOut(Easing.sine) }),
-        withTiming(1, { duration: 2000, easing: Easing.inOut(Easing.sine) })
+        withTiming(1.15, { duration: 2000 }),
+        withTiming(1, { duration: 2000 })
       ),
       -1,
       true
@@ -126,8 +126,8 @@ export default function AuraAvatar({
 
     pulse2.value = withRepeat(
       withSequence(
-        withTiming(1.25, { duration: 2500, easing: Easing.inOut(Easing.sine) }),
-        withTiming(1, { duration: 2500, easing: Easing.inOut(Easing.sine) })
+        withTiming(1.25, { duration: 2500 }),
+        withTiming(1, { duration: 2500 })
       ),
       -1,
       true
@@ -135,8 +135,8 @@ export default function AuraAvatar({
 
     pulse3.value = withRepeat(
       withSequence(
-        withTiming(1.35, { duration: 3000, easing: Easing.inOut(Easing.sine) }),
-        withTiming(1, { duration: 3000, easing: Easing.inOut(Easing.sine) })
+        withTiming(1.35, { duration: 3000 }),
+        withTiming(1, { duration: 3000 })
       ),
       -1,
       true
@@ -144,7 +144,7 @@ export default function AuraAvatar({
 
     // Slow rotation
     rotation.value = withRepeat(
-      withTiming(360, { duration: 20000, easing: Easing.linear }),
+      withTiming(360, { duration: 20000 }),
       -1,
       false
     );
