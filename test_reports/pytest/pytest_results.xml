@@ -1,1 +1,184 @@
-<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="21" time="14.165" timestamp="2026-02-11T20:37:07.594439+00:00" hostname="agent-env-dd44cae8-eeda-4b66-9195-847b432fe5ed"><testcase classname="backend.tests.test_api.TestHealthAndBasicEndpoints" name="test_api_root" time="0.060" /><testcase classname="backend.tests.test_api.TestMoodEndpoints" name="test_create_mood" time="0.058" /><testcase classname="backend.tests.test_api.TestMoodEndpoints" name="test_get_moods" time="0.042" /><testcase classname="backend.tests.test_api.TestMoodEndpoints" name="test_get_latest_mood" time="0.081" /><testcase classname="backend.tests.test_api.TestSacredTextEndpoints" name="test_get_sacred_text_serein" time="0.039" /><testcase classname="backend.tests.test_api.TestSacredTextEndpoints" name="test_get_sacred_text_melancolique" time="0.041" /><testcase classname="backend.tests.test_api.TestDailyNotifications" name="test_get_daily_notification" time="0.041" /><testcase classname="backend.tests.test_api.TestAstrologyProfileEndpoints" name="test_create_astrology_profile" time="12.982" /><testcase classname="backend.tests.test_api.TestAstrologyProfileEndpoints" name="test_create_astrology_profile_required_fields" time="0.140" /><testcase classname="backend.tests.test_api.TestAstrologyProfileEndpoints" name="test_get_latest_astrology_profile" time="0.036" /><testcase classname="backend.tests.test_api.TestAstrologyProfileEndpoints" name="test_invalid_date_format" time="0.040" /><testcase classname="backend.tests.test_api.TestAstrologyDataEndpoints" name="test_get_astrology_houses" time="0.037" /><testcase classname="backend.tests.test_api.TestAstrologyDataEndpoints" name="test_get_celtic_zodiac" time="0.037" /><testcase classname="backend.tests.test_api.TestAstrologyDataEndpoints" name="test_get_celtic_sign_for_date" time="0.040" /><testcase classname="backend.tests.test_api.TestAstrologyDataEndpoints" name="test_get_dream_symbols" time="0.037" /><testcase classname="backend.tests.test_api.TestBookRecommendations" name="test_get_book_recommendations" time="0.036" /><testcase classname="backend.tests.test_api.TestCapsuleEndpoints" name="test_create_capsule" time="0.041" /><testcase classname="backend.tests.test_api.TestCapsuleEndpoints" name="test_get_capsules" time="0.041" /><testcase classname="backend.tests.test_api.TestDreamEndpoints" name="test_create_dream" time="0.079" /><testcase classname="backend.tests.test_api.TestDreamEndpoints" name="test_get_dreams" time="0.080" /><testcase classname="backend.tests.test_api.TestWritingPrompts" name="test_get_prompts" time="0.043" /></testsuite></testsuites>
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="21" time="385.201" timestamp="2026-02-16T17:48:11.115473+00:00" hostname="agent-env-dd44cae8-eeda-4b66-9195-847b432fe5ed"><testcase classname="tests.test_latence_features.TestBasicEndpoints" name="test_api_root" time="0.328" /><testcase classname="tests.test_latence_features.TestBasicEndpoints" name="test_notifications_daily" time="0.302" /><testcase classname="tests.test_latence_features.TestJournalInterpretation" name="test_create_journal_entry" time="0.237" /><testcase classname="tests.test_latence_features.TestJournalInterpretation" name="test_journal_interpret_endpoint" time="23.738" /><testcase classname="tests.test_latence_features.TestJournalInterpretation" name="test_journal_interpret_with_mood" time="19.535" /><testcase classname="tests.test_latence_features.TestDreamJournal" name="test_create_dream" time="0.219" /><testcase classname="tests.test_latence_features.TestDreamJournal" name="test_create_nightmare" time="0.199" /><testcase classname="tests.test_latence_features.TestDreamJournal" name="test_create_recurring_dream" time="0.214" /><testcase classname="tests.test_latence_features.TestDreamJournal" name="test_get_dreams_list" time="0.176" /><testcase classname="tests.test_latence_features.TestDreamJournal" name="test_dream_interpret_endpoint" time="52.228" /><testcase classname="tests.test_latence_features.TestDreamJournal" name="test_dream_interpret_nightmare" time="60.139"><failure message="requests.exceptions.ReadTimeout: HTTPSConnectionPool(host='moon-feelings.preview.emergentagent.com', port=443): Read timed out. (read timeout=60)">/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py:534: in _make_request
+    response = conn.getresponse()
+               ^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/urllib3/connection.py:571: in getresponse
+    httplib_response = super().getresponse()
+                       ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/http/client.py:1395: in getresponse
+    response.begin()
+/usr/local/lib/python3.11/http/client.py:325: in begin
+    version, status, reason = self._read_status()
+                              ^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/http/client.py:286: in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/socket.py:718: in readinto
+    return self._sock.recv_into(b)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/ssl.py:1314: in recv_into
+    return self.read(nbytes, buffer)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/ssl.py:1166: in read
+    return self._sslobj.read(len, buffer)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TimeoutError: The read operation timed out
+
+The above exception was the direct cause of the following exception:
+/root/.venv/lib/python3.11/site-packages/requests/adapters.py:644: in send
+    resp = conn.urlopen(
+/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py:841: in urlopen
+    retries = retries.increment(
+/root/.venv/lib/python3.11/site-packages/urllib3/util/retry.py:490: in increment
+    raise reraise(type(error), error, _stacktrace)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/urllib3/util/util.py:39: in reraise
+    raise value
+/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py:787: in urlopen
+    response = self._make_request(
+/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py:536: in _make_request
+    self._raise_timeout(err=e, url=url, timeout_value=read_timeout)
+/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py:367: in _raise_timeout
+    raise ReadTimeoutError(
+E   urllib3.exceptions.ReadTimeoutError: HTTPSConnectionPool(host='moon-feelings.preview.emergentagent.com', port=443): Read timed out. (read timeout=60)
+
+During handling of the above exception, another exception occurred:
+tests/test_latence_features.py:166: in test_dream_interpret_nightmare
+    res = requests.post(
+/root/.venv/lib/python3.11/site-packages/requests/api.py:115: in post
+    return request("post", url, data=data, json=json, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/api.py:59: in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/sessions.py:589: in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/sessions.py:703: in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/adapters.py:690: in send
+    raise ReadTimeout(e, request=request)
+E   requests.exceptions.ReadTimeout: HTTPSConnectionPool(host='moon-feelings.preview.emergentagent.com', port=443): Read timed out. (read timeout=60)</failure></testcase><testcase classname="tests.test_latence_features.TestAstrologyProfile" name="test_create_profile_without_birth_hour" time="60.147"><failure message="requests.exceptions.ReadTimeout: HTTPSConnectionPool(host='moon-feelings.preview.emergentagent.com', port=443): Read timed out. (read timeout=60)">/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py:534: in _make_request
+    response = conn.getresponse()
+               ^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/urllib3/connection.py:571: in getresponse
+    httplib_response = super().getresponse()
+                       ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/http/client.py:1395: in getresponse
+    response.begin()
+/usr/local/lib/python3.11/http/client.py:325: in begin
+    version, status, reason = self._read_status()
+                              ^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/http/client.py:286: in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/socket.py:718: in readinto
+    return self._sock.recv_into(b)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/ssl.py:1314: in recv_into
+    return self.read(nbytes, buffer)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/ssl.py:1166: in read
+    return self._sslobj.read(len, buffer)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TimeoutError: The read operation timed out
+
+The above exception was the direct cause of the following exception:
+/root/.venv/lib/python3.11/site-packages/requests/adapters.py:644: in send
+    resp = conn.urlopen(
+/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py:841: in urlopen
+    retries = retries.increment(
+/root/.venv/lib/python3.11/site-packages/urllib3/util/retry.py:490: in increment
+    raise reraise(type(error), error, _stacktrace)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/urllib3/util/util.py:39: in reraise
+    raise value
+/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py:787: in urlopen
+    response = self._make_request(
+/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py:536: in _make_request
+    self._raise_timeout(err=e, url=url, timeout_value=read_timeout)
+/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py:367: in _raise_timeout
+    raise ReadTimeoutError(
+E   urllib3.exceptions.ReadTimeoutError: HTTPSConnectionPool(host='moon-feelings.preview.emergentagent.com', port=443): Read timed out. (read timeout=60)
+
+During handling of the above exception, another exception occurred:
+tests/test_latence_features.py:187: in test_create_profile_without_birth_hour
+    res = requests.post(
+/root/.venv/lib/python3.11/site-packages/requests/api.py:115: in post
+    return request("post", url, data=data, json=json, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/api.py:59: in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/sessions.py:589: in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/sessions.py:703: in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/adapters.py:690: in send
+    raise ReadTimeout(e, request=request)
+E   requests.exceptions.ReadTimeout: HTTPSConnectionPool(host='moon-feelings.preview.emergentagent.com', port=443): Read timed out. (read timeout=60)</failure></testcase><testcase classname="tests.test_latence_features.TestAstrologyProfile" name="test_create_profile_with_birth_hour" time="60.172"><failure message="requests.exceptions.ReadTimeout: HTTPSConnectionPool(host='moon-feelings.preview.emergentagent.com', port=443): Read timed out. (read timeout=60)">/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py:534: in _make_request
+    response = conn.getresponse()
+               ^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/urllib3/connection.py:571: in getresponse
+    httplib_response = super().getresponse()
+                       ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/http/client.py:1395: in getresponse
+    response.begin()
+/usr/local/lib/python3.11/http/client.py:325: in begin
+    version, status, reason = self._read_status()
+                              ^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/http/client.py:286: in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/socket.py:718: in readinto
+    return self._sock.recv_into(b)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/ssl.py:1314: in recv_into
+    return self.read(nbytes, buffer)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/ssl.py:1166: in read
+    return self._sslobj.read(len, buffer)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TimeoutError: The read operation timed out
+
+The above exception was the direct cause of the following exception:
+/root/.venv/lib/python3.11/site-packages/requests/adapters.py:644: in send
+    resp = conn.urlopen(
+/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py:841: in urlopen
+    retries = retries.increment(
+/root/.venv/lib/python3.11/site-packages/urllib3/util/retry.py:490: in increment
+    raise reraise(type(error), error, _stacktrace)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/urllib3/util/util.py:39: in reraise
+    raise value
+/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py:787: in urlopen
+    response = self._make_request(
+/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py:536: in _make_request
+    self._raise_timeout(err=e, url=url, timeout_value=read_timeout)
+/root/.venv/lib/python3.11/site-packages/urllib3/connectionpool.py:367: in _raise_timeout
+    raise ReadTimeoutError(
+E   urllib3.exceptions.ReadTimeoutError: HTTPSConnectionPool(host='moon-feelings.preview.emergentagent.com', port=443): Read timed out. (read timeout=60)
+
+During handling of the above exception, another exception occurred:
+tests/test_latence_features.py:214: in test_create_profile_with_birth_hour
+    res = requests.post(
+/root/.venv/lib/python3.11/site-packages/requests/api.py:115: in post
+    return request("post", url, data=data, json=json, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/api.py:59: in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/sessions.py:589: in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/sessions.py:703: in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.venv/lib/python3.11/site-packages/requests/adapters.py:690: in send
+    raise ReadTimeout(e, request=request)
+E   requests.exceptions.ReadTimeout: HTTPSConnectionPool(host='moon-feelings.preview.emergentagent.com', port=443): Read timed out. (read timeout=60)</failure></testcase><testcase classname="tests.test_latence_features.TestAstrologyProfile" name="test_get_latest_profile" time="60.228"><failure message="assert 520 == 200&#10; +  where 520 = &lt;Response [520]&gt;.status_code">tests/test_latence_features.py:240: in test_get_latest_profile
+    assert res.status_code == 200
+E   assert 520 == 200
+E    +  where 520 = &lt;Response [520]&gt;.status_code</failure></testcase><testcase classname="tests.test_latence_features.TestAstrologyProfile" name="test_invalid_date_format" time="42.441" /><testcase classname="tests.test_latence_features.TestMoodAndSacredTexts" name="test_create_mood" time="0.189" /><testcase classname="tests.test_latence_features.TestMoodAndSacredTexts" name="test_get_sacred_text" time="0.133" /><testcase classname="tests.test_latence_features.TestMoodAndSacredTexts" name="test_get_book_recommendations" time="0.195" /><testcase classname="tests.test_latence_features.TestLunarFeatures" name="test_lunar_reading" time="3.664" /><testcase classname="tests.test_latence_features.TestLunarFeatures" name="test_get_celtic_zodiac" time="0.143" /><testcase classname="tests.test_latence_features.TestLunarFeatures" name="test_get_houses" time="0.126" /></testsuite></testsuites>
