@@ -691,7 +691,7 @@ export default function AstrologyScreen() {
         >
           <Ionicons name="chevron-down" size={28} color={theme.iconColor} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, ds.text]}>Astres</Text>
+        <Text style={[styles.headerTitle, ds.text]}>Cosmos</Text>
         <View style={styles.placeholder} />
       </View>
 
