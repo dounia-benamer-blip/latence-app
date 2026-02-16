@@ -376,15 +376,61 @@ export default function AstrologyScreen() {
           {userProfile.zodiac_sign && (
             <Animated.View entering={FadeInUp.duration(400).delay(50)} style={[styles.profileCard, ds.card]}>
               <View style={[styles.profileIconContainer, { backgroundColor: `${theme.accentWarm}20` }]}>
-                <Ionicons name="star" size={28} color={theme.accentWarm} />
+                <Ionicons name="sunny" size={28} color={theme.accentWarm} />
               </View>
-              <Text style={[styles.profileCardTitle, ds.text]}>Signe zodiacal</Text>
+              <Text style={[styles.profileCardTitle, ds.text]}>Signe Solaire</Text>
               <Text style={[styles.profileCardValue, ds.textSecondary]}>
                 {userProfile.zodiac_sign.name}
               </Text>
               <Text style={[styles.profileCardTheme, { color: theme.accentWarm }]}>
                 {userProfile.zodiac_sign.element} - Planète {userProfile.zodiac_sign.planet}
               </Text>
+            </Animated.View>
+          )}
+
+          {/* LUNAR SIGN - NEW FEATURED SECTION */}
+          {userProfile.lunar_sign && (
+            <Animated.View entering={FadeInUp.duration(400).delay(80)} style={[styles.profileCard, ds.card, { borderWidth: 1, borderColor: `${theme.accent}30` }]}>
+              <View style={[styles.profileIconContainer, { backgroundColor: `${theme.accent}20` }]}>
+                <Ionicons name="moon" size={28} color={theme.accent} />
+              </View>
+              <Text style={[styles.profileCardTitle, ds.text]}>Signe Lunaire</Text>
+              <Text style={[styles.profileCardValue, ds.textSecondary]}>
+                Lune en {userProfile.lunar_sign.name}
+              </Text>
+              <Text style={[styles.profileCardTheme, { color: theme.accent }]}>
+                {userProfile.lunar_sign.element} - Maître {userProfile.lunar_sign.ruler}
+              </Text>
+              
+              {/* Detailed lunar sign info */}
+              <View style={[styles.lunarDetailSection, { borderTopColor: theme.border }]}>
+                <View style={styles.lunarDetailRow}>
+                  <Text style={[styles.lunarDetailLabel, ds.textMuted]}>Nature émotionnelle</Text>
+                  <Text style={[styles.lunarDetailValue, ds.text]}>{userProfile.lunar_sign.emotional_nature}</Text>
+                </View>
+                <View style={styles.lunarDetailRow}>
+                  <Text style={[styles.lunarDetailLabel, ds.textMuted]}>Instincts</Text>
+                  <Text style={[styles.lunarDetailValue, ds.text]}>{userProfile.lunar_sign.instincts}</Text>
+                </View>
+                <View style={styles.lunarDetailRow}>
+                  <Text style={[styles.lunarDetailLabel, ds.textMuted]}>Moi intérieur</Text>
+                  <Text style={[styles.lunarDetailValue, ds.text]}>{userProfile.lunar_sign.inner_self}</Text>
+                </View>
+                <View style={styles.lunarDetailRow}>
+                  <Text style={[styles.lunarDetailLabel, ds.textMuted]}>Besoins</Text>
+                  <Text style={[styles.lunarDetailValue, ds.text]}>{userProfile.lunar_sign.needs}</Text>
+                </View>
+                <View style={styles.lunarDetailRow}>
+                  <Text style={[styles.lunarDetailLabel, ds.textMuted]}>Don</Text>
+                  <Text style={[styles.lunarDetailValue, { color: theme.accent }]}>{userProfile.lunar_sign.gift}</Text>
+                </View>
+              </View>
+              
+              {userProfile.lunar_sign.description && (
+                <Text style={[styles.lunarDescription, ds.textSecondary]}>
+                  {userProfile.lunar_sign.description}
+                </Text>
+              )}
             </Animated.View>
           )}
 
@@ -421,7 +467,7 @@ export default function AstrologyScreen() {
           {userProfile.moon_phase_at_birth && (
             <Animated.View entering={FadeInUp.duration(400).delay(150)} style={[styles.profileCard, ds.card]}>
               <View style={[styles.profileIconContainer, { backgroundColor: `${theme.accentWarm}20` }]}>
-                <Ionicons name="moon" size={28} color={theme.accentWarm} />
+                <Ionicons name="moon-outline" size={28} color={theme.accentWarm} />
               </View>
               <Text style={[styles.profileCardTitle, ds.text]}>Phase lunaire de naissance</Text>
               <Text style={[styles.profileCardValue, ds.textSecondary]}>
@@ -466,7 +512,7 @@ export default function AstrologyScreen() {
           {userProfile.arabic_mansion && (
             <Animated.View entering={FadeInUp.duration(400).delay(450)} style={[styles.profileCard, ds.card]}>
               <View style={[styles.profileIconContainer, { backgroundColor: `${theme.accentWarm}20` }]}>
-                <Ionicons name="star" size={28} color={theme.accentWarm} />
+                <Ionicons name="star-outline" size={28} color={theme.accentWarm} />
               </View>
               <Text style={[styles.profileCardTitle, ds.text]}>Demeure lunaire arabe</Text>
               <Text style={[styles.profileCardValue, ds.textSecondary]}>
