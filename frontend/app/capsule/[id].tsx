@@ -77,11 +77,7 @@ export default function CapsuleDetailScreen() {
     if (!capsule) return;
     try {
       await Share.share({
-        message: `Ma capsule "${capsule.title}" sera ouverte ${format(
-          new Date(capsule.unlock_at),
-          "'le' d MMMM yyyy",
-          { locale: fr }
-        )}.`,
+        message: `Ma capsule "${capsule.title}" sera ouverte le ${safeDateFormat(capsule.unlock_at)}.`,
       });
     } catch (e) {
       console.log('Error sharing:', e);
@@ -147,14 +143,14 @@ export default function CapsuleDetailScreen() {
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Déposée</Text>
                 <Text style={styles.infoValue}>
-                  {format(new Date(capsule.created_at), "d MMMM yyyy", { locale: fr })}
+                  {safeDateFormat(capsule.created_at)}
                 </Text>
               </View>
               <View style={styles.infoDivider} />
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Ouverture</Text>
                 <Text style={styles.infoValue}>
-                  {format(new Date(capsule.unlock_at), "d MMMM yyyy", { locale: fr })}
+                  {safeDateFormat(capsule.unlock_at)}
                 </Text>
               </View>
             </View>
@@ -182,10 +178,7 @@ export default function CapsuleDetailScreen() {
             </View>
             
             <Text style={styles.metaText}>
-              Déposée {formatDistanceToNow(new Date(capsule.created_at), {
-                addSuffix: true,
-                locale: fr,
-              })}
+              Déposée {timeAgo(capsule.created_at)}
             </Text>
           </Animated.View>
         )}
