@@ -208,10 +208,10 @@ const styles = StyleSheet.create({
   },
   textInput: {
     fontSize: 18,
-    color: '#4A4A4A',
+    color: '#2A2A2A',
     lineHeight: 30,
     minHeight: 250,
-    fontWeight: '300',
+    fontWeight: '400',
   },
   reflectingContainer: {
     flex: 1,

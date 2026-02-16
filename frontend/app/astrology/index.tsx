@@ -347,9 +347,9 @@ export default function AstrologyScreen() {
           {userProfile.zodiac_sign && (
             <Animated.View entering={FadeInUp.duration(400).delay(50)} style={[styles.profileCard, ds.card]}>
               <View style={[styles.profileIconContainer, { backgroundColor: `${theme.accentWarm}20` }]}>
-                <Ionicons name="sunny" size={28} color={theme.accentWarm} />
+                <Ionicons name="star" size={28} color={theme.accentWarm} />
               </View>
-              <Text style={[styles.profileCardTitle, ds.text]}>Signe solaire</Text>
+              <Text style={[styles.profileCardTitle, ds.text]}>Signe zodiacal</Text>
               <Text style={[styles.profileCardValue, ds.textSecondary]}>
                 {userProfile.zodiac_sign.name}
               </Text>
