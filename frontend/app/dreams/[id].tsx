@@ -11,10 +11,20 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
+
+function formatDreamDate(dateStr: string): string {
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '';
+    const days = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+    const months = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+    return `${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+  } catch {
+    return '';
+  }
+}
 
 const DREAM_TYPES: { [key: string]: { label: string; icon: string } } = {
   reve: { label: 'Rêve', icon: 'cloudy-night-outline' },
@@ -142,7 +152,7 @@ export default function DreamDetailScreen() {
         <Animated.View entering={FadeInUp.duration(500).delay(100)}>
           <Text style={styles.title}>{dream.title}</Text>
           <Text style={styles.date}>
-            {format(new Date(dream.date), "EEEE d MMMM yyyy", { locale: fr })}
+            {formatDreamDate(dream.date)}
           </Text>
         </Animated.View>
 
