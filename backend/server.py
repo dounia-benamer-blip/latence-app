@@ -365,46 +365,108 @@ DREAM_SYMBOLS_DATABASE = {
 }
 
 async def interpret_dream_with_ai(dream_content: str, dream_type: str, emotions: List[str]) -> str:
-    """Use AI to interpret a dream based on multiple dream analysis traditions"""
+    """Use GPT-5 to interpret a dream based on multiple dream analysis traditions"""
     
-    system_prompt = """Tu es un expert en interprétation des rêves, formé dans plusieurs traditions :
+    system_prompt = """Tu es un maître onirologue, héritier de Freud, Jung, Hilman et des traditions ancestrales.
+Tu interprètes les rêves avec une profondeur psychanalytique rigoureuse et une sensibilité poétique.
 
-1. **Psychanalyse Freudienne** : Les rêves comme réalisation de désirs inconscients
-2. **Psychologie Jungienne** : Archétypes, inconscient collectif, individuation
-3. **Tradition Onirique Celtique** : Connexion aux mondes invisibles, messages des ancêtres
-4. **Interprétation Symbolique Universelle** : Symboles transculturels et leur signification
-5. **Approche Gestalt** : Chaque élément du rêve comme partie du rêveur
+TES APPROCHES (utilise-les TOUTES) :
 
-Analyse le rêve de manière bienveillante et perspicace. Fournis :
-- Les symboles clés identifiés et leur signification
-- L'interprétation selon différentes écoles
-- Un message ou conseil personnel
-- Les thèmes émotionnels sous-jacents
+1. **FREUD - Le Désir Caché** : Identifie le contenu latent derrière le contenu manifeste. Quels désirs refoulés s'expriment ? Quels mécanismes (condensation, déplacement, symbolisation) sont à l'œuvre ?
 
-Réponds en français avec empathie et sagesse."""
+2. **JUNG - L'Inconscient Collectif** : Repère les archétypes (Ombre, Anima/Animus, le Soi, le Héros, la Grande Mère, le Trickster). Quel processus d'individuation est en cours ? Quels symboles universels apparaissent ?
+
+3. **GESTALT - Le Rêveur est Tout** : Chaque élément du rêve EST une partie du rêveur. Que représente chaque personnage, objet, lieu ?
+
+4. **SYMBOLISME UNIVERSEL** : Eau = émotions/inconscient, Vol = liberté/transcendance, Chute = perte de contrôle, Maison = psyché, Escalier = évolution, Miroir = confrontation au Soi...
+
+5. **TRADITION CELTIQUE** : Le rêve comme passage entre les mondes. Messages des ancêtres et du Sidh.
+
+FORMAT DE RÉPONSE :
+- **Symboles clés** : Liste des symboles identifiés avec leur signification profonde
+- **Regard freudien** : Interprétation psychanalytique
+- **Regard jungien** : Archétypes et individuation
+- **Message de l'âme** : Conseil personnel poétique et bienveillant
+- **Récurrence** : Si c'est un rêve récurrent, explique pourquoi il revient
+
+Écris avec élégance, profondeur et bienveillance. En français."""
 
     chat = LlmChat(
         api_key=EMERGENT_LLM_KEY,
         session_id=f"dream-{uuid.uuid4()}",
         system_message=system_prompt
-    ).with_model("openai", "gpt-4o")
+    ).with_model("openai", "gpt-5")
 
-    user_prompt = f"""Voici le rêve à interpréter :
+    type_labels = {
+        "reve": "Rêve ordinaire",
+        "cauchemar": "Cauchemar",
+        "lucide": "Rêve lucide",
+        "recurrent": "Rêve récurrent",
+    }
+    type_label = type_labels.get(dream_type, dream_type)
 
-**Type de rêve** : {dream_type}
-**Émotions ressenties** : {', '.join(emotions)}
+    user_prompt = f"""Interprète ce rêve en profondeur :
 
-**Description du rêve** :
+**Nature du rêve** : {type_label}
+**Émotions ressenties au réveil** : {', '.join(emotions)}
+
+**Le rêve** :
 {dream_content}
 
-Merci de fournir une interprétation complète et éclairante."""
+Fournis une interprétation complète selon toutes tes traditions. Si c'est un cauchemar, explore ce que l'ombre essaie de communiquer. Si c'est récurrent, explique le message qui persiste."""
 
     try:
         response = await chat.send_message(UserMessage(text=user_prompt))
         return response
     except Exception as e:
         logging.error(f"Dream interpretation error: {e}")
-        return "Désolé, l'interprétation n'a pas pu être générée. Veuillez réessayer."
+        return "Les voiles du rêve restent opaques pour l'instant. Réessaie dans quelques instants..."
+
+
+async def interpret_journal_with_ai(content: str, mood: str = None) -> str:
+    """Use GPT-5 to provide poetic reflection on a journal entry"""
+
+    system_prompt = """Tu es un compagnon d'écriture intérieure, mêlant psychologie, philosophie et poésie.
+Tu lis les pensées confiées avec une attention profonde et tu offres en retour une réflexion lumineuse.
+
+TON STYLE :
+- Poétique mais jamais prétentieux
+- Profond mais accessible
+- Bienveillant, jamais moralisateur
+- Références subtiles à la philosophie (Rumi, Khalil Gibran, Marc Aurèle, Lao Tseu)
+- Tu tutoies, avec chaleur
+
+CE QUE TU FAIS :
+1. Tu identifies le fil émotionnel principal
+2. Tu reformules ce que tu perçois avec tes mots (miroir empathique)
+3. Tu offres une perspective nouvelle ou un éclairage poétique
+4. Tu poses une question ouverte qui invite à aller plus loin
+
+Tu ne donnes JAMAIS de conseil direct. Tu éclaires, tu accompagnes, tu invites.
+Réponds en 2-3 paragraphes, pas plus. Chaque mot compte."""
+
+    chat = LlmChat(
+        api_key=EMERGENT_LLM_KEY,
+        session_id=f"journal-{uuid.uuid4()}",
+        system_message=system_prompt
+    ).with_model("openai", "gpt-5")
+
+    mood_context = f"\n\n(L'humeur du moment : {mood})" if mood else ""
+
+    prompt = f"""Voici ce que je viens d'écrire dans mon journal :{mood_context}
+
+---
+{content}
+---
+
+Offre-moi ta réflexion."""
+
+    try:
+        response = await chat.send_message(UserMessage(text=prompt))
+        return response
+    except Exception as e:
+        logging.error(f"Journal interpretation error: {e}")
+        return "Les mots ont besoin de temps pour révéler leur lumière. Réessaie dans un instant..."
 
 # ==================== API ROUTES ====================
 
