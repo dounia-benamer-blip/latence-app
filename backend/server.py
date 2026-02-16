@@ -600,18 +600,26 @@ class AstrologyProfileCreate(BaseModel):
     name: str
     birth_date: str  # DD/MM/YYYY
     birth_place: str
+    birth_hour: Optional[str] = None  # HH:MM (24h format)
 
 class AstrologyProfileResponse(BaseModel):
     id: str
     name: str
     birth_date: str
     birth_place: str
+    birth_hour: Optional[str] = None
+    zodiac_sign: Optional[dict] = None
+    ascendant: Optional[dict] = None
     celtic_tree: Optional[dict] = None
     arabic_mansion: Optional[dict] = None
     lunar_house: Optional[dict] = None
     moon_phase_at_birth: Optional[dict] = None
     ai_interpretation: Optional[str] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class JournalInterpretRequest(BaseModel):
+    content: str
+    mood: Optional[str] = None
 
 @api_router.get("/sacred-text/{mood}")
 async def get_sacred_text(mood: str):
