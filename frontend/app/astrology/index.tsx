@@ -1078,6 +1078,13 @@ const styles = StyleSheet.create({
   governsChip: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 10 },
   governsText: { fontSize: 11 },
   
+  // Lunar Sign Section
+  lunarDetailSection: { width: '100%', marginTop: 16, paddingTop: 16, borderTopWidth: 1 },
+  lunarDetailRow: { marginBottom: 12 },
+  lunarDetailLabel: { fontSize: 10, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 },
+  lunarDetailValue: { fontSize: 14, lineHeight: 20 },
+  lunarDescription: { fontSize: 13, lineHeight: 22, marginTop: 16, fontStyle: 'italic', textAlign: 'center' },
+  
   // Modal
   modalContainer: { flex: 1 },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, borderBottomWidth: 1 },
