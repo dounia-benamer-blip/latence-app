@@ -515,10 +515,18 @@ async def create_capsule(input: TimeCapsuleCreate):
     await db.capsules.insert_one(capsule.dict())
     return capsule
 
-@api_router.get("/capsules", response_model=List[TimeCapsule])
+@api_router.get("/capsules")
 async def get_capsules():
-    capsules = await db.capsules.find().sort("created_at", -1).to_list(100)
-    return [TimeCapsule(**c) for c in capsules]
+    capsules = await db.capsules.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    now = datetime.utcnow()
+    result = []
+    for c in capsules:
+        cap = TimeCapsule(**c).dict()
+        cap["days_remaining"] = max(0, (cap["unlock_at"] - now).days) if cap.get("unlock_at") else None
+        cap["created_at"] = cap["created_at"].isoformat() if isinstance(cap["created_at"], datetime) else cap["created_at"]
+        cap["unlock_at"] = cap["unlock_at"].isoformat() if isinstance(cap["unlock_at"], datetime) else cap["unlock_at"]
+        result.append(cap)
+    return result
 
 @api_router.get("/capsule/{capsule_id}")
 async def get_capsule(capsule_id: str):
