@@ -989,6 +989,9 @@ async def get_daily_notification():
 
 app.include_router(api_router)
 
+# Mount static files for fonts
+app.mount("/api/static", StaticFiles(directory=str(ROOT_DIR / "static")), name="static")
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
