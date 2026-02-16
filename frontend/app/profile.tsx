@@ -150,12 +150,14 @@ export default function ProfileScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        {/* Aura Avatar with Meaning */}
         <Animated.View entering={FadeInUp.duration(500)} style={styles.avatarContainer}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>
-              {firstName ? firstName[0].toUpperCase() : '🌙'}
-            </Text>
-          </View>
+          <AuraAvatar 
+            mood={currentMood} 
+            size={100}
+            userName={firstName || astroProfile?.name || ''}
+            showMeaning={true}
+          />
         </Animated.View>
 
         <Animated.View entering={FadeInUp.duration(500).delay(100)} style={styles.section}>
