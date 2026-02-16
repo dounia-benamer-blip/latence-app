@@ -1,89 +1,92 @@
-# Latence - Application de Journal Intime Poetique
+# Latence - Application de Journal Intime Poétique
 
-## Apercu
-Application mobile de journal intime avec astrologie et bien-etre emotionnel.
-Frontend: React Native (Expo) | Backend: FastAPI + MongoDB | AI: GPT-5 via Emergent LLM
+## Aperçu
+Application mobile de journal intime avec astrologie, IA et bien-être émotionnel.
+Frontend: React Native (Expo) | Backend: FastAPI + MongoDB | AI: GPT-4o via Emergent LLM
 
-## Fonctionnalites implementees
+## Fonctionnalités implémentées
 
 ### Phase 1 - Base
-- Theme 3 etats : clair, sombre, silence (AMOLED)
-- Onboarding : auth -> humeur 2x2 -> energie -> sagesse -> home
-- Compagnon poetique AI, notification quotidienne lunaire
+- Thème 3 états : clair, sombre, silence (AMOLED)
+- Onboarding : auth → humeur 2x2 → énergie → sagesse → home
+- Compagnon poétique AI, notification quotidienne lunaire
 
 ### Phase 2 - Astrologie AI
-- Profil astral : prenom, date/heure de naissance, lieu
-- Calculs : signe solaire, ascendant, phase lunaire, arbre celtique, demeure arabe, maison lunaire
-- Portrait astral AI par GPT-5
+- Profil astral : prénom, date/heure de naissance, lieu
+- Calculs : signe zodiacal (étoile, pas soleil), ascendant, phase lunaire, arbre celtique, demeure arabe, maison lunaire
+- Portrait astral AI par GPT-4o
 
-### Phase 3 - AI partout + Bug fixes (16/02/2026)
-- [x] Ecrire : auto-interpretation AI GPT-5 apres sauvegarde (3 phases: write -> reflecting -> done)
-- [x] Carnet des reves : type (reve/cauchemar/lucide/recurrent), 10 emotions, interpretation Freud/Jung GPT-5
-- [x] Fix: date-fns crashes remplaces par fonctions safe (formatDreamDate, safeDateFormat, timeAgo, formatToday)
-- [x] Fix: capsule badge "undefined jours" -> "Xj restants" (backend days_remaining)
-- [x] Fix: dreams list crash "Invalid time value"
-- [x] Fix: Ionicons font loading via backend /api/static
-- [x] Fix: bouton "Continuer" invisible sur mobile -> deplace dans stickyBottom View
+### Phase 3 - AI partout + Bug fixes
+- [x] Écrire : auto-interprétation AI après sauvegarde
+- [x] Carnet des rêves : type, 10 émotions, interprétation Freud/Jung GPT-4o
+- [x] Fix: texte visible dans "Écrire" (couleur #2A2A2A)
+- [x] Fix: date-fns crashes → fonctions safe
+- [x] Fix: capsule badge "undefined jours" → "Xj restants"
+- [x] Fix: bouton "Continuer" sticky en bas
 
-### Phase 4 - Ameliorations UX (16/02/2026)
-- [x] Animation de scellement REFINED - Animation elegante en 9 phases:
-  - Phase 1: Apparition majestueuse de la boite (0-800ms)
-  - Phase 2: Ouverture ceremonieuse du couvercle (800-1600ms)
-  - Phase 3: Envol de la lettre avec rotation spirale (1600-3000ms)
-  - Phase 4: Fermeture solennelle (3100-4000ms)
-  - Phase 5: Aura doree pulsante (4000-5200ms)
-  - Phase 6: Scellement magique avec pulse (4200-5000ms)
-  - Phase 7: Etoiles ephemeres (4500-5500ms)
-  - Phase 8: Cadenas celeste avec rebond (5000-5800ms)
-  - Phase 9: Murmure final (5500-6200ms)
-- [x] Styles visuels raffines: couleurs dorees, ombres elegantes, proportions ameliorees
+### Phase 4 - IA Miroir + Littérature (16/02/2026)
+- [x] **IA MIROIR** - 3 modes de psychanalyse poétique :
+  - **Reflet** : Reflète tes pensées/émotions avec douceur
+  - **Analyse** : Analyse ce que ton écriture révèle de toi
+  - **Question** : Pose LA question profonde qui peut tout éclairer
+- [x] **Bibliothèque de penseurs élargie** - 100+ citations de :
+  - Rumi, Khalil Gibran, Marc Aurèle, Lao Tseu, Bouddha, Sénèque, Confucius
+  - Ibn Arabi, Thich Nhat Hanh, Jung, Nietzsche, Camus, Dostoïevski
+  - Pessoa, Victor Hugo, Platon, Gandhi, Einstein, et bien d'autres
+- [x] Animation de scellement élégante en 9 phases
+- [x] Icône étoile au lieu de soleil pour l'astrologie
 
-## Tests - iteration 4: Backend 100%, Frontend 100%
+## Modèle AI
+- Utilise GPT-4o (rapide et de qualité)
+- Temps de réponse: ~5-15 secondes selon la complexité
 
-## Modele AI
-- Utilise GPT-4o (rapide et economique)
-- Temps de reponse: Reves ~12s, Journal ~7s, Astrologie ~19s
+## Tests
+- Backend: 100% fonctionnel
+- Frontend: 100% fonctionnel
+- IA Miroir: Testé et opérationnel
 
 ## Backlog P1
-- [ ] Suivi d'humeur graphiques
-- [ ] Micro-animations sur les interactions (hover, tap)
+- [ ] Suivi d'humeur avec graphiques
+- [ ] Micro-animations sur les interactions
 
 ## Backlog P2
 - [ ] Mode hors-ligne
 - [ ] Partage de capsules
-- [ ] Deepening des traditions astrologiques (Celtic, Arabic, Houses) avec AI
+- [ ] Approfondissement des traditions astrologiques avec AI
 
 ## Architecture
 ```
 /app/frontend/app/
-├── index.tsx         # Onboarding/Mood (FIXED: bouton sticky)
-├── home.tsx          # Dashboard principal
+├── index.tsx         # Onboarding/Mood
+├── home.tsx          # Dashboard avec Miroir
 ├── _layout.tsx       # Tab navigator
+├── mirror/           # IA MIROIR (NOUVEAU)
+│   └── index.tsx     # Chat avec 3 modes
 ├── astrology/        # Module astrologie
 ├── capsule/
-│   ├── seal.tsx      # Animation de scellement (REFINED)
-│   ├── write.tsx     # Creation de journal
-│   ├── list.tsx      # Liste des capsules
-│   └── [id].tsx      # Detail capsule
-├── dreams/
-│   ├── index.tsx     # Liste des reves
-│   ├── new.tsx       # Nouveau reve
-│   └── [id].tsx      # Detail reve
-└── +html.tsx         # Template HTML custom
+│   ├── seal.tsx      # Animation élégante
+│   ├── write.tsx     # Écriture (texte visible)
+│   └── list.tsx      # Liste capsules
+├── dreams/           # Journal des rêves
+└── profile.tsx       # Profil utilisateur
 
 /app/backend/
-├── server.py         # API FastAPI complete
-└── static/fonts/     # Ionicons.ttf
+└── server.py         # API avec :
+    - /api/mirror/reflect
+    - /api/mirror/analyze-writing
+    - /api/mirror/deep-question
+    - /api/dream/interpret
+    - /api/journal/interpret
+    - /api/astrology/profile
 ```
 
-## Endpoints API cles
-- POST /api/mood - Enregistrer humeur
-- GET /api/sacred-text/{mood} - Texte sacre par humeur
-- POST /api/capsule - Creer capsule
-- GET /api/capsules - Liste capsules
-- POST /api/dream - Creer reve
-- GET /api/dreams - Liste reves
-- POST /api/dream/interpret - Interpreter reve (AI)
-- POST /api/journal/interpret - Interpreter journal (AI)
-- POST /api/astrology/profile - Creer profil astral (AI)
-- GET /api/notifications/daily - Notification lunaire
+## Penseurs et Sagesses
+L'app puise dans les traditions :
+- Soufisme (Rumi, Ibn Arabi)
+- Bouddhisme (Bouddha, Thich Nhat Hanh)
+- Taoïsme (Lao Tseu)
+- Stoïcisme (Marc Aurèle, Sénèque, Épictète)
+- Philosophie grecque (Platon, Socrate)
+- Sagesses africaines, celtiques, arabes, indiennes, japonaises
+- Littérature (Hugo, Camus, Pessoa, Dostoïevski, Gibran)
+- Psychanalyse poétique (Jung - non clinique)
