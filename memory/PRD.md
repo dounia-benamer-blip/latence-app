@@ -6,42 +6,29 @@ Frontend: React Native (Expo) | Backend: FastAPI + MongoDB | AI: GPT-5 via Emerg
 
 ## Fonctionnalites implementees
 
-### Phase 1 - Base (Complete)
-- Systeme de theme 3 etats : clair, sombre, silence (AMOLED)
-- Page d'accueil avec phase lunaire, citations, navigation
-- Onboarding : auth -> humeur -> energie -> sagesse
-- Compagnon poetique AI (dialogue interieur)
-- Grille de selection d'humeur 2x2
-- Notification poetique quotidienne
+### Phase 1 - Base
+- Theme 3 etats : clair, sombre, silence (AMOLED)
+- Onboarding : auth -> humeur 2x2 -> energie -> sagesse -> home
+- Compagnon poetique AI, notification quotidienne lunaire
 
-### Phase 2 - Astrologie + AI (Complete - 16/02/2026)
-- [x] Profil astral complet : prenom, date/heure de naissance, lieu
-- [x] Calculs : signe solaire, ascendant, phase lunaire, arbre celtique, demeure arabe, maison lunaire
-- [x] Portrait astral AI par GPT-5 multi-traditions
+### Phase 2 - Astrologie AI
+- Profil astral : prenom, date/heure de naissance, lieu
+- Calculs : signe solaire, ascendant, phase lunaire, arbre celtique, demeure arabe, maison lunaire
+- Portrait astral AI par GPT-5
 
-### Phase 3 - Ecriture AI + Carnet des reves (Complete - 16/02/2026)
-- [x] Page Ecrire avec bouton "Eclairer" - interpretation AI GPT-5
-- [x] Carnet des reves complet : type (reve/cauchemar/lucide/recurrent), titre, emotions, interpretation Freud/Jung/Gestalt GPT-5
-- [x] Bug fix: "Invalid time value" - remplacement date-fns format par formatDreamDate safe
-- [x] Bug fix: champ API dream (date vs created_at, title requis)
+### Phase 3 - AI partout + Bug fixes (16/02/2026)
+- [x] Ecrire : auto-interpretation AI GPT-5 apres sauvegarde (3 phases: write -> reflecting -> done)
+- [x] Carnet des reves : type (reve/cauchemar/lucide/recurrent), 10 emotions, interpretation Freud/Jung GPT-5
+- [x] Fix: date-fns crashes remplaces par fonctions safe (formatDreamDate, safeDateFormat, timeAgo, formatToday)
+- [x] Fix: capsule badge "undefined jours" -> "Xj restants" (backend days_remaining)
+- [x] Fix: dreams list crash "Invalid time value"
+- [x] Fix: Ionicons font loading via backend /api/static
 
-## Endpoints API
-- POST /api/astrology/profile (birth_hour), GET /api/astrology/profile/latest
-- POST /api/journal/interpret (GPT-5), POST /api/dream/interpret (GPT-5 Freud/Jung)
-- GET /api/notifications/daily
-- POST /api/mood, POST /api/companion/chat, POST /api/lunar-reading
-- GET/POST /api/capsules, GET/POST /api/dreams, PUT /api/dream/{id}/interpretation
-
-## Architecture
-- /app/frontend/app/capsule/write.tsx - Ecriture + AI
-- /app/frontend/app/dreams/index.tsx - Carnet des reves
-- /app/frontend/app/dreams/[id].tsx - Detail reve + interpretation
-- /app/frontend/app/astrology/index.tsx - 5 onglets + profil
-- /app/backend/server.py - API complete GPT-5
+## Tests - iteration 3: Backend 100%, Frontend 100%
 
 ## Backlog P1
 - [ ] Animations plus elegantes (transitions, micro-interactions)
-- [ ] Suivi d'humeur dans le temps (graphiques)
+- [ ] Suivi d'humeur graphiques
 
 ## Backlog P2
 - [ ] Mode hors-ligne
