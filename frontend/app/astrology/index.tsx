@@ -236,6 +236,7 @@ export default function AstrologyScreen() {
           name: userName.trim(),
           birth_date: birthDateInput,
           birth_place: birthPlace.trim() || 'Non précisé',
+          birth_hour: birthHour.trim() || null,
         }),
       });
       
