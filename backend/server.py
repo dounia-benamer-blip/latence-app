@@ -806,6 +806,12 @@ async def create_journal_entry(input: JournalCreate):
     await db.journals.insert_one(entry.dict())
     return entry
 
+@api_router.post("/journal/interpret")
+async def interpret_journal(request: JournalInterpretRequest):
+    """Interpret a journal entry with AI"""
+    interpretation = await interpret_journal_with_ai(request.content, request.mood)
+    return {"interpretation": interpretation}
+
 @api_router.get("/journals")
 async def get_journal_entries():
     """Get all journal entries"""
