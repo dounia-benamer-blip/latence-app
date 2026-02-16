@@ -492,35 +492,145 @@ export default function AstrologyScreen() {
             </Animated.View>
           )}
 
-          {/* Celtic Tree */}
+          {/* Celtic Tree - DETAILED CARD */}
           {userProfile.celtic_tree && (
-            <Animated.View entering={FadeInUp.duration(400).delay(350)} style={[styles.profileCard, ds.card]}>
+            <Animated.View entering={FadeInUp.duration(400).delay(350)} style={[styles.profileCard, ds.card, { borderWidth: 1, borderColor: `${theme.accent}30` }]}>
               <View style={[styles.profileIconContainer, { backgroundColor: `${theme.accent}20` }]}>
-                <Ionicons name="leaf" size={28} color={theme.accent} />
+                <Text style={styles.profileOgham}>{userProfile.celtic_tree.ogham || '🌳'}</Text>
               </View>
-              <Text style={[styles.profileCardTitle, ds.text]}>Arbre celtique</Text>
+              <Text style={[styles.profileCardTitle, ds.text]}>Arbre Celtique</Text>
               <Text style={[styles.profileCardValue, ds.textSecondary]}>
                 {userProfile.celtic_tree.tree}
               </Text>
               <Text style={[styles.profileCardTheme, { color: theme.accent }]}>
                 {userProfile.celtic_tree.meaning}
               </Text>
+              
+              {/* Detailed celtic tree info */}
+              {userProfile.celtic_tree.personality && (
+                <View style={[styles.lunarDetailSection, { borderTopColor: theme.border }]}>
+                  {userProfile.celtic_tree.element && (
+                    <View style={styles.lunarDetailRow}>
+                      <Text style={[styles.lunarDetailLabel, ds.textMuted]}>Élément</Text>
+                      <Text style={[styles.lunarDetailValue, ds.text]}>{userProfile.celtic_tree.element}</Text>
+                    </View>
+                  )}
+                  {userProfile.celtic_tree.planet && (
+                    <View style={styles.lunarDetailRow}>
+                      <Text style={[styles.lunarDetailLabel, ds.textMuted]}>Planète</Text>
+                      <Text style={[styles.lunarDetailValue, ds.text]}>{userProfile.celtic_tree.planet}</Text>
+                    </View>
+                  )}
+                  {userProfile.celtic_tree.qualities && (
+                    <View style={styles.lunarDetailRow}>
+                      <Text style={[styles.lunarDetailLabel, ds.textMuted]}>Qualités</Text>
+                      <View style={styles.profileChips}>
+                        {userProfile.celtic_tree.qualities.map((q: string, i: number) => (
+                          <View key={i} style={[styles.profileChip, { backgroundColor: `${theme.accent}15` }]}>
+                            <Text style={[styles.profileChipText, { color: theme.accent }]}>{q}</Text>
+                          </View>
+                        ))}
+                      </View>
+                    </View>
+                  )}
+                  {userProfile.celtic_tree.gift && (
+                    <View style={styles.lunarDetailRow}>
+                      <Text style={[styles.lunarDetailLabel, ds.textMuted]}>Don</Text>
+                      <Text style={[styles.lunarDetailValue, { color: theme.accent }]}>{userProfile.celtic_tree.gift}</Text>
+                    </View>
+                  )}
+                  {userProfile.celtic_tree.shadow && (
+                    <View style={styles.lunarDetailRow}>
+                      <Text style={[styles.lunarDetailLabel, ds.textMuted]}>Ombre</Text>
+                      <Text style={[styles.lunarDetailValue, ds.textMuted]}>{userProfile.celtic_tree.shadow}</Text>
+                    </View>
+                  )}
+                </View>
+              )}
+              
+              {userProfile.celtic_tree.personality && (
+                <Text style={[styles.lunarDescription, ds.textSecondary]}>
+                  {userProfile.celtic_tree.personality}
+                </Text>
+              )}
+              
+              {userProfile.celtic_tree.message && (
+                <Text style={[styles.celticMessage, { color: theme.accent, backgroundColor: `${theme.accent}10` }]}>
+                  "{userProfile.celtic_tree.message}"
+                </Text>
+              )}
             </Animated.View>
           )}
 
-          {/* Arabic Mansion */}
+          {/* Arabic Mansion - DETAILED CARD */}
           {userProfile.arabic_mansion && (
-            <Animated.View entering={FadeInUp.duration(400).delay(450)} style={[styles.profileCard, ds.card]}>
+            <Animated.View entering={FadeInUp.duration(400).delay(450)} style={[styles.profileCard, ds.card, { borderWidth: 1, borderColor: `${theme.accentWarm}30` }]}>
               <View style={[styles.profileIconContainer, { backgroundColor: `${theme.accentWarm}20` }]}>
-                <Ionicons name="star-outline" size={28} color={theme.accentWarm} />
+                <Text style={styles.mansionArabicProfile}>{userProfile.arabic_mansion.arabic || '☪'}</Text>
               </View>
-              <Text style={[styles.profileCardTitle, ds.text]}>Demeure lunaire arabe</Text>
+              <Text style={[styles.profileCardTitle, ds.text]}>Demeure Lunaire Arabe</Text>
               <Text style={[styles.profileCardValue, ds.textSecondary]}>
                 {userProfile.arabic_mansion.name}
               </Text>
-              <Text style={[styles.profileCardTheme, { color: theme.accentWarm }]}>
-                Demeure n°{userProfile.arabic_mansion.number}
-              </Text>
+              {userProfile.arabic_mansion.translation && (
+                <Text style={[styles.profileCardTheme, { color: theme.accentWarm }]}>
+                  "{userProfile.arabic_mansion.translation}" — Demeure n°{userProfile.arabic_mansion.number}
+                </Text>
+              )}
+              
+              {/* Detailed arabic mansion info */}
+              {userProfile.arabic_mansion.personality && (
+                <View style={[styles.lunarDetailSection, { borderTopColor: theme.border }]}>
+                  {userProfile.arabic_mansion.element && (
+                    <View style={styles.lunarDetailRow}>
+                      <Text style={[styles.lunarDetailLabel, ds.textMuted]}>Élément</Text>
+                      <Text style={[styles.lunarDetailValue, ds.text]}>{userProfile.arabic_mansion.element}</Text>
+                    </View>
+                  )}
+                  {userProfile.arabic_mansion.nature && (
+                    <View style={styles.lunarDetailRow}>
+                      <Text style={[styles.lunarDetailLabel, ds.textMuted]}>Nature</Text>
+                      <Text style={[styles.lunarDetailValue, ds.text]}>{userProfile.arabic_mansion.nature}</Text>
+                    </View>
+                  )}
+                  {userProfile.arabic_mansion.stars && (
+                    <View style={styles.lunarDetailRow}>
+                      <Text style={[styles.lunarDetailLabel, ds.textMuted]}>Étoiles</Text>
+                      <Text style={[styles.lunarDetailValue, ds.text]}>{userProfile.arabic_mansion.stars}</Text>
+                    </View>
+                  )}
+                  {userProfile.arabic_mansion.influence && (
+                    <View style={styles.lunarDetailRow}>
+                      <Text style={[styles.lunarDetailLabel, ds.textMuted]}>Influence</Text>
+                      <Text style={[styles.lunarDetailValue, ds.text]}>{userProfile.arabic_mansion.influence}</Text>
+                    </View>
+                  )}
+                  {userProfile.arabic_mansion.gift && (
+                    <View style={styles.lunarDetailRow}>
+                      <Text style={[styles.lunarDetailLabel, ds.textMuted]}>Don</Text>
+                      <Text style={[styles.lunarDetailValue, { color: theme.accentWarm }]}>{userProfile.arabic_mansion.gift}</Text>
+                    </View>
+                  )}
+                  {userProfile.arabic_mansion.shadow && (
+                    <View style={styles.lunarDetailRow}>
+                      <Text style={[styles.lunarDetailLabel, ds.textMuted]}>Ombre</Text>
+                      <Text style={[styles.lunarDetailValue, ds.textMuted]}>{userProfile.arabic_mansion.shadow}</Text>
+                    </View>
+                  )}
+                </View>
+              )}
+              
+              {userProfile.arabic_mansion.personality && (
+                <Text style={[styles.lunarDescription, ds.textSecondary]}>
+                  {userProfile.arabic_mansion.personality}
+                </Text>
+              )}
+              
+              {userProfile.arabic_mansion.message && (
+                <Text style={[styles.celticMessage, { color: theme.accentWarm, backgroundColor: `${theme.accentWarm}10` }]}>
+                  "{userProfile.arabic_mansion.message}"
+                </Text>
+              )}
             </Animated.View>
           )}
         </View>
