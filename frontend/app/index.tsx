@@ -308,18 +308,6 @@ export default function WelcomeScreen() {
           </View>
         ))}
       </View>
-
-      <TouchableOpacity
-        style={[
-          styles.continueButton,
-          !selectedMood && styles.continueButtonDisabled,
-        ]}
-        onPress={handleMoodContinue}
-        disabled={!selectedMood}
-        activeOpacity={0.8}
-      >
-        <Text style={styles.continueButtonText}>Continuer</Text>
-      </TouchableOpacity>
     </Animated.View>
   );
 
