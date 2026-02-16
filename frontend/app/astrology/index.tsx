@@ -697,7 +697,7 @@ export default function AstrologyScreen() {
         {tab === 'maisons' && renderHousesTab()}
       </ScrollView>
 
-      {/* Profile Input Modal */}
+      {/* Profile Input Modal - ENHANCED */}
       <Modal
         visible={showDateModal}
         animationType="slide"
@@ -706,61 +706,157 @@ export default function AstrologyScreen() {
       >
         <SafeAreaView style={[styles.modalContainer, ds.container]}>
           <View style={[styles.modalHeader, { borderBottomColor: theme.border }]}>
-            <Text style={[styles.modalTitle, ds.text]}>Profil astral</Text>
+            <Text style={[styles.modalTitle, ds.text]}>Ton profil astral</Text>
             <TouchableOpacity onPress={() => setShowDateModal(false)} data-testid="close-profile-modal">
               <Ionicons name="close" size={28} color={theme.iconColor} />
             </TouchableOpacity>
           </View>
 
-          <ScrollView style={styles.modalContent} contentContainerStyle={{ padding: 32, alignItems: 'center' }}>
-            <Ionicons name="sparkles-outline" size={48} color={theme.accentWarm} style={{ marginBottom: 24 }} />
-            <Text style={[styles.modalIntro, ds.textSecondary]}>
-              Remplis ces informations pour découvrir ton portrait astrologique personnalisé.
-            </Text>
+          <ScrollView style={styles.modalContent} contentContainerStyle={{ padding: 24 }}>
+            <View style={styles.modalIntroContainer}>
+              <View style={[styles.modalIntroIcon, { backgroundColor: `${theme.accentWarm}15` }]}>
+                <Ionicons name="sparkles" size={32} color={theme.accentWarm} />
+              </View>
+              <Text style={[styles.modalIntro, ds.textSecondary]}>
+                Les étoiles attendent de te révéler tes secrets...
+              </Text>
+            </View>
             
-            <Text style={[styles.inputLabel, ds.textMuted]}>Prénom</Text>
+            {/* Name */}
+            <Text style={[styles.inputLabel, ds.textMuted]}>Ton prénom</Text>
             <TextInput
               style={[styles.dateInput, ds.input, { borderColor: theme.border }]}
-              placeholder="Ton prénom"
+              placeholder="Comment t'appelles-tu ?"
               placeholderTextColor={theme.textMuted}
               value={userName}
               onChangeText={setUserName}
+              autoCapitalize="words"
               data-testid="profile-name-input"
             />
 
+            {/* Birth Date with Day/Month/Year pickers */}
             <Text style={[styles.inputLabel, ds.textMuted]}>Date de naissance</Text>
-            <TextInput
-              style={[styles.dateInput, ds.input, { borderColor: theme.border }]}
-              placeholder="JJ/MM/AAAA"
-              placeholderTextColor={theme.textMuted}
-              value={birthDateInput}
-              onChangeText={setBirthDateInput}
-              keyboardType="numeric"
-              maxLength={10}
-              data-testid="profile-birthdate-input"
-            />
+            <View style={styles.datePickerRow}>
+              <View style={styles.datePickerItem}>
+                <Text style={[styles.datePickerLabel, ds.textMuted]}>Jour</Text>
+                <ScrollView style={[styles.pickerScroll, ds.card]} showsVerticalScrollIndicator={false}>
+                  {Array.from({length: 31}, (_, i) => i + 1).map(d => (
+                    <TouchableOpacity
+                      key={d}
+                      style={[
+                        styles.pickerOption,
+                        selectedDay === d && { backgroundColor: theme.accentWarm }
+                      ]}
+                      onPress={() => {
+                        setSelectedDay(d);
+                        updateBirthDate(d, selectedMonth, selectedYear);
+                      }}
+                    >
+                      <Text style={[styles.pickerText, selectedDay === d && { color: '#fff' }]}>{d}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+              <View style={styles.datePickerItem}>
+                <Text style={[styles.datePickerLabel, ds.textMuted]}>Mois</Text>
+                <ScrollView style={[styles.pickerScroll, ds.card]} showsVerticalScrollIndicator={false}>
+                  {['Jan', 'Fév', 'Mars', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sept', 'Oct', 'Nov', 'Déc'].map((m, i) => (
+                    <TouchableOpacity
+                      key={i}
+                      style={[
+                        styles.pickerOption,
+                        selectedMonth === (i + 1) && { backgroundColor: theme.accentWarm }
+                      ]}
+                      onPress={() => {
+                        setSelectedMonth(i + 1);
+                        updateBirthDate(selectedDay, i + 1, selectedYear);
+                      }}
+                    >
+                      <Text style={[styles.pickerText, selectedMonth === (i + 1) && { color: '#fff' }]}>{m}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+              <View style={styles.datePickerItem}>
+                <Text style={[styles.datePickerLabel, ds.textMuted]}>Année</Text>
+                <ScrollView style={[styles.pickerScroll, ds.card]} showsVerticalScrollIndicator={false}>
+                  {Array.from({length: 100}, (_, i) => 2010 - i).map(y => (
+                    <TouchableOpacity
+                      key={y}
+                      style={[
+                        styles.pickerOption,
+                        selectedYear === y && { backgroundColor: theme.accentWarm }
+                      ]}
+                      onPress={() => {
+                        setSelectedYear(y);
+                        updateBirthDate(selectedDay, selectedMonth, y);
+                      }}
+                    >
+                      <Text style={[styles.pickerText, selectedYear === y && { color: '#fff' }]}>{y}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            </View>
 
+            {/* Birth Place with search */}
             <Text style={[styles.inputLabel, ds.textMuted]}>Lieu de naissance</Text>
             <TextInput
               style={[styles.dateInput, ds.input, { borderColor: theme.border }]}
-              placeholder="Ville, Pays"
+              placeholder="Tape le nom de ta ville..."
               placeholderTextColor={theme.textMuted}
               value={birthPlace}
-              onChangeText={setBirthPlace}
+              onChangeText={(text) => {
+                setBirthPlace(text);
+                searchCities(text);
+              }}
               data-testid="profile-birthplace-input"
             />
+            {cityResults.length > 0 && (
+              <View style={[styles.citySuggestions, ds.card]}>
+                {cityResults.map((city, i) => (
+                  <TouchableOpacity
+                    key={i}
+                    style={[styles.citySuggestion, { borderBottomColor: theme.border }]}
+                    onPress={() => {
+                      setBirthPlace(`${city.city}, ${city.country}`);
+                      setCityResults([]);
+                    }}
+                  >
+                    <Ionicons name="location-outline" size={16} color={theme.accentWarm} />
+                    <Text style={[styles.cityText, ds.text]}>{city.city}, {city.country}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
 
-            <Text style={[styles.inputLabel, ds.textMuted]}>Heure de naissance (optionnel)</Text>
-            <TextInput
-              style={[styles.dateInput, ds.input, { borderColor: theme.border }]}
-              placeholder="HH:MM (ex: 14:30)"
-              placeholderTextColor={theme.textMuted}
-              value={birthHour}
-              onChangeText={setBirthHour}
-              keyboardType="numeric"
-              maxLength={5}
-              data-testid="profile-birthhour-input"
-            />
+            {/* Birth Hour */}
+            <Text style={[styles.inputLabel, ds.textMuted]}>Heure de naissance (pour l'ascendant)</Text>
+            <View style={styles.hourPickerContainer}>
+              <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.hourPicker}
+              >
+                {['Inconnue', '00:00', '01:00', '02:00', '03:00', '04:00', '05:00', '06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'].map((h) => (
+                  <TouchableOpacity
+                    key={h}
+                    style={[
+                      styles.hourChip,
+                      { borderColor: theme.border },
+                      birthHour === (h === 'Inconnue' ? '' : h) && { backgroundColor: theme.accentWarm, borderColor: theme.accentWarm }
+                    ]}
+                    onPress={() => setBirthHour(h === 'Inconnue' ? '' : h)}
+                  >
+                    <Text style={[
+                      styles.hourChipText,
+                      ds.textMuted,
+                      birthHour === (h === 'Inconnue' ? '' : h) && { color: '#fff' }
+                    ]}>{h}</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
             
             <TouchableOpacity
               style={[styles.saveButton, { backgroundColor: theme.accentWarm }, isLoadingProfile && { opacity: 0.6 }]}
@@ -769,9 +865,15 @@ export default function AstrologyScreen() {
               data-testid="save-profile-btn"
             >
               {isLoadingProfile ? (
-                <ActivityIndicator color="#fff" size="small" />
+                <View style={styles.loadingRow}>
+                  <ActivityIndicator color="#fff" size="small" />
+                  <Text style={[styles.saveButtonText, { marginLeft: 10 }]}>Les astres calculent...</Text>
+                </View>
               ) : (
-                <Text style={styles.saveButtonText}>Découvrir mon profil</Text>
+                <View style={styles.loadingRow}>
+                  <Ionicons name="sparkles" size={20} color="#fff" />
+                  <Text style={[styles.saveButtonText, { marginLeft: 10 }]}>Révéler mon portrait astral</Text>
+                </View>
               )}
             </TouchableOpacity>
           </ScrollView>
