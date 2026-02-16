@@ -395,7 +395,7 @@ FORMAT DE RÉPONSE :
         api_key=EMERGENT_LLM_KEY,
         session_id=f"dream-{uuid.uuid4()}",
         system_message=system_prompt
-    ).with_model("openai", "gpt-5")
+    ).with_model("openai", "gpt-4o")
 
     type_labels = {
         "reve": "Rêve ordinaire",
@@ -449,7 +449,7 @@ Réponds en 2-3 paragraphes, pas plus. Chaque mot compte."""
         api_key=EMERGENT_LLM_KEY,
         session_id=f"journal-{uuid.uuid4()}",
         system_message=system_prompt
-    ).with_model("openai", "gpt-5")
+    ).with_model("openai", "gpt-4o")
 
     mood_context = f"\n\n(L'humeur du moment : {mood})" if mood else ""
 
@@ -1034,7 +1034,7 @@ Tu ne prédis pas l'avenir. Tu éclaires l'essence."""
         api_key=EMERGENT_LLM_KEY,
         session_id=f"astro-profile-{uuid.uuid4()}",
         system_message=system_prompt
-    ).with_model("openai", "gpt-5")
+    ).with_model("openai", "gpt-4o")
 
     hour_info = f"\n**Heure de naissance** : {birth_hour}" if birth_hour else ""
     asc_info = f"\n- Ascendant : {ascendant['name']} ({ascendant['element']})" if ascendant else "\n- Ascendant : non calculé (heure non fournie)"
