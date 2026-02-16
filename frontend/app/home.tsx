@@ -316,12 +316,16 @@ export default function HomeScreen() {
                 color={theme.accentWarm} 
               />
             </TouchableOpacity>
-            {/* Profile Button */}
+            {/* Aura Profile Avatar */}
             <TouchableOpacity 
-              style={[styles.profileButton, dynamicStyles.card]}
               onPress={() => router.push('/profile')}
+              activeOpacity={0.8}
             >
-              <Ionicons name="person-outline" size={22} color={theme.iconColor} />
+              <AuraAvatar 
+                mood={currentMood?.mood || 'serein'} 
+                size={44}
+                userName={astroProfile?.name || ''}
+              />
             </TouchableOpacity>
           </View>
         </Animated.View>
