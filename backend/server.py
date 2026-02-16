@@ -1005,46 +1005,53 @@ async def create_astrology_profile(input: AstrologyProfileCreate):
     profile["created_at"] = profile["created_at"].isoformat()
     return profile
 
-async def generate_astrology_interpretation(name, birth_date, birth_place, moon_phase, celtic_tree, arabic_mansion, lunar_house):
-    """Generate AI-powered astrological interpretation"""
-    system_prompt = """Tu es un astrologue poétique et érudit, formé dans les traditions occidentale, celtique et arabe.
-Tu rédiges des portraits astrologiques personnalisés avec sagesse, poésie et profondeur.
+async def generate_astrology_interpretation(name, birth_date, birth_place, birth_hour, moon_phase, celtic_tree, arabic_mansion, lunar_house, zodiac_sign, ascendant):
+    """Generate AI-powered astrological interpretation with GPT-5"""
+    system_prompt = """Tu es un astrologue-poète d'une érudition rare, maîtrisant les traditions occidentale, celtique et arabe.
+Tu composes des portraits astrologiques qui sont de véritables œuvres littéraires : précis, profonds et lumineux.
 
-STYLE :
-- Poétique mais accessible
-- Profond et personnel (utilise le prénom de la personne)
-- Références aux éléments naturels
-- Bienveillant et lumineux
-- 3 à 4 paragraphes
+STRUCTURE DE TON PORTRAIT :
+1. **Ouverture poétique** - Une image évocatrice liée au signe solaire et à la phase lunaire
+2. **Le Soleil** - L'essence de l'être, sa mission de vie (signe solaire)
+3. **L'Ascendant** - Le masque et la manière d'aborder le monde (si disponible)
+4. **La Lune** - Le monde émotionnel, l'inconscient, les besoins profonds
+5. **L'Arbre Celtique** - La sagesse ancestrale et les forces de caractère
+6. **La Demeure Arabe** - L'influence subtile du destin lunaire
+7. **Fermeture** - Un message personnel, une phrase qui résonne
 
-Tu ne prédis pas l'avenir. Tu éclaires l'essence de l'âme."""
+STYLE : Poétique, précis, personnel (utilise le prénom). 5-6 paragraphes.
+Tu ne prédis pas l'avenir. Tu éclaires l'essence."""
 
     chat = LlmChat(
         api_key=EMERGENT_LLM_KEY,
         session_id=f"astro-profile-{uuid.uuid4()}",
         system_message=system_prompt
-    ).with_model("openai", "gpt-4o")
+    ).with_model("openai", "gpt-5")
 
-    prompt = f"""Compose un portrait astrologique personnalisé pour :
+    hour_info = f"\n**Heure de naissance** : {birth_hour}" if birth_hour else ""
+    asc_info = f"\n- Ascendant : {ascendant['name']} ({ascendant['element']})" if ascendant else "\n- Ascendant : non calculé (heure non fournie)"
+
+    prompt = f"""Compose un portrait astrologique complet pour :
 
 **Prénom** : {name}
-**Date de naissance** : {birth_date}
+**Date de naissance** : {birth_date}{hour_info}
 **Lieu de naissance** : {birth_place}
 
 **Données calculées** :
+- Signe solaire : {zodiac_sign['name']} ({zodiac_sign['element']}, planète {zodiac_sign['planet']}){asc_info}
 - Phase lunaire de naissance : {moon_phase['name']} (jour {moon_phase['day_in_cycle']} du cycle)
 - Arbre celtique : {celtic_tree['tree']} ({celtic_tree['meaning']})
 - Demeure lunaire arabe : {arabic_mansion['name']} (demeure n°{arabic_mansion['number']})
 - Maison astrologique : {lunar_house['name']} ({lunar_house['theme']})
 
-Rédige un portrait qui relie ces différentes traditions en un tout cohérent et lumineux."""
+Rédige un portrait qui tisse ces différentes traditions en un tout cohérent et lumineux."""
 
     try:
         response = await chat.send_message(UserMessage(text=prompt))
         return response
     except Exception as e:
         logging.error(f"Astrology interpretation error: {e}")
-        return f"Les astres murmurent pour {name}... Né(e) sous la phase de {moon_phase['name']}, guidé(e) par l'arbre {celtic_tree['tree']} et la demeure de {arabic_mansion['name']}, ton chemin brille d'une lumière unique."
+        return f"Les astres murmurent pour {name}... Né(e) sous le signe {zodiac_sign['name']}, en phase de {moon_phase['name']}, guidé(e) par l'arbre {celtic_tree['tree']} et la demeure de {arabic_mansion['name']}, ton chemin brille d'une lumière unique."
 
 @api_router.get("/astrology/profile/latest")
 async def get_latest_astrology_profile():
