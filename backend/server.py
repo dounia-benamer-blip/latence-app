@@ -901,6 +901,50 @@ def calculate_lunar_house(phase_value: float):
     house_data = ASTROLOGY_HOUSES[house_number - 1]
     return {"number": house_number, "name": house_data["name"], "theme": house_data["theme"]}
 
+def get_zodiac_sign(month: int, day: int):
+    """Get Western zodiac sign from birth date"""
+    signs = [
+        ((3, 21), (4, 19), "Bélier", "Feu", "Mars", "Cardinal"),
+        ((4, 20), (5, 20), "Taureau", "Terre", "Vénus", "Fixe"),
+        ((5, 21), (6, 20), "Gémeaux", "Air", "Mercure", "Mutable"),
+        ((6, 21), (7, 22), "Cancer", "Eau", "Lune", "Cardinal"),
+        ((7, 23), (8, 22), "Lion", "Feu", "Soleil", "Fixe"),
+        ((8, 23), (9, 22), "Vierge", "Terre", "Mercure", "Mutable"),
+        ((9, 23), (10, 22), "Balance", "Air", "Vénus", "Cardinal"),
+        ((10, 23), (11, 21), "Scorpion", "Eau", "Pluton", "Fixe"),
+        ((11, 22), (12, 21), "Sagittaire", "Feu", "Jupiter", "Mutable"),
+        ((12, 22), (1, 19), "Capricorne", "Terre", "Saturne", "Cardinal"),
+        ((1, 20), (2, 18), "Verseau", "Air", "Uranus", "Fixe"),
+        ((2, 19), (3, 20), "Poissons", "Eau", "Neptune", "Mutable"),
+    ]
+    for start, end, name, element, planet, mode in signs:
+        if start[0] > end[0]:
+            if (month == start[0] and day >= start[1]) or (month == end[0] and day <= end[1]):
+                return {"name": name, "element": element, "planet": planet, "mode": mode}
+        else:
+            if (month == start[0] and day >= start[1]) or (month == end[0] and day <= end[1]):
+                return {"name": name, "element": element, "planet": planet, "mode": mode}
+    return {"name": "Capricorne", "element": "Terre", "planet": "Saturne", "mode": "Cardinal"}
+
+def calculate_ascendant(hour: int, month: int, day: int):
+    """Estimate ascendant sign based on birth hour and date"""
+    # Simplified ascendant: zodiac sign rising at birth hour
+    # Each sign rises for ~2 hours. Sunrise sign = zodiac sign at date
+    zodiac_order = [
+        "Bélier", "Taureau", "Gémeaux", "Cancer", "Lion", "Vierge",
+        "Balance", "Scorpion", "Sagittaire", "Capricorne", "Verseau", "Poissons"
+    ]
+    sun_sign = get_zodiac_sign(month, day)
+    sun_index = next((i for i, s in enumerate(zodiac_order) if s == sun_sign["name"]), 0)
+    # Approximate: 6h = sun sign, each 2h shifts one sign
+    shift = (hour - 6) // 2
+    asc_index = (sun_index + shift) % 12
+    asc_name = zodiac_order[asc_index]
+    elements = {"Bélier": "Feu", "Taureau": "Terre", "Gémeaux": "Air", "Cancer": "Eau",
+                "Lion": "Feu", "Vierge": "Terre", "Balance": "Air", "Scorpion": "Eau",
+                "Sagittaire": "Feu", "Capricorne": "Terre", "Verseau": "Air", "Poissons": "Eau"}
+    return {"name": asc_name, "element": elements.get(asc_name, "")}
+
 @api_router.post("/astrology/profile")
 async def create_astrology_profile(input: AstrologyProfileCreate):
     """Create astrology profile with full calculations and AI interpretation"""
