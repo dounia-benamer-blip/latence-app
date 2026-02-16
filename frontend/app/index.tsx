@@ -85,8 +85,6 @@ export default function WelcomeScreen() {
   
   // Calculate card width for 2-column grid (kept for reference if needed)
 
-  const renderMoodItem = ({ item: mood }: { item: typeof MOODS[0] }) => null; // unused
-
   const moonScale = useSharedValue(1);
   const poeticGreeting = getPoeticalGreeting();
 
