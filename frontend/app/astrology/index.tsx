@@ -886,7 +886,8 @@ export default function AstrologyScreen() {
               </Text>
             </TouchableOpacity>
         ))}
-      </ScrollView>
+        </ScrollView>
+      </View>
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
