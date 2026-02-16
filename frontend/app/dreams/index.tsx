@@ -114,7 +114,7 @@ export default function DreamsScreen() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          content: content.trim(),
+          dream_content: content.trim(),
           dream_type: getDreamType(),
           emotions: selectedEmotions.length > 0 ? selectedEmotions : ['non précisé'],
         }),
