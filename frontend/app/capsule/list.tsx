@@ -11,10 +11,22 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
-import { formatDistanceToNow } from 'date-fns';
-import { fr } from 'date-fns/locale';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
+
+function timeAgo(dateStr: string): string {
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '';
+    const diff = Date.now() - d.getTime();
+    const days = Math.floor(diff / 86400000);
+    if (days === 0) return "aujourd'hui";
+    if (days === 1) return 'hier';
+    if (days < 30) return `il y a ${days} jours`;
+    if (days < 365) return `il y a ${Math.floor(days / 30)} mois`;
+    return `il y a ${Math.floor(days / 365)} ans`;
+  } catch { return ''; }
+}
 
 interface Capsule {
   id: string;
