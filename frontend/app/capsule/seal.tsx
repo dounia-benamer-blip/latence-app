@@ -129,74 +129,99 @@ export default function SealScreen() {
   const startSealAnimation = () => {
     setStep('sealing');
     
-    // Phase 1: Box appears (0-500ms)
-    boxOpacity.value = withTiming(1, { duration: 400 });
-    boxY.value = withTiming(0, { duration: 500, easing: Easing.out(Easing.back(1.2)) });
-    boxScale.value = withTiming(1, { duration: 500, easing: Easing.out(Easing.back(1.2)) });
+    // =========== PHASE 1: L'Apparition Majestueuse (0-800ms) ===========
+    // La boîte émerge avec une élégance douce et un léger rebond
+    boxOpacity.value = withTiming(1, { duration: 600, easing: Easing.out(Easing.cubic) });
+    boxY.value = withTiming(0, { duration: 800, easing: Easing.out(Easing.back(1.5)) });
+    boxScale.value = withTiming(1, { duration: 800, easing: Easing.out(Easing.back(1.5)) });
     
-    // Phase 2: Lid opens (500-1000ms)
-    lidRotation.value = withDelay(500, withTiming(-70, { 
-      duration: 600, 
-      easing: Easing.bezier(0.25, 0.1, 0.25, 1) 
+    // =========== PHASE 2: L'Ouverture Cérémonieuse (800-1600ms) ===========
+    // Le couvercle s'ouvre avec grâce, comme une fleur qui s'épanouit
+    lidRotation.value = withDelay(800, withTiming(-75, { 
+      duration: 800, 
+      easing: Easing.bezier(0.34, 1.56, 0.64, 1) 
     }));
-    lidY.value = withDelay(500, withTiming(-8, { duration: 400 }));
+    lidY.value = withDelay(800, withTiming(-12, { duration: 600, easing: Easing.out(Easing.cubic) }));
     
-    // Phase 3: Letter rises, rolls and enters box (1000-2200ms)
-    letterY.value = withDelay(900, withSequence(
-      withTiming(-30, { duration: 400, easing: Easing.out(Easing.quad) }),
-      withTiming(120, { duration: 700, easing: Easing.in(Easing.quad) })
+    // =========== PHASE 3: L'Envol de la Lettre (1600-3000ms) ===========
+    // La lettre s'élève doucement, tourne avec grâce et descend dans l'écrin
+    letterY.value = withDelay(1600, withSequence(
+      // Élévation douce avec suspension
+      withTiming(-50, { duration: 600, easing: Easing.out(Easing.cubic) }),
+      // Flottement suspendu
+      withTiming(-55, { duration: 300, easing: Easing.inOut(Easing.sine) }),
+      // Descente gracieuse
+      withTiming(100, { duration: 800, easing: Easing.bezier(0.25, 0.1, 0.25, 1) })
     ));
-    letterScale.value = withDelay(1000, withSequence(
+    letterScale.value = withDelay(1600, withSequence(
+      withTiming(1.15, { duration: 500, easing: Easing.out(Easing.cubic) }),
       withTiming(1.1, { duration: 300 }),
-      withTiming(0.4, { duration: 700 })
+      withTiming(0.35, { duration: 800, easing: Easing.in(Easing.cubic) })
     ));
-    letterRotateZ.value = withDelay(1000, withTiming(180, { duration: 900 }));
-    letterOpacity.value = withDelay(1800, withTiming(0, { duration: 300 }));
-    
-    // Phase 4: Lid closes (2200-3000ms)
-    lidRotation.value = withDelay(2200, withTiming(0, { 
-      duration: 600, 
-      easing: Easing.bezier(0.6, 0.05, 0.28, 0.91) 
+    // Rotation élégante en spirale
+    letterRotateZ.value = withDelay(1600, withTiming(360, { 
+      duration: 1400, 
+      easing: Easing.bezier(0.4, 0, 0.2, 1) 
     }));
-    lidY.value = withDelay(2200, withTiming(0, { duration: 400 }));
+    letterOpacity.value = withDelay(2900, withTiming(0, { duration: 200, easing: Easing.out(Easing.cubic) }));
     
-    // Phase 5: Glow appears (2800-3800ms)
-    glowOpacity.value = withDelay(2800, withSequence(
-      withTiming(0.9, { duration: 400, easing: Easing.out(Easing.quad) }),
-      withTiming(0.3, { duration: 800, easing: Easing.inOut(Easing.quad) })
+    // =========== PHASE 4: La Fermeture Solennelle (3100-4000ms) ===========
+    // Le couvercle se referme avec une lenteur cérémoniale
+    lidRotation.value = withDelay(3100, withTiming(0, { 
+      duration: 900, 
+      easing: Easing.bezier(0.4, 0, 0.2, 1) 
+    }));
+    lidY.value = withDelay(3100, withTiming(0, { duration: 700, easing: Easing.out(Easing.cubic) }));
+    
+    // =========== PHASE 5: L'Aura Dorée (4000-5200ms) ===========
+    // Une lumière dorée pulse doucement autour de la boîte scellée
+    glowOpacity.value = withDelay(4000, withSequence(
+      withTiming(0.8, { duration: 500, easing: Easing.out(Easing.cubic) }),
+      withTiming(0.5, { duration: 400 }),
+      withTiming(0.7, { duration: 300 })
     ));
-    glowScale.value = withDelay(2800, withSequence(
+    glowScale.value = withDelay(4000, withSequence(
+      withTiming(1.8, { duration: 500, easing: Easing.out(Easing.cubic) }),
       withTiming(1.5, { duration: 400 }),
-      withTiming(1.2, { duration: 800 })
+      withTiming(1.3, { duration: 300 })
     ));
     
-    // Phase 6: Box pulse effect (3000-3500ms)
-    boxScale.value = withDelay(3000, withSequence(
-      withSpring(0.9, { damping: 6, stiffness: 200 }),
-      withSpring(1.05, { damping: 6, stiffness: 200 }),
-      withSpring(1, { damping: 10, stiffness: 100 })
+    // =========== PHASE 6: Le Scellement Magique (4200-5000ms) ===========
+    // La boîte pulse comme un cœur, imprégnée de magie
+    boxScale.value = withDelay(4200, withSequence(
+      withSpring(0.92, { damping: 8, stiffness: 180 }),
+      withSpring(1.08, { damping: 8, stiffness: 180 }),
+      withSpring(0.96, { damping: 10, stiffness: 150 }),
+      withSpring(1, { damping: 12, stiffness: 100 })
     ));
     
-    // Phase 7: Particles fly out (3200-4000ms)
-    particlesOpacity.value = withDelay(3200, withSequence(
-      withTiming(1, { duration: 300 }),
-      withTiming(0, { duration: 600 })
+    // =========== PHASE 7: Les Étoiles Éphémères (4500-5500ms) ===========
+    // Des particules scintillantes s'échappent comme des étoiles filantes
+    particlesOpacity.value = withDelay(4500, withSequence(
+      withTiming(1, { duration: 400, easing: Easing.out(Easing.cubic) }),
+      withTiming(0, { duration: 700, easing: Easing.in(Easing.cubic) })
     ));
     
-    // Phase 8: Lock appears (3600-4200ms)
-    lockScale.value = withDelay(3600, withSequence(
-      withSpring(1.2, { damping: 6, stiffness: 150 }),
-      withSpring(1, { damping: 10, stiffness: 100 })
+    // =========== PHASE 8: Le Cadenas Céleste (5000-5800ms) ===========
+    // Le cadenas apparaît avec une rotation élégante et un rebond doux
+    lockScale.value = withDelay(5000, withSequence(
+      withSpring(1.3, { damping: 6, stiffness: 120 }),
+      withSpring(0.9, { damping: 8, stiffness: 150 }),
+      withSpring(1, { damping: 12, stiffness: 100 })
     ));
-    lockOpacity.value = withDelay(3600, withTiming(1, { duration: 300 }));
+    lockOpacity.value = withDelay(5000, withTiming(1, { duration: 400, easing: Easing.out(Easing.cubic) }));
     
-    // Phase 9: Seal text (4200-4800ms)
-    sealTextOpacity.value = withDelay(4200, withTiming(1, { duration: 500 }));
+    // =========== PHASE 9: Le Murmure Final (5500-6200ms) ===========
+    // Le texte apparaît en fondu, comme un souffle
+    sealTextOpacity.value = withDelay(5500, withTiming(1, { 
+      duration: 700, 
+      easing: Easing.out(Easing.cubic) 
+    }));
     
-    // Save capsule and transition
+    // Sauvegarde et transition après l'animation complète
     setTimeout(() => {
       saveCapsule();
-    }, 5000);
+    }, 6500);
   };
 
   const saveCapsule = async () => {
