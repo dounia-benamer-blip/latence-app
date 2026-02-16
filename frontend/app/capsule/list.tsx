@@ -142,9 +142,15 @@ export default function CapsuleListScreen() {
                       size={18}
                       color={capsule.is_sealed ? '#D4A574' : '#8B9A7D'}
                     />
-                    <Text style={styles.durationBadge}>
-                      {getDurationLabel(capsule.duration_days)}
-                    </Text>
+                    {capsule.days_remaining != null && capsule.days_remaining > 0 ? (
+                      <Text style={styles.durationBadge}>
+                        {capsule.days_remaining}j restants
+                      </Text>
+                    ) : capsule.duration_days ? (
+                      <Text style={styles.durationBadge}>
+                        {getDurationLabel(capsule.duration_days)}
+                      </Text>
+                    ) : null}
                   </View>
 
                   <Text style={styles.capsuleTitle}>{capsule.title}</Text>
@@ -153,11 +159,6 @@ export default function CapsuleListScreen() {
                     <Text style={styles.metaText}>
                       {timeAgo(capsule.created_at)}
                     </Text>
-                    {capsule.is_sealed && capsule.days_remaining !== undefined && (
-                      <Text style={styles.remainingText}>
-                        {capsule.days_remaining}j restants
-                      </Text>
-                    )}
                   </View>
                 </TouchableOpacity>
               </Animated.View>
