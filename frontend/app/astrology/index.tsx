@@ -1037,9 +1037,33 @@ const styles = StyleSheet.create({
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, borderBottomWidth: 1 },
   modalTitle: { fontSize: 18, fontWeight: '500' },
   modalContent: { flex: 1 },
-  modalIntro: { fontSize: 14, textAlign: 'center', lineHeight: 22, marginBottom: 32 },
-  inputLabel: { fontSize: 12, alignSelf: 'flex-start', marginBottom: 6, marginLeft: 4, letterSpacing: 0.5, textTransform: 'uppercase' },
-  dateInput: { width: '100%', borderRadius: 14, padding: 16, fontSize: 16, textAlign: 'center', borderWidth: 1, marginBottom: 20 },
-  saveButton: { paddingVertical: 16, paddingHorizontal: 40, borderRadius: 28 },
+  modalIntroContainer: { alignItems: 'center', marginBottom: 24 },
+  modalIntroIcon: { width: 70, height: 70, borderRadius: 35, alignItems: 'center', justifyContent: 'center', marginBottom: 16 },
+  modalIntro: { fontSize: 14, textAlign: 'center', lineHeight: 22 },
+  inputLabel: { fontSize: 11, alignSelf: 'flex-start', marginBottom: 8, marginLeft: 4, letterSpacing: 1, textTransform: 'uppercase', fontWeight: '600' },
+  dateInput: { width: '100%', borderRadius: 14, padding: 16, fontSize: 16, borderWidth: 1, marginBottom: 20 },
+  
+  // Date Picker
+  datePickerRow: { flexDirection: 'row', gap: 8, marginBottom: 20, width: '100%' },
+  datePickerItem: { flex: 1 },
+  datePickerLabel: { fontSize: 10, textAlign: 'center', marginBottom: 6, textTransform: 'uppercase', letterSpacing: 0.5 },
+  pickerScroll: { height: 150, borderRadius: 12, paddingVertical: 4 },
+  pickerOption: { paddingVertical: 10, paddingHorizontal: 8, marginHorizontal: 4, marginVertical: 2, borderRadius: 8, alignItems: 'center' },
+  pickerText: { fontSize: 14, fontWeight: '500' },
+  
+  // City suggestions
+  citySuggestions: { borderRadius: 12, marginTop: -16, marginBottom: 20, overflow: 'hidden' },
+  citySuggestion: { flexDirection: 'row', alignItems: 'center', padding: 14, borderBottomWidth: 1, gap: 10 },
+  cityText: { fontSize: 14 },
+  
+  // Hour picker
+  hourPickerContainer: { marginBottom: 24, width: '100%' },
+  hourPicker: { gap: 8, paddingVertical: 4 },
+  hourChip: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20, borderWidth: 1 },
+  hourChipText: { fontSize: 13, fontWeight: '500' },
+  
+  // Save button
+  saveButton: { paddingVertical: 16, paddingHorizontal: 32, borderRadius: 28, marginTop: 8, width: '100%' },
   saveButtonText: { color: '#fff', fontSize: 15, fontWeight: '500' },
+  loadingRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
 });
