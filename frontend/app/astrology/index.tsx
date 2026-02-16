@@ -905,7 +905,7 @@ const styles = StyleSheet.create({
   modalContainer: { flex: 1 },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, borderBottomWidth: 1 },
   modalTitle: { fontSize: 18, fontWeight: '500' },
-  modalContent: { flex: 1, padding: 32, alignItems: 'center', justifyContent: 'center' },
+  modalContent: { flex: 1 },
   modalIntro: { fontSize: 14, textAlign: 'center', lineHeight: 22, marginBottom: 32 },
   inputLabel: { fontSize: 12, alignSelf: 'flex-start', marginBottom: 6, marginLeft: 4, letterSpacing: 0.5, textTransform: 'uppercase' },
   dateInput: { width: '100%', borderRadius: 14, padding: 16, fontSize: 16, textAlign: 'center', borderWidth: 1, marginBottom: 20 },
