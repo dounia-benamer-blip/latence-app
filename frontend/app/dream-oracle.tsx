@@ -576,17 +576,20 @@ const styles = StyleSheet.create({
   section: { padding: 20, borderRadius: 16, marginBottom: 16 },
   sectionTitle: { fontSize: 15, fontWeight: '600', marginBottom: 16 },
 
-  patternsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  patternsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, justifyContent: 'center' },
   patternCard: { 
     width: (width - 80) / 2, 
     padding: 14, 
     borderRadius: 12, 
     alignItems: 'center',
+    minHeight: 100,
+    borderWidth: 1,
+    borderColor: 'rgba(212, 165, 116, 0.2)',
   },
-  patternIcon: { fontSize: 28, marginBottom: 6 },
-  patternSymbol: { fontSize: 14, fontWeight: '600', textTransform: 'capitalize' },
-  patternCount: { fontSize: 12, fontWeight: '500', marginBottom: 4 },
-  patternMeaning: { fontSize: 11, textAlign: 'center' },
+  patternIcon: { fontSize: 28, marginBottom: 6, textAlign: 'center' },
+  patternSymbol: { fontSize: 14, fontWeight: '600', textTransform: 'capitalize', textAlign: 'center' },
+  patternCount: { fontSize: 12, fontWeight: '500', marginBottom: 4, textAlign: 'center' },
+  patternMeaning: { fontSize: 11, textAlign: 'center', lineHeight: 16 },
 
   deepMessage: { fontSize: 15, lineHeight: 26, fontStyle: 'italic' },
 
