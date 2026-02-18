@@ -2275,6 +2275,242 @@ async def get_daily_notification():
         "day_in_cycle": moon["day_in_cycle"],
     }
 
+# ==================== DREAM ORACLE ROUTES ====================
+
+class DreamOracleRequest(BaseModel):
+    dreams: List[dict]
+    patterns: List[dict]
+    dominantEmotion: str
+
+@api_router.post("/dream-oracle/analyze")
+async def analyze_dream_oracle(request: DreamOracleRequest):
+    """Analyze dream patterns using AI to provide deep insights"""
+    
+    system_prompt = """Tu es un Oracle des Rêves, un guide mystique qui lit les messages de l'inconscient.
+Tu analyses les patterns récurrents dans les rêves pour révéler des vérités profondes sur l'âme.
+
+TON STYLE:
+- Mystérieux et poétique, comme un oracle ancien
+- Profond mais bienveillant
+- Tu parles de l'âme, de l'inconscient, des cycles
+- Tu fais des liens avec les archétypes jungiens
+- Tu ne donnes JAMAIS de conseils médicaux
+
+FORMAT DE RÉPONSE (JSON strict):
+{
+  "patterns": [liste des patterns analysés avec signification],
+  "emotionalTheme": "thème émotionnel dominant",
+  "deepMessage": "message profond de 2-3 paragraphes poétiques",
+  "guidance": ["conseil 1", "conseil 2", "conseil 3"]
+}
+
+Les conseils doivent être spirituels/introspectifs, pas pratiques."""
+
+    chat = LlmChat(
+        api_key=EMERGENT_LLM_KEY,
+        session_id=f"oracle-{uuid.uuid4()}",
+        system_message=system_prompt
+    ).with_model("openai", "gpt-4o")
+
+    dream_summaries = []
+    for d in request.dreams[:10]:
+        dream_summaries.append(f"- {d.get('title', 'Rêve')}: {d.get('content', '')[:200]}...")
+
+    patterns_text = "\n".join([f"- {p.get('symbol', '')}: apparu {p.get('count', 0)} fois ({p.get('meaning', '')})" 
+                               for p in request.patterns[:5]])
+
+    prompt = f"""Analyse ces rêves comme un Oracle:
+
+SYMBOLES RÉCURRENTS:
+{patterns_text}
+
+ÉMOTION DOMINANTE: {request.dominantEmotion}
+
+RÊVES RÉCENTS:
+{chr(10).join(dream_summaries)}
+
+Révèle les messages cachés de l'inconscient. Réponds en JSON."""
+
+    try:
+        response = await chat.send_message(UserMessage(text=prompt))
+        # Try to parse JSON from response
+        import json
+        # Clean the response - remove markdown code blocks if present
+        clean_response = response.strip()
+        if clean_response.startswith("```json"):
+            clean_response = clean_response[7:]
+        if clean_response.startswith("```"):
+            clean_response = clean_response[3:]
+        if clean_response.endswith("```"):
+            clean_response = clean_response[:-3]
+        
+        result = json.loads(clean_response.strip())
+        return result
+    except Exception as e:
+        logging.error(f"Dream oracle error: {e}")
+        # Return fallback response
+        return {
+            "patterns": request.patterns,
+            "emotionalTheme": request.dominantEmotion,
+            "deepMessage": f"Les voiles de tes rêves révèlent une âme en transformation. L'émotion de {request.dominantEmotion} qui traverse tes nuits parle d'un processus intérieur profond. Ton inconscient te guide vers une compréhension nouvelle de toi-même.",
+            "guidance": [
+                "Avant de dormir, pose une question à ton inconscient",
+                "Tiens un carnet près de ton lit pour capturer tes rêves au réveil",
+                "Médite sur les symboles qui reviennent souvent"
+            ]
+        }
+
+# ==================== LUNAR RITUALS ROUTES ====================
+
+MOON_PHASE_DATA = {
+    "Nouvelle Lune": {
+        "energy": "Introspection, plantation de graines, nouveaux départs",
+        "element": "Terre",
+        "focus": "Intentions et manifestation",
+        "ritual_themes": ["intention", "méditation", "silence", "planification"],
+    },
+    "Premier Croissant": {
+        "energy": "Action, courage, premiers pas",
+        "element": "Feu",
+        "focus": "Surmonter les doutes",
+        "ritual_themes": ["action", "courage", "mouvement", "engagement"],
+    },
+    "Premier Quartier": {
+        "energy": "Décision, engagement, persévérance",
+        "element": "Feu",
+        "focus": "Obstacles et croissance",
+        "ritual_themes": ["décision", "engagement", "force", "clarté"],
+    },
+    "Gibbeuse Croissante": {
+        "energy": "Raffinement, patience, ajustements",
+        "element": "Eau",
+        "focus": "Perfectionner et affiner",
+        "ritual_themes": ["patience", "raffinement", "gratitude", "persévérance"],
+    },
+    "Pleine Lune": {
+        "energy": "Culmination, libération, gratitude",
+        "element": "Eau",
+        "focus": "Célébration et lâcher-prise",
+        "ritual_themes": ["libération", "gratitude", "célébration", "clarté"],
+    },
+    "Gibbeuse Décroissante": {
+        "energy": "Partage, transmission, générosité",
+        "element": "Air",
+        "focus": "Donner et enseigner",
+        "ritual_themes": ["partage", "générosité", "sagesse", "diffusion"],
+    },
+    "Dernier Quartier": {
+        "energy": "Introspection, bilan, réflexion",
+        "element": "Terre",
+        "focus": "Faire le point",
+        "ritual_themes": ["bilan", "introspection", "pardon", "compréhension"],
+    },
+    "Dernier Croissant": {
+        "energy": "Repos, préparation, lâcher-prise",
+        "element": "Eau",
+        "focus": "Se ressourcer",
+        "ritual_themes": ["repos", "abandon", "vide fertile", "préparation"],
+    },
+}
+
+@api_router.get("/lunar-phase/current")
+async def get_current_lunar_phase():
+    """Get the current moon phase with detailed information"""
+    now = datetime.utcnow()
+    moon = calculate_moon_phase_for_date(now)
+    phase_name = moon["name"]
+    phase_data = MOON_PHASE_DATA.get(phase_name, MOON_PHASE_DATA["Nouvelle Lune"])
+    
+    return {
+        "phase": phase_name,
+        "day_in_cycle": moon["day_in_cycle"],
+        "phase_index": moon["phase_index"],
+        "energy": phase_data["energy"],
+        "element": phase_data["element"],
+        "focus": phase_data["focus"],
+        "ritual_themes": phase_data["ritual_themes"],
+    }
+
+class LunarRitualRequest(BaseModel):
+    phase: str
+    intention: Optional[str] = None
+
+@api_router.post("/lunar-rituals/generate")
+async def generate_lunar_ritual(request: LunarRitualRequest):
+    """Generate a personalized lunar ritual based on current phase"""
+    
+    phase_data = MOON_PHASE_DATA.get(request.phase, MOON_PHASE_DATA["Nouvelle Lune"])
+    
+    system_prompt = f"""Tu es un guide spirituel spécialisé dans les rituels lunaires.
+Tu crées des rituels personnalisés basés sur la phase de lune actuelle.
+
+PHASE ACTUELLE: {request.phase}
+ÉNERGIE: {phase_data['energy']}
+ÉLÉMENT: {phase_data['element']}
+FOCUS: {phase_data['focus']}
+
+TON STYLE:
+- Poétique et mystique
+- Pratique mais spirituel
+- Connecté à la nature et aux cycles
+- Bienveillant et inclusif
+
+FORMAT DE RÉPONSE (JSON):
+{{
+  "title": "Titre poétique du rituel",
+  "duration": "10-20 min",
+  "intention": "L'intention du rituel",
+  "preparation": ["élément 1", "élément 2"],
+  "steps": ["étape 1", "étape 2", "étape 3", "étape 4", "étape 5"],
+  "closing": "Phrase de clôture poétique",
+  "affirmation": "Une affirmation à répéter"
+}}"""
+
+    chat = LlmChat(
+        api_key=EMERGENT_LLM_KEY,
+        session_id=f"ritual-{uuid.uuid4()}",
+        system_message=system_prompt
+    ).with_model("openai", "gpt-4o")
+
+    intention_text = f"\nL'intention personnelle: {request.intention}" if request.intention else ""
+    prompt = f"Crée un rituel pour la {request.phase}.{intention_text}\nRéponds en JSON uniquement."
+
+    try:
+        response = await chat.send_message(UserMessage(text=prompt))
+        import json
+        clean_response = response.strip()
+        if clean_response.startswith("```json"):
+            clean_response = clean_response[7:]
+        if clean_response.startswith("```"):
+            clean_response = clean_response[3:]
+        if clean_response.endswith("```"):
+            clean_response = clean_response[:-3]
+        
+        result = json.loads(clean_response.strip())
+        result["phase"] = request.phase
+        result["phase_data"] = phase_data
+        return result
+    except Exception as e:
+        logging.error(f"Lunar ritual generation error: {e}")
+        # Fallback ritual
+        return {
+            "title": f"Rituel de la {request.phase}",
+            "duration": "15 min",
+            "phase": request.phase,
+            "phase_data": phase_data,
+            "intention": f"Se connecter à l'énergie de la {request.phase}",
+            "preparation": ["Une bougie", "Un espace calme", "Quelques minutes de silence"],
+            "steps": [
+                "Allume ta bougie et prends 3 respirations profondes",
+                f"Connecte-toi à l'énergie de {phase_data['focus'].lower()}",
+                "Pose tes mains sur ton cœur et ressens",
+                "Formule ton intention à voix haute ou en silence",
+                "Remercie la lune pour sa guidance"
+            ],
+            "closing": "Que la lumière de la lune guide tes pas.",
+            "affirmation": f"Je suis aligné(e) avec les cycles de la nature."
+        }
+
 app.include_router(api_router)
 
 # Mount static files for fonts
