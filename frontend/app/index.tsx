@@ -83,22 +83,11 @@ export default function WelcomeScreen() {
   const [sacredText, setSacredText] = useState<{ text: string; source: string } | null>(null);
   const [isLoadingText, setIsLoadingText] = useState(false);
   
-  // Calculate card width for 2-column grid (kept for reference if needed)
-
-  const moonScale = useSharedValue(1);
   const poeticGreeting = getPoeticalGreeting();
 
   useEffect(() => {
     checkAuth();
     checkAppleAvailability();
-    moonScale.value = withRepeat(
-      withSequence(
-        withSpring(1.05, { damping: 4 }),
-        withSpring(1, { damping: 4 })
-      ),
-      -1,
-      true
-    );
   }, []);
 
   const checkAuth = async () => {
