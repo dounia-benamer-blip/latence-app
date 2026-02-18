@@ -47,6 +47,27 @@ interface MenuItem {
 
 const MENU_ITEMS: MenuItem[] = [
   {
+    id: 'cadence',
+    title: 'Cadence',
+    subtitle: 'Ton rythme intérieur',
+    icon: 'infinite-outline',
+    route: '/cadence',
+  },
+  {
+    id: 'sagesse',
+    title: 'Sagesse',
+    subtitle: 'Citations sacrées universelles',
+    icon: 'sparkles-outline',
+    route: '/citations',
+  },
+  {
+    id: 'lettre',
+    title: 'Lettre à Moi',
+    subtitle: 'Message pour ton futur toi',
+    icon: 'mail-outline',
+    route: '/lettre',
+  },
+  {
     id: 'rituals',
     title: 'Rituels Lunaires',
     subtitle: 'Guidés par la lune',
