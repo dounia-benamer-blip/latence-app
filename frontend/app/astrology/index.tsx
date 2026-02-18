@@ -1099,6 +1099,7 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 12 },
   backButton: { padding: 4 },
+  headerTitleContainer: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   headerTitle: { fontSize: 18, fontWeight: '600', letterSpacing: 1 },
   placeholder: { width: 36 },
   
