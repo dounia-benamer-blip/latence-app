@@ -111,6 +111,13 @@ Journal intime immersif centré sur la lune, l'introspection et la sagesse unive
 
 ## Changelog
 
+### 18 Février 2026 - Itération 5
+- ✅ **Mode Nuit Global** : Thème sombre fonctionne dans TOUS les modules
+- ✅ Mise à jour fichiers capsule (write, list, [id]) pour utiliser useTheme
+- ✅ Mise à jour dreams/[id].tsx pour utiliser useTheme
+- ✅ 3 thèmes fonctionnels : Light (#FAF6F0), Dark (#1A1612), Silence (#0C0A08)
+- ✅ Persistance du thème via AsyncStorage
+
 ### 18 Février 2026 - Itération 4
 - ✅ Bug fix: "Lettre à Moi-Même" - envoi fonctionnel
 - ✅ Design: Lune retirée du logo d'accueil
