@@ -7,203 +7,67 @@ import {
   ScrollView,
   SafeAreaView,
   TextInput,
+  ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
+import Animated, { 
+  FadeIn, 
+  FadeInUp, 
+  FadeInDown,
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withTiming,
+  withSequence,
+  Easing,
+  interpolate,
+} from 'react-native-reanimated';
 import { useTheme } from '../src/context/ThemeContext';
-import { CandleFlame } from '../src/components/CandleFlame';
 import { TwinklingStars } from '../src/components/TwinklingStars';
 
-// Moon phase rituals
-const MOON_RITUALS = {
-  'Nouvelle Lune': {
-    icon: '🌑',
-    theme: 'Intentions & Nouveaux Départs',
-    energy: 'Introspection, plantation de graines',
-    rituals: [
-      {
-        title: 'Rituel des Intentions',
-        duration: '15 min',
-        description: 'Écris 3 intentions pour ce nouveau cycle lunaire. Que veux-tu manifester dans ta vie ?',
-        steps: [
-          'Allume une bougie blanche',
-          'Prends 3 respirations profondes',
-          'Écris tes 3 intentions sur papier',
-          'Lis-les à voix haute',
-          'Place le papier sous ta bougie jusqu\'à ce qu\'elle se consume',
-        ],
-      },
-      {
-        title: 'Méditation de la Graine',
-        duration: '10 min',
-        description: 'Visualise tes rêves comme des graines plantées dans un sol fertile.',
-        steps: [
-          'Assieds-toi confortablement dans l\'obscurité',
-          'Ferme les yeux et respire lentement',
-          'Imagine une graine dans ta main',
-          'Cette graine contient ton intention la plus chère',
-          'Plante-la mentalement dans un sol riche',
-          'Visualise-la germer et grandir',
-        ],
-      },
-    ],
-  },
-  'Premier Croissant': {
-    icon: '🌒',
-    theme: 'Action & Courage',
-    energy: 'Premiers pas, surmonter les doutes',
-    rituals: [
-      {
-        title: 'Rituel du Premier Pas',
-        duration: '10 min',
-        description: 'Identifie une action concrète pour avancer vers tes intentions.',
-        steps: [
-          'Relis tes intentions de la nouvelle lune',
-          'Choisis une petite action à faire aujourd\'hui',
-          'Écris cette action sur un post-it',
-          'Colle-le où tu le verras souvent',
-          'Accomplis cette action dans les 24h',
-        ],
-      },
-    ],
-  },
-  'Premier Quartier': {
-    icon: '🌓',
-    theme: 'Décisions & Engagement',
-    energy: 'Surmonter les obstacles, persévérance',
-    rituals: [
-      {
-        title: 'Rituel de l\'Engagement',
-        duration: '15 min',
-        description: 'Renforce ta détermination face aux défis qui se présentent.',
-        steps: [
-          'Identifie un obstacle actuel',
-          'Écris 3 façons de le surmonter',
-          'Choisis celle qui résonne le plus',
-          'Prends un engagement écrit envers toi-même',
-          'Signe et date ton engagement',
-        ],
-      },
-    ],
-  },
-  'Gibbeuse Croissante': {
-    icon: '🌔',
-    theme: 'Raffinement & Patience',
-    energy: 'Ajustements, perfectionner',
-    rituals: [
-      {
-        title: 'Rituel du Raffinement',
-        duration: '20 min',
-        description: 'Analyse ce qui fonctionne et ce qui doit être ajusté.',
-        steps: [
-          'Revois tes progrès depuis la nouvelle lune',
-          'Note ce qui avance bien',
-          'Identifie ce qui bloque',
-          'Ajuste ta stratégie si nécessaire',
-          'Célèbre tes petites victoires',
-        ],
-      },
-    ],
-  },
-  'Pleine Lune': {
-    icon: '🌕',
-    theme: 'Gratitude & Libération',
-    energy: 'Culmination, émotions intenses, lâcher-prise',
-    rituals: [
-      {
-        title: 'Rituel de Gratitude',
-        duration: '15 min',
-        description: 'Célèbre tes accomplissements et exprime ta gratitude.',
-        steps: [
-          'Allume une bougie dorée ou orange',
-          'Écris 10 choses pour lesquelles tu es reconnaissant(e)',
-          'Lis-les à voix haute face à la lune',
-          'Ressens la gratitude dans ton cœur',
-          'Termine par 3 respirations profondes',
-        ],
-      },
-      {
-        title: 'Rituel de Libération',
-        duration: '20 min',
-        description: 'Libère ce qui ne te sert plus pour faire place au nouveau.',
-        steps: [
-          'Écris ce que tu veux libérer sur un papier',
-          'Peurs, doutes, habitudes, relations...',
-          'Lis chaque chose à voix haute en disant "Je te libère"',
-          'Brûle le papier en sécurité (ou déchire-le en petits morceaux)',
-          'Visualise ces énergies quitter ton corps',
-        ],
-      },
-    ],
-  },
-  'Gibbeuse Décroissante': {
-    icon: '🌖',
-    theme: 'Partage & Transmission',
-    energy: 'Donner, enseigner, diffuser',
-    rituals: [
-      {
-        title: 'Rituel du Don',
-        duration: '15 min',
-        description: 'Partage ta sagesse et tes ressources avec les autres.',
-        steps: [
-          'Réfléchis à ce que tu peux offrir',
-          'Temps, conseils, objets, attention...',
-          'Choisis une personne à qui donner',
-          'Accomplis cet acte de générosité',
-          'Note comment cela te fait sentir',
-        ],
-      },
-    ],
-  },
-  'Dernier Quartier': {
-    icon: '🌗',
-    theme: 'Introspection & Bilan',
-    energy: 'Réflexion, faire le point',
-    rituals: [
-      {
-        title: 'Rituel du Bilan',
-        duration: '20 min',
-        description: 'Fais le bilan de ce cycle lunaire qui se termine.',
-        steps: [
-          'Relis tes intentions de la nouvelle lune',
-          'Qu\'as-tu accompli ? Qu\'as-tu appris ?',
-          'Quels obstacles as-tu rencontrés ?',
-          'Comment as-tu grandi ?',
-          'Qu\'est-ce que tu feras différemment ?',
-        ],
-      },
-    ],
-  },
-  'Dernier Croissant': {
-    icon: '🌘',
-    theme: 'Repos & Préparation',
-    energy: 'Lâcher-prise, se ressourcer',
-    rituals: [
-      {
-        title: 'Rituel du Repos',
-        duration: '30 min',
-        description: 'Accorde-toi un moment de repos total avant le nouveau cycle.',
-        steps: [
-          'Prends un bain ou une douche en conscience',
-          'Imagine l\'eau emporter les énergies du cycle passé',
-          'Reste dans le silence quelques minutes',
-          'Ne planifie rien, sois juste présent(e)',
-          'Prépare-toi mentalement pour le nouveau cycle',
-        ],
-      },
-    ],
-  },
-};
+const { width } = Dimensions.get('window');
+const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
-// Get current moon phase
+// Moon phases icons and data
+const MOON_PHASES = [
+  { name: 'Nouvelle Lune', icon: '🌑', shortName: 'Nouvelle' },
+  { name: 'Premier Croissant', icon: '🌒', shortName: 'Croissant' },
+  { name: 'Premier Quartier', icon: '🌓', shortName: 'Quartier' },
+  { name: 'Gibbeuse Croissante', icon: '🌔', shortName: 'Gibbeuse+' },
+  { name: 'Pleine Lune', icon: '🌕', shortName: 'Pleine' },
+  { name: 'Gibbeuse Décroissante', icon: '🌖', shortName: 'Gibbeuse-' },
+  { name: 'Dernier Quartier', icon: '🌗', shortName: 'Quartier' },
+  { name: 'Dernier Croissant', icon: '🌘', shortName: 'Croissant' },
+];
+
+interface PhaseData {
+  phase: string;
+  day_in_cycle: number;
+  energy: string;
+  element: string;
+  focus: string;
+  ritual_themes: string[];
+}
+
+interface GeneratedRitual {
+  title: string;
+  duration: string;
+  intention: string;
+  preparation: string[];
+  steps: string[];
+  closing: string;
+  affirmation: string;
+}
+
+// Calculate current moon phase locally
 const getMoonPhase = () => {
   const date = new Date();
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
   const day = date.getDate();
   
-  // Simplified moon phase calculation
   const c = Math.floor(365.25 * year);
   const e = Math.floor(30.6 * month);
   const jd = c + e + day - 694039.09;
@@ -221,13 +85,83 @@ const getMoonPhase = () => {
   return 'Nouvelle Lune';
 };
 
+// Animated Moon Component
+const AnimatedMoon = ({ phase, size = 100 }: { phase: string; size?: number }) => {
+  const pulse = useSharedValue(0);
+  const glow = useSharedValue(0);
+
+  useEffect(() => {
+    pulse.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration: 2500, easing: Easing.inOut(Easing.ease) }),
+        withTiming(0, { duration: 2500, easing: Easing.inOut(Easing.ease) })
+      ),
+      -1,
+      false
+    );
+    glow.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration: 3000, easing: Easing.inOut(Easing.ease) }),
+        withTiming(0, { duration: 3000, easing: Easing.inOut(Easing.ease) })
+      ),
+      -1,
+      false
+    );
+  }, []);
+
+  const moonStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: interpolate(pulse.value, [0, 1], [1, 1.08]) }],
+  }));
+
+  const glowStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(glow.value, [0, 1], [0.3, 0.6]),
+    transform: [{ scale: interpolate(glow.value, [0, 1], [1, 1.3]) }],
+  }));
+
+  const outerGlowStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(glow.value, [0, 1], [0.15, 0.35]),
+    transform: [{ scale: interpolate(glow.value, [0, 1], [1, 1.5]) }],
+  }));
+
+  const phaseData = MOON_PHASES.find(p => p.name === phase) || MOON_PHASES[4];
+
+  return (
+    <View style={[styles.moonContainer, { width: size * 2.5, height: size * 2.5 }]}>
+      {/* Outer glow */}
+      <Animated.View
+        style={[
+          styles.moonGlow,
+          outerGlowStyle,
+          { width: size * 2, height: size * 2, borderRadius: size, backgroundColor: 'rgba(245, 230, 211, 0.2)' }
+        ]}
+      />
+      {/* Inner glow */}
+      <Animated.View
+        style={[
+          styles.moonGlow,
+          glowStyle,
+          { width: size * 1.5, height: size * 1.5, borderRadius: size * 0.75, backgroundColor: 'rgba(245, 230, 211, 0.3)' }
+        ]}
+      />
+      {/* Moon */}
+      <Animated.View style={moonStyle}>
+        <Text style={{ fontSize: size }}>{phaseData.icon}</Text>
+      </Animated.View>
+    </View>
+  );
+};
+
 export default function RitualsScreen() {
   const router = useRouter();
-  const { theme, isDark } = useTheme();
+  const { theme } = useTheme();
   const [currentPhase, setCurrentPhase] = useState(getMoonPhase());
-  const [selectedRitual, setSelectedRitual] = useState<number | null>(null);
-  const [journalEntry, setJournalEntry] = useState('');
+  const [phaseData, setPhaseData] = useState<PhaseData | null>(null);
+  const [generatedRitual, setGeneratedRitual] = useState<GeneratedRitual | null>(null);
+  const [customIntention, setCustomIntention] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [loadingRitual, setLoadingRitual] = useState(false);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [showRitual, setShowRitual] = useState(false);
 
   const ds = {
     container: { backgroundColor: theme.background },
@@ -237,171 +171,296 @@ export default function RitualsScreen() {
     card: { backgroundColor: theme.card },
   };
 
-  const phaseData = MOON_RITUALS[currentPhase as keyof typeof MOON_RITUALS];
+  useEffect(() => {
+    fetchPhaseData();
+  }, [currentPhase]);
 
-  const toggleStep = (stepIndex: number) => {
-    if (completedSteps.includes(stepIndex)) {
-      setCompletedSteps(completedSteps.filter(i => i !== stepIndex));
+  const fetchPhaseData = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/api/lunar-phase/current`);
+      if (response.ok) {
+        const data = await response.json();
+        setPhaseData(data);
+      }
+    } catch (error) {
+      console.error('Error fetching phase data:', error);
+      // Fallback data
+      setPhaseData({
+        phase: currentPhase,
+        day_in_cycle: 15,
+        energy: "Énergie de transformation",
+        element: "Eau",
+        focus: "Connexion intérieure",
+        ritual_themes: ["méditation", "introspection", "gratitude"],
+      });
+    }
+    setLoading(false);
+  };
+
+  const generateRitual = async () => {
+    setLoadingRitual(true);
+    setShowRitual(false);
+    setCompletedSteps([]);
+    
+    try {
+      const response = await fetch(`${API_URL}/api/lunar-rituals/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phase: currentPhase,
+          intention: customIntention || null,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setGeneratedRitual(data);
+        setShowRitual(true);
+      }
+    } catch (error) {
+      console.error('Error generating ritual:', error);
+      // Fallback ritual
+      setGeneratedRitual({
+        title: `Rituel de la ${currentPhase}`,
+        duration: "15 min",
+        intention: customIntention || "Se connecter à l'énergie lunaire",
+        preparation: ["Une bougie", "Un espace calme"],
+        steps: [
+          "Allume ta bougie et prends 3 respirations profondes",
+          "Connecte-toi à l'énergie de la lune",
+          "Pose tes mains sur ton cœur",
+          "Formule ton intention",
+          "Remercie la lune"
+        ],
+        closing: "Que la lumière de la lune guide tes pas.",
+        affirmation: "Je suis aligné(e) avec les cycles de la nature."
+      });
+      setShowRitual(true);
+    }
+    setLoadingRitual(false);
+  };
+
+  const toggleStep = (index: number) => {
+    if (completedSteps.includes(index)) {
+      setCompletedSteps(completedSteps.filter(i => i !== index));
     } else {
-      setCompletedSteps([...completedSteps, stepIndex]);
+      setCompletedSteps([...completedSteps, index]);
     }
   };
 
-  const selectRitual = (index: number) => {
-    setSelectedRitual(selectedRitual === index ? null : index);
-    setCompletedSteps([]);
-  };
+  const phaseInfo = MOON_PHASES.find(p => p.name === currentPhase) || MOON_PHASES[4];
 
   return (
     <SafeAreaView style={[styles.container, ds.container]}>
-      <TwinklingStars starCount={30} minSize={1} maxSize={2} />
+      <TwinklingStars starCount={50} minSize={1} maxSize={3} />
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton} data-testid="back-button">
           <Ionicons name="chevron-down" size={28} color={theme.iconColor} />
         </TouchableOpacity>
-        <View style={styles.headerCenter}>
-          <CandleFlame size="small" intensity="gentle" />
-          <Text style={[styles.headerTitle, ds.text]}>Rituels</Text>
-          <CandleFlame size="small" intensity="gentle" />
-        </View>
+        <Text style={[styles.headerTitle, ds.text]}>Rituels Lunaires</Text>
         <View style={styles.placeholder} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Current Moon Phase */}
-        <Animated.View entering={FadeIn.duration(500)} style={[styles.phaseCard, ds.card]}>
-          <Text style={styles.phaseIcon}>{phaseData.icon}</Text>
-          <Text style={[styles.phaseName, ds.text]}>{currentPhase}</Text>
-          <Text style={[styles.phaseTheme, { color: theme.accentWarm }]}>{phaseData.theme}</Text>
-          <Text style={[styles.phaseEnergy, ds.textMuted]}>{phaseData.energy}</Text>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        {/* Animated Moon */}
+        <Animated.View entering={FadeIn.duration(800)} style={styles.moonSection}>
+          <AnimatedMoon phase={currentPhase} size={80} />
         </Animated.View>
 
-        {/* Rituals List */}
-        <Text style={[styles.sectionTitle, ds.text]}>Rituels suggérés</Text>
-        
-        {phaseData.rituals.map((ritual, index) => (
-          <Animated.View
-            key={index}
-            entering={FadeInUp.duration(400).delay(index * 100)}
-          >
-            <TouchableOpacity
-              style={[
-                styles.ritualCard, 
-                ds.card,
-                selectedRitual === index && { borderColor: theme.accentWarm, borderWidth: 2 }
-              ]}
-              onPress={() => selectRitual(index)}
-            >
-              <View style={styles.ritualHeader}>
-                <View>
-                  <Text style={[styles.ritualTitle, ds.text]}>{ritual.title}</Text>
-                  <Text style={[styles.ritualDuration, ds.textMuted]}>
-                    <Ionicons name="time-outline" size={12} /> {ritual.duration}
-                  </Text>
+        {/* Phase Info */}
+        <Animated.View entering={FadeInUp.duration(600).delay(200)} style={[styles.phaseCard, ds.card]}>
+          <Text style={[styles.phaseName, ds.text]}>{currentPhase}</Text>
+          {phaseData && (
+            <>
+              <View style={styles.phaseDetails}>
+                <View style={[styles.detailBadge, { backgroundColor: `${theme.accentWarm}20` }]}>
+                  <Text style={[styles.detailText, { color: theme.accentWarm }]}>{phaseData.element}</Text>
                 </View>
-                <Ionicons 
-                  name={selectedRitual === index ? "chevron-up" : "chevron-down"} 
-                  size={20} 
-                  color={theme.iconColor} 
-                />
+                <View style={[styles.detailBadge, { backgroundColor: `${theme.accent}20` }]}>
+                  <Text style={[styles.detailText, { color: theme.accent }]}>Jour {phaseData.day_in_cycle}/29</Text>
+                </View>
               </View>
-              <Text style={[styles.ritualDescription, ds.textSecondary]}>
-                {ritual.description}
-              </Text>
+              <Text style={[styles.phaseEnergy, ds.textSecondary]}>{phaseData.energy}</Text>
+              <Text style={[styles.phaseFocus, ds.textMuted]}>Focus : {phaseData.focus}</Text>
+            </>
+          )}
+        </Animated.View>
 
-              {/* Expanded Content */}
-              {selectedRitual === index && (
-                <Animated.View entering={FadeIn} style={styles.ritualContent}>
-                  <Text style={[styles.stepsTitle, ds.text]}>Étapes du rituel</Text>
-                  {ritual.steps.map((step, stepIndex) => (
-                    <TouchableOpacity
-                      key={stepIndex}
-                      style={styles.stepRow}
-                      onPress={() => toggleStep(stepIndex)}
-                    >
-                      <View style={[
-                        styles.stepCheckbox,
-                        { borderColor: theme.accentWarm },
-                        completedSteps.includes(stepIndex) && { backgroundColor: theme.accentWarm }
-                      ]}>
-                        {completedSteps.includes(stepIndex) && (
-                          <Ionicons name="checkmark" size={14} color="#fff" />
-                        )}
-                      </View>
-                      <Text style={[
-                        styles.stepText,
-                        ds.text,
-                        completedSteps.includes(stepIndex) && styles.stepCompleted
-                      ]}>
-                        {step}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
+        {/* Phase Selector */}
+        <Animated.View entering={FadeInUp.duration(600).delay(300)}>
+          <Text style={[styles.sectionTitle, ds.text]}>Phases de la lune</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.phasesScroll}>
+            {MOON_PHASES.map((phase) => (
+              <TouchableOpacity
+                key={phase.name}
+                style={[
+                  styles.phaseChip,
+                  { backgroundColor: phase.name === currentPhase ? theme.accentWarm : theme.card }
+                ]}
+                onPress={() => {
+                  setCurrentPhase(phase.name);
+                  setShowRitual(false);
+                  setGeneratedRitual(null);
+                }}
+                data-testid={`phase-${phase.shortName}`}
+              >
+                <Text style={styles.phaseChipIcon}>{phase.icon}</Text>
+                <Text style={[
+                  styles.phaseChipText,
+                  { color: phase.name === currentPhase ? '#fff' : theme.textSecondary }
+                ]}>
+                  {phase.shortName}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </Animated.View>
 
-                  {/* Progress */}
-                  {completedSteps.length > 0 && (
-                    <View style={styles.progressContainer}>
-                      <View style={[styles.progressBar, { backgroundColor: theme.border }]}>
-                        <View 
-                          style={[
-                            styles.progressFill, 
-                            { 
-                              backgroundColor: theme.accentWarm,
-                              width: `${(completedSteps.length / ritual.steps.length) * 100}%` 
-                            }
-                          ]} 
-                        />
-                      </View>
-                      <Text style={[styles.progressText, ds.textMuted]}>
-                        {completedSteps.length}/{ritual.steps.length} étapes
-                      </Text>
-                    </View>
-                  )}
-
-                  {/* Journal Entry */}
-                  <Text style={[styles.journalTitle, ds.text]}>Notes du rituel</Text>
-                  <TextInput
-                    style={[styles.journalInput, ds.text, { borderColor: theme.border, backgroundColor: theme.inputBackground }]}
-                    placeholder="Comment te sens-tu après ce rituel ?"
-                    placeholderTextColor={theme.textMuted}
-                    multiline
-                    value={journalEntry}
-                    onChangeText={setJournalEntry}
-                  />
-                </Animated.View>
+        {/* Intention Input */}
+        {!showRitual && (
+          <Animated.View entering={FadeInUp.duration(600).delay(400)} style={[styles.intentionCard, ds.card]}>
+            <Text style={[styles.intentionLabel, ds.text]}>Ton intention (optionnel)</Text>
+            <TextInput
+              style={[styles.intentionInput, ds.text, { borderColor: theme.border, backgroundColor: theme.inputBackground }]}
+              placeholder="Que souhaites-tu manifester ?"
+              placeholderTextColor={theme.textMuted}
+              value={customIntention}
+              onChangeText={setCustomIntention}
+              multiline
+              data-testid="intention-input"
+            />
+            
+            <TouchableOpacity
+              style={[styles.generateButton, { backgroundColor: theme.accentWarm }]}
+              onPress={generateRitual}
+              disabled={loadingRitual}
+              data-testid="generate-ritual-btn"
+            >
+              {loadingRitual ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <>
+                  <Ionicons name="moon" size={20} color="#fff" />
+                  <Text style={styles.generateButtonText}>Créer mon rituel</Text>
+                </>
               )}
             </TouchableOpacity>
           </Animated.View>
-        ))}
+        )}
 
-        {/* Phase Selector */}
-        <Text style={[styles.sectionTitle, ds.text, { marginTop: 30 }]}>Explorer d'autres phases</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.phasesScroll}>
-          {Object.entries(MOON_RITUALS).map(([phase, data]) => (
+        {/* Generated Ritual */}
+        {showRitual && generatedRitual && (
+          <Animated.View entering={FadeInUp.duration(500)}>
+            {/* Ritual Header */}
+            <View style={[styles.ritualCard, ds.card]}>
+              <View style={styles.ritualHeader}>
+                <Text style={[styles.ritualTitle, ds.text]}>{generatedRitual.title}</Text>
+                <View style={[styles.durationBadge, { backgroundColor: `${theme.accent}20` }]}>
+                  <Ionicons name="time-outline" size={14} color={theme.accent} />
+                  <Text style={[styles.durationText, { color: theme.accent }]}>{generatedRitual.duration}</Text>
+                </View>
+              </View>
+              <Text style={[styles.ritualIntention, ds.textSecondary, { fontStyle: 'italic' }]}>
+                "{generatedRitual.intention}"
+              </Text>
+            </View>
+
+            {/* Preparation */}
+            <View style={[styles.ritualCard, ds.card]}>
+              <Text style={[styles.ritualSectionTitle, ds.text]}>
+                <Ionicons name="sparkles-outline" size={16} /> Préparation
+              </Text>
+              {generatedRitual.preparation.map((item, i) => (
+                <View key={i} style={styles.prepItem}>
+                  <Text style={[styles.prepBullet, { color: theme.accentWarm }]}>✧</Text>
+                  <Text style={[styles.prepText, ds.textSecondary]}>{item}</Text>
+                </View>
+              ))}
+            </View>
+
+            {/* Steps */}
+            <View style={[styles.ritualCard, ds.card]}>
+              <Text style={[styles.ritualSectionTitle, ds.text]}>
+                <Ionicons name="list-outline" size={16} /> Étapes du rituel
+              </Text>
+              {generatedRitual.steps.map((step, i) => (
+                <TouchableOpacity
+                  key={i}
+                  style={styles.stepRow}
+                  onPress={() => toggleStep(i)}
+                  data-testid={`step-${i}`}
+                >
+                  <View style={[
+                    styles.stepCheckbox,
+                    { borderColor: theme.accentWarm },
+                    completedSteps.includes(i) && { backgroundColor: theme.accentWarm }
+                  ]}>
+                    {completedSteps.includes(i) && (
+                      <Ionicons name="checkmark" size={14} color="#fff" />
+                    )}
+                  </View>
+                  <Text style={[
+                    styles.stepText,
+                    ds.text,
+                    completedSteps.includes(i) && styles.stepCompleted
+                  ]}>
+                    {step}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+
+              {/* Progress */}
+              {completedSteps.length > 0 && (
+                <View style={styles.progressContainer}>
+                  <View style={[styles.progressBar, { backgroundColor: theme.border }]}>
+                    <View 
+                      style={[
+                        styles.progressFill, 
+                        { 
+                          backgroundColor: theme.accentWarm,
+                          width: `${(completedSteps.length / generatedRitual.steps.length) * 100}%` 
+                        }
+                      ]} 
+                    />
+                  </View>
+                  <Text style={[styles.progressText, ds.textMuted]}>
+                    {completedSteps.length}/{generatedRitual.steps.length}
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            {/* Closing & Affirmation */}
+            <View style={[styles.ritualCard, ds.card, { borderLeftWidth: 3, borderLeftColor: theme.accentWarm }]}>
+              <Text style={[styles.closingText, ds.textSecondary]}>
+                {generatedRitual.closing}
+              </Text>
+              <View style={[styles.affirmationBox, { backgroundColor: `${theme.accentWarm}10` }]}>
+                <Text style={[styles.affirmationLabel, ds.textMuted]}>AFFIRMATION</Text>
+                <Text style={[styles.affirmationText, ds.text]}>
+                  "{generatedRitual.affirmation}"
+                </Text>
+              </View>
+            </View>
+
+            {/* New Ritual Button */}
             <TouchableOpacity
-              key={phase}
-              style={[
-                styles.phaseChip,
-                { backgroundColor: phase === currentPhase ? theme.accentWarm : theme.card }
-              ]}
+              style={[styles.newRitualButton, { borderColor: theme.border }]}
               onPress={() => {
-                setCurrentPhase(phase);
-                setSelectedRitual(null);
+                setShowRitual(false);
+                setGeneratedRitual(null);
                 setCompletedSteps([]);
               }}
+              data-testid="new-ritual-btn"
             >
-              <Text style={styles.phaseChipIcon}>{data.icon}</Text>
-              <Text style={[
-                styles.phaseChipText,
-                { color: phase === currentPhase ? '#fff' : theme.textSecondary }
-              ]}>
-                {phase.split(' ').slice(-1)[0]}
-              </Text>
+              <Ionicons name="refresh" size={18} color={theme.textMuted} />
+              <Text style={[styles.newRitualText, ds.textMuted]}>Nouveau rituel</Text>
             </TouchableOpacity>
-          ))}
-        </ScrollView>
+          </Animated.View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -409,65 +468,113 @@ export default function RitualsScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 12 },
+  header: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    justifyContent: 'space-between', 
+    paddingHorizontal: 20, 
+    paddingVertical: 12 
+  },
   backButton: { padding: 4 },
-  headerCenter: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   headerTitle: { fontSize: 18, fontWeight: '600', letterSpacing: 1 },
   placeholder: { width: 36 },
   scrollContent: { padding: 20, paddingBottom: 40 },
 
-  phaseCard: { alignItems: 'center', padding: 24, borderRadius: 20, marginBottom: 24 },
-  phaseIcon: { fontSize: 50, marginBottom: 12 },
-  phaseName: { fontSize: 22, fontWeight: '600', marginBottom: 6 },
-  phaseTheme: { fontSize: 14, fontWeight: '500', marginBottom: 8 },
-  phaseEnergy: { fontSize: 13, textAlign: 'center', fontStyle: 'italic' },
+  moonSection: { alignItems: 'center', marginBottom: 10 },
+  moonContainer: { alignItems: 'center', justifyContent: 'center' },
+  moonGlow: { position: 'absolute' },
 
-  sectionTitle: { fontSize: 16, fontWeight: '600', marginBottom: 16 },
+  phaseCard: { 
+    padding: 24, 
+    borderRadius: 20, 
+    marginBottom: 24,
+    alignItems: 'center',
+  },
+  phaseName: { fontSize: 24, fontWeight: '600', marginBottom: 12 },
+  phaseDetails: { flexDirection: 'row', gap: 10, marginBottom: 12 },
+  detailBadge: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20 },
+  detailText: { fontSize: 12, fontWeight: '500' },
+  phaseEnergy: { fontSize: 14, textAlign: 'center', marginBottom: 8 },
+  phaseFocus: { fontSize: 13, textAlign: 'center', fontStyle: 'italic' },
 
-  ritualCard: { padding: 16, borderRadius: 16, marginBottom: 12 },
-  ritualHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 },
-  ritualTitle: { fontSize: 16, fontWeight: '600', marginBottom: 4 },
-  ritualDuration: { fontSize: 12 },
-  ritualDescription: { fontSize: 14, lineHeight: 20 },
+  sectionTitle: { fontSize: 16, fontWeight: '600', marginBottom: 12 },
+  phasesScroll: { marginBottom: 24 },
+  phaseChip: { 
+    alignItems: 'center', 
+    paddingVertical: 12, 
+    paddingHorizontal: 16, 
+    borderRadius: 16, 
+    marginRight: 10,
+    minWidth: 70,
+  },
+  phaseChipIcon: { fontSize: 24, marginBottom: 4 },
+  phaseChipText: { fontSize: 11, fontWeight: '500' },
 
-  ritualContent: { marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.1)' },
-  stepsTitle: { fontSize: 14, fontWeight: '600', marginBottom: 12 },
-  stepRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12 },
+  intentionCard: { padding: 20, borderRadius: 16, marginBottom: 20 },
+  intentionLabel: { fontSize: 14, fontWeight: '500', marginBottom: 12 },
+  intentionInput: { 
+    borderWidth: 1, 
+    borderRadius: 12, 
+    paddingHorizontal: 16, 
+    paddingVertical: 14, 
+    fontSize: 15, 
+    minHeight: 60,
+    textAlignVertical: 'top',
+    marginBottom: 16,
+  },
+  generateButton: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    paddingVertical: 16, 
+    borderRadius: 30, 
+    gap: 10,
+  },
+  generateButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+
+  ritualCard: { padding: 20, borderRadius: 16, marginBottom: 16 },
+  ritualHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 },
+  ritualTitle: { fontSize: 18, fontWeight: '600', flex: 1, marginRight: 10 },
+  durationBadge: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12, gap: 4 },
+  durationText: { fontSize: 12, fontWeight: '500' },
+  ritualIntention: { fontSize: 14, lineHeight: 22 },
+
+  ritualSectionTitle: { fontSize: 15, fontWeight: '600', marginBottom: 14 },
+  prepItem: { flexDirection: 'row', marginBottom: 8 },
+  prepBullet: { marginRight: 10 },
+  prepText: { flex: 1, fontSize: 14 },
+
+  stepRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 14 },
   stepCheckbox: { 
-    width: 22, 
-    height: 22, 
-    borderRadius: 11, 
+    width: 24, 
+    height: 24, 
+    borderRadius: 12, 
     borderWidth: 2, 
     marginRight: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  stepText: { flex: 1, fontSize: 14, lineHeight: 20 },
+  stepText: { flex: 1, fontSize: 14, lineHeight: 22 },
   stepCompleted: { textDecorationLine: 'line-through', opacity: 0.6 },
 
-  progressContainer: { marginTop: 16, marginBottom: 20 },
-  progressBar: { height: 6, borderRadius: 3, overflow: 'hidden' },
+  progressContainer: { flexDirection: 'row', alignItems: 'center', marginTop: 10, gap: 10 },
+  progressBar: { flex: 1, height: 6, borderRadius: 3, overflow: 'hidden' },
   progressFill: { height: '100%', borderRadius: 3 },
-  progressText: { fontSize: 12, marginTop: 6, textAlign: 'right' },
+  progressText: { fontSize: 12 },
 
-  journalTitle: { fontSize: 14, fontWeight: '600', marginBottom: 10 },
-  journalInput: { 
-    borderWidth: 1, 
-    borderRadius: 12, 
-    padding: 14, 
-    fontSize: 14, 
-    minHeight: 80,
-    textAlignVertical: 'top',
-  },
+  closingText: { fontSize: 15, lineHeight: 24, marginBottom: 16, fontStyle: 'italic' },
+  affirmationBox: { padding: 16, borderRadius: 12 },
+  affirmationLabel: { fontSize: 10, letterSpacing: 1, marginBottom: 6 },
+  affirmationText: { fontSize: 15, fontWeight: '500', fontStyle: 'italic' },
 
-  phasesScroll: { marginTop: 8 },
-  phaseChip: { 
+  newRitualButton: { 
+    flexDirection: 'row', 
     alignItems: 'center', 
-    paddingVertical: 10, 
-    paddingHorizontal: 14, 
-    borderRadius: 16, 
-    marginRight: 10,
+    justifyContent: 'center', 
+    paddingVertical: 14, 
+    borderRadius: 25, 
+    borderWidth: 1,
+    gap: 8,
   },
-  phaseChipIcon: { fontSize: 20, marginBottom: 4 },
-  phaseChipText: { fontSize: 11, fontWeight: '500' },
+  newRitualText: { fontSize: 14 },
 });
