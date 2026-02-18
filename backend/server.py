@@ -2628,6 +2628,66 @@ async def get_daily_cadence():
         "eveningReflection": "Ce soir, avant de dormir, demande-toi : qu'ai-je appris aujourd'hui sur moi-même ?" if time_of_day == "soir" else None,
     }
 
+@api_router.get("/cadence/streak")
+async def get_cadence_streak():
+    """Get the user's current cadence streak"""
+    # Get all completions
+    completions = await db.cadence_completions.find({}, {"_id": 0}).sort("date", -1).to_list(100)
+    
+    if not completions:
+        return {"streak": 0, "last_completed": None, "total_completions": 0}
+    
+    # Calculate streak
+    streak = 0
+    today = datetime.utcnow().date()
+    
+    for completion in completions:
+        completion_date = datetime.fromisoformat(completion["date"]).date() if isinstance(completion["date"], str) else completion["date"].date()
+        expected_date = today - timedelta(days=streak)
+        
+        if completion_date == expected_date:
+            streak += 1
+        elif completion_date < expected_date:
+            break
+    
+    return {
+        "streak": streak,
+        "last_completed": completions[0]["date"] if completions else None,
+        "total_completions": len(completions)
+    }
+
+class CadenceComplete(BaseModel):
+    ritual_id: str
+    ritual_type: str
+    completed_at: Optional[str] = None
+
+@api_router.post("/cadence/complete")
+async def complete_cadence_ritual(completion: CadenceComplete):
+    """Mark a cadence ritual as completed"""
+    today = datetime.utcnow().date().isoformat()
+    
+    # Check if already completed today
+    existing = await db.cadence_completions.find_one({
+        "date": today,
+        "ritual_id": completion.ritual_id
+    })
+    
+    if existing:
+        return {"success": True, "message": "Déjà complété aujourd'hui", "already_completed": True}
+    
+    # Save completion
+    completion_doc = {
+        "id": str(uuid.uuid4()),
+        "ritual_id": completion.ritual_id,
+        "ritual_type": completion.ritual_type,
+        "date": today,
+        "completed_at": completion.completed_at or datetime.utcnow().isoformat()
+    }
+    
+    await db.cadence_completions.insert_one(completion_doc)
+    
+    return {"success": True, "message": "Rituel complété", "already_completed": False}
+
 # ==================== SACRED QUOTES ROUTES ====================
 
 @api_router.get("/sacred-quote")
