@@ -47,16 +47,9 @@ interface MenuItem {
 
 const MENU_ITEMS: MenuItem[] = [
   {
-    id: 'tarot',
-    title: 'Tarot',
-    subtitle: 'Tirage en 3 cartes',
-    icon: 'sparkles-outline',
-    route: '/tarot',
-  },
-  {
     id: 'rituals',
     title: 'Rituels Lunaires',
-    subtitle: 'Selon la phase de lune',
+    subtitle: 'Guidés par la lune',
     icon: 'moon-outline',
     route: '/rituals',
   },
@@ -108,13 +101,6 @@ const MENU_ITEMS: MenuItem[] = [
     subtitle: 'Lune, Celtique, Arabe, Maisons',
     icon: 'planet-outline',
     route: '/astrology',
-  },
-  {
-    id: 'compatibility',
-    title: 'Compatibilité',
-    subtitle: 'Alchimie entre deux âmes',
-    icon: 'heart-outline',
-    route: '/compatibility',
   },
   {
     id: 'stats',
