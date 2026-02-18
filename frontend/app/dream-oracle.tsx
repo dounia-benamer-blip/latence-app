@@ -390,24 +390,33 @@ export default function DreamOracleScreen() {
             </View>
 
             {/* Patterns Found */}
-            {oracleReading.patterns.length > 0 && (
+            {oracleReading.patterns && oracleReading.patterns.length > 0 && (
               <View style={[styles.section, ds.card]}>
                 <Text style={[styles.sectionTitle, ds.text]}>
                   <Ionicons name="key-outline" size={16} /> Symboles révélés
                 </Text>
                 <View style={styles.patternsGrid}>
-                  {oracleReading.patterns.map((pattern, i) => (
-                    <Animated.View
-                      key={pattern.symbol}
-                      entering={FadeInUp.delay(i * 100)}
-                      style={[styles.patternCard, { backgroundColor: theme.background }]}
-                    >
-                      <Text style={styles.patternIcon}>{pattern.icon}</Text>
-                      <Text style={[styles.patternSymbol, ds.text]}>{pattern.symbol}</Text>
-                      <Text style={[styles.patternCount, { color: theme.accentWarm }]}>×{pattern.count}</Text>
-                      <Text style={[styles.patternMeaning, ds.textMuted]}>{pattern.meaning}</Text>
-                    </Animated.View>
-                  ))}
+                  {oracleReading.patterns.map((pattern: any, i: number) => {
+                    // Handle both AI response format and local format
+                    const symbolName = pattern.symbol || pattern.pattern || 'symbole';
+                    const symbolData = DREAM_SYMBOLS[symbolName.toLowerCase() as keyof typeof DREAM_SYMBOLS];
+                    const icon = pattern.icon || symbolData?.icon || '✨';
+                    const meaning = pattern.meaning || pattern.significance || symbolData?.meaning || '';
+                    const count = pattern.count || 1;
+                    
+                    return (
+                      <Animated.View
+                        key={symbolName + i}
+                        entering={FadeInUp.delay(i * 100)}
+                        style={[styles.patternCard, { backgroundColor: theme.background }]}
+                      >
+                        <Text style={styles.patternIcon}>{icon}</Text>
+                        <Text style={[styles.patternSymbol, ds.text]}>{symbolName}</Text>
+                        {pattern.count && <Text style={[styles.patternCount, { color: theme.accentWarm }]}>×{count}</Text>}
+                        <Text style={[styles.patternMeaning, ds.textMuted]} numberOfLines={3}>{meaning}</Text>
+                      </Animated.View>
+                    );
+                  })}
                 </View>
               </View>
             )}
