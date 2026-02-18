@@ -2535,6 +2535,185 @@ FORMAT DE RÉPONSE (JSON):
             "affirmation": f"Je suis aligné(e) avec les cycles de la nature."
         }
 
+# ==================== CADENCE (Daily Routine) ROUTES ====================
+
+class CadenceRitual(BaseModel):
+    id: str
+    type: str
+    title: str
+    description: str
+    duration: str
+    completed: bool = False
+
+@api_router.get("/cadence/daily")
+async def get_daily_cadence():
+    """Get personalized daily micro-rituals based on time of day and moon phase"""
+    now = datetime.utcnow()
+    hour = now.hour
+    moon = calculate_moon_phase_for_date(now)
+    phase_name = moon["name"]
+    
+    # Determine time of day
+    if hour < 12:
+        time_of_day = "matin"
+        greeting = "Le jour se lève. Prends un moment pour toi avant que le monde ne s'éveille."
+    elif hour < 18:
+        time_of_day = "apres-midi"
+        greeting = "L'après-midi t'invite à une pause. Recentre-toi sur l'essentiel."
+    else:
+        time_of_day = "soir"
+        greeting = "La nuit approche. C'est le moment de faire le bilan et de lâcher prise."
+    
+    # Generate rituals based on moon phase
+    rituals = []
+    
+    # Always start with breath
+    rituals.append({
+        "id": "breath",
+        "type": "respiration",
+        "title": "Trois respirations conscientes",
+        "description": "Inspire profondément par le nez, retiens un instant, expire lentement par la bouche. Répète trois fois.",
+        "duration": "2 min",
+        "completed": False,
+    })
+    
+    # Introspection based on moon phase
+    questions = {
+        "Nouvelle Lune": "Quelle intention veux-tu planter pour ce nouveau cycle ?",
+        "Premier Croissant": "Quel petit pas peux-tu faire aujourd'hui vers ton rêve ?",
+        "Premier Quartier": "Qu'est-ce qui te retient ? Comment le dépasser ?",
+        "Gibbeuse Croissante": "Que dois-tu ajuster ou affiner dans ta vie ?",
+        "Pleine Lune": "De quoi as-tu besoin de te libérer ?",
+        "Gibbeuse Décroissante": "Que peux-tu partager ou transmettre ?",
+        "Dernier Quartier": "Qu'as-tu appris récemment sur toi-même ?",
+        "Dernier Croissant": "De quoi as-tu besoin pour te ressourcer ?",
+    }
+    rituals.append({
+        "id": "introspection",
+        "type": "introspection",
+        "title": "Question du jour",
+        "description": questions.get(phase_name, "Qu'est-ce qui t'habite en ce moment ?"),
+        "duration": "5 min",
+        "completed": False,
+    })
+    
+    # Gratitude
+    rituals.append({
+        "id": "gratitude",
+        "type": "gratitude",
+        "title": "Un moment de gratitude",
+        "description": "Pense à une chose, même infime, pour laquelle tu ressens de la reconnaissance.",
+        "duration": "2 min",
+        "completed": False,
+    })
+    
+    # Silence
+    rituals.append({
+        "id": "silence",
+        "type": "silence",
+        "title": "Une minute de silence",
+        "description": "Ferme les yeux. Écoute le silence entre les sons. Ne fais rien d'autre que d'être.",
+        "duration": "1 min",
+        "completed": False,
+    })
+    
+    moon_influence = f"La {phase_name} t'invite à {MOON_PHASE_DATA.get(phase_name, {}).get('focus', 'l\\'introspection').lower()}."
+    
+    return {
+        "greeting": greeting,
+        "moonInfluence": moon_influence,
+        "rituals": rituals,
+        "eveningReflection": "Ce soir, avant de dormir, demande-toi : qu'ai-je appris aujourd'hui sur moi-même ?" if time_of_day == "soir" else None,
+    }
+
+# ==================== SACRED QUOTES ROUTES ====================
+
+@api_router.get("/sacred-quote")
+async def get_sacred_quote():
+    """Get a personalized sacred quote based on user mood"""
+    # Get latest mood
+    mood_data = await db.moods.find_one(sort=[("date", -1)])
+    mood = mood_data.get("mood", "neutre") if mood_data else "neutre"
+    
+    system_prompt = """Tu es un sage qui connaît les textes sacrés et la poésie spirituelle de toutes les traditions.
+Tu choisis UNE citation adaptée à l'état émotionnel de la personne.
+
+IMPORTANT:
+- Ne catégorise JAMAIS la source (pas de "Coran", "Bible", "Torah" explicite)
+- Cite simplement l'auteur ou la tradition
+- Mélange : poètes soufis (Rumi, Hafiz), sages anciens, textes sacrés, philosophes
+- La citation doit être profonde, poétique, réconfortante
+
+Réponds UNIQUEMENT en JSON:
+{"text": "citation ici", "author": "auteur ou tradition"}"""
+
+    chat = LlmChat(
+        api_key=EMERGENT_LLM_KEY,
+        session_id=f"quote-{uuid.uuid4()}",
+        system_message=system_prompt
+    ).with_model("openai", "gpt-4o")
+
+    prompt = f"La personne ressent : {mood}. Donne une citation sacrée ou poétique qui résonne avec cet état."
+
+    try:
+        response = await chat.send_message(UserMessage(text=prompt))
+        clean_response = response.strip()
+        if clean_response.startswith("```json"):
+            clean_response = clean_response[7:]
+        if clean_response.startswith("```"):
+            clean_response = clean_response[3:]
+        if clean_response.endswith("```"):
+            clean_response = clean_response[:-3]
+        
+        result = json.loads(clean_response.strip())
+        return result
+    except Exception as e:
+        logging.error(f"Sacred quote error: {e}")
+        return {
+            "text": "Ce que tu cherches te cherche aussi.",
+            "author": "Rumi"
+        }
+
+# ==================== LETTER TO SELF ROUTES ====================
+
+class LetterCreate(BaseModel):
+    content: str
+    delivery_months: int
+    delivery_date: Optional[str] = None
+
+@api_router.post("/letter")
+async def create_letter(letter: LetterCreate):
+    """Create a letter to future self"""
+    delivery_date = datetime.utcnow() + timedelta(days=letter.delivery_months * 30)
+    
+    letter_doc = {
+        "id": str(uuid.uuid4()),
+        "content": letter.content,
+        "delivery_months": letter.delivery_months,
+        "delivery_date": delivery_date.isoformat(),
+        "created_at": datetime.utcnow().isoformat(),
+        "delivered": False,
+    }
+    
+    await db.letters.insert_one(letter_doc)
+    return {"success": True, "delivery_date": letter_doc["delivery_date"]}
+
+@api_router.get("/letters")
+async def get_letters():
+    """Get all letters"""
+    letters = await db.letters.find({}, {"_id": 0}).sort("delivery_date", 1).to_list(100)
+    return letters
+
+@api_router.get("/letters/delivered")
+async def get_delivered_letters():
+    """Get letters that should be delivered now"""
+    now = datetime.utcnow().isoformat()
+    letters = await db.letters.find(
+        {"delivery_date": {"$lte": now}, "delivered": False},
+        {"_id": 0}
+    ).to_list(100)
+    return letters
+
 app.include_router(api_router)
 
 # Mount static files for fonts
