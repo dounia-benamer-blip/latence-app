@@ -2617,7 +2617,8 @@ async def get_daily_cadence():
         "completed": False,
     })
     
-    moon_influence = f"La {phase_name} t'invite à {MOON_PHASE_DATA.get(phase_name, {}).get('focus', 'l\\'introspection').lower()}."
+    default_focus = "l'introspection"
+    moon_influence = f"La {phase_name} t'invite à {MOON_PHASE_DATA.get(phase_name, {}).get('focus', default_focus).lower()}."
     
     return {
         "greeting": greeting,
