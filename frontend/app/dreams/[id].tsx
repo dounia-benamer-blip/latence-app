@@ -11,6 +11,7 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
+import { useTheme } from '../../src/context/ThemeContext';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
@@ -45,10 +46,19 @@ interface Dream {
 
 export default function DreamDetailScreen() {
   const router = useRouter();
+  const { theme } = useTheme();
   const { id } = useLocalSearchParams();
   const [dream, setDream] = useState<Dream | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  const ds = {
+    container: { backgroundColor: theme.background },
+    card: { backgroundColor: theme.card },
+    text: { color: theme.text },
+    textSecondary: { color: theme.textSecondary },
+    textMuted: { color: theme.textMuted },
+  };
 
   useEffect(() => {
     fetchDream();
@@ -103,9 +113,9 @@ export default function DreamDetailScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, ds.container]}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#8B9A7D" />
+          <ActivityIndicator size="large" color={theme.accent} />
         </View>
       </SafeAreaView>
     );
@@ -113,11 +123,11 @@ export default function DreamDetailScreen() {
 
   if (!dream) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, ds.container]}>
         <View style={styles.loadingContainer}>
-          <Text style={styles.errorText}>Rêve introuvable</Text>
+          <Text style={[styles.errorText, ds.textMuted]}>Rêve introuvable</Text>
           <TouchableOpacity onPress={() => router.back()}>
-            <Text style={styles.backLink}>Retour</Text>
+            <Text style={[styles.backLink, { color: theme.accent }]}>Retour</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -127,13 +137,13 @@ export default function DreamDetailScreen() {
   const typeInfo = DREAM_TYPES[dream.dream_type] || DREAM_TYPES.reve;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, ds.container]}>
       <Animated.View entering={FadeIn.duration(500)} style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => router.back()}
         >
-          <Ionicons name="arrow-back" size={24} color="#6B6B5B" />
+          <Ionicons name="arrow-back" size={24} color={theme.iconColor} />
         </TouchableOpacity>
         <View style={styles.placeholder} />
       </Animated.View>
@@ -143,15 +153,15 @@ export default function DreamDetailScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Animated.View entering={FadeInUp.duration(500)} style={styles.typeContainer}>
-          <View style={styles.typeBadge}>
-            <Ionicons name={typeInfo.icon as any} size={20} color="#6B6B5B" />
-            <Text style={styles.typeText}>{typeInfo.label}</Text>
+          <View style={[styles.typeBadge, ds.card]}>
+            <Ionicons name={typeInfo.icon as any} size={20} color={theme.textSecondary} />
+            <Text style={[styles.typeText, ds.text]}>{typeInfo.label}</Text>
           </View>
         </Animated.View>
 
         <Animated.View entering={FadeInUp.duration(500).delay(100)}>
-          <Text style={styles.title}>{dream.title}</Text>
-          <Text style={styles.date}>
+          <Text style={[styles.title, ds.text]}>{dream.title}</Text>
+          <Text style={[styles.date, ds.textMuted]}>
             {formatDreamDate(dream.date)}
           </Text>
         </Animated.View>
@@ -159,29 +169,29 @@ export default function DreamDetailScreen() {
         {dream.emotions.length > 0 && (
           <Animated.View entering={FadeInUp.duration(500).delay(200)} style={styles.emotionsContainer}>
             {dream.emotions.map((emotion, index) => (
-              <View key={index} style={styles.emotionChip}>
-                <Text style={styles.emotionText}>{emotion}</Text>
+              <View key={index} style={[styles.emotionChip, ds.card]}>
+                <Text style={[styles.emotionText, ds.textSecondary]}>{emotion}</Text>
               </View>
             ))}
           </Animated.View>
         )}
 
-        <Animated.View entering={FadeInUp.duration(500).delay(300)} style={styles.contentCard}>
-          <Text style={styles.contentText}>{dream.content}</Text>
+        <Animated.View entering={FadeInUp.duration(500).delay(300)} style={[styles.contentCard, ds.card]}>
+          <Text style={[styles.contentText, ds.text]}>{dream.content}</Text>
         </Animated.View>
 
         {dream.interpretation ? (
-          <Animated.View entering={FadeInUp.duration(500).delay(400)} style={styles.interpretationCard}>
-            <Text style={styles.interpretationTitle}>Interprétation</Text>
-            <Text style={styles.interpretationText}>{dream.interpretation}</Text>
+          <Animated.View entering={FadeInUp.duration(500).delay(400)} style={[styles.interpretationCard, { backgroundColor: theme.cardSelected, borderColor: theme.border }]}>
+            <Text style={[styles.interpretationTitle, ds.text]}>Interprétation</Text>
+            <Text style={[styles.interpretationText, ds.textSecondary]}>{dream.interpretation}</Text>
           </Animated.View>
         ) : (
           <Animated.View entering={FadeInUp.duration(500).delay(400)} style={styles.analyzeContainer}>
-            <Text style={styles.analyzePrompt}>
+            <Text style={[styles.analyzePrompt, ds.textMuted]}>
               Découvrir la signification de ce rêve ?
             </Text>
             <TouchableOpacity
-              style={styles.analyzeButton}
+              style={[styles.analyzeButton, { backgroundColor: theme.accentSoft }]}
               onPress={handleAnalyze}
               disabled={isAnalyzing}
               activeOpacity={0.8}
@@ -202,7 +212,6 @@ export default function DreamDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F0E8',
   },
   loadingContainer: {
     flex: 1,
@@ -211,10 +220,8 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 14,
-    color: '#A0A090',
   },
   backLink: {
-    color: '#8B9A7D',
     fontSize: 14,
     marginTop: 16,
   },
@@ -246,7 +253,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: '#FFFFFF',
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 20,
@@ -258,20 +264,17 @@ const styles = StyleSheet.create({
   },
   typeText: {
     fontSize: 14,
-    color: '#4A4A4A',
     fontWeight: '500',
   },
   title: {
     fontSize: 26,
     fontWeight: '300',
-    color: '#4A4A4A',
     textAlign: 'center',
     marginBottom: 8,
     letterSpacing: 0.5,
   },
   date: {
     fontSize: 13,
-    color: '#A0A090',
     textAlign: 'center',
     textTransform: 'capitalize',
     marginBottom: 24,
@@ -284,7 +287,6 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   emotionChip: {
-    backgroundColor: '#FFFFFF',
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
@@ -296,10 +298,8 @@ const styles = StyleSheet.create({
   },
   emotionText: {
     fontSize: 13,
-    color: '#6B6B5B',
   },
   contentCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 24,
     marginBottom: 24,
@@ -311,25 +311,20 @@ const styles = StyleSheet.create({
   },
   contentText: {
     fontSize: 15,
-    color: '#4A4A4A',
     lineHeight: 24,
   },
   interpretationCard: {
-    backgroundColor: '#FDF9F3',
     borderRadius: 16,
     padding: 24,
     borderWidth: 1,
-    borderColor: '#E8E0D4',
   },
   interpretationTitle: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#4A4A4A',
     marginBottom: 16,
   },
   interpretationText: {
     fontSize: 14,
-    color: '#6B6B5B',
     lineHeight: 22,
   },
   analyzeContainer: {
@@ -338,12 +333,10 @@ const styles = StyleSheet.create({
   },
   analyzePrompt: {
     fontSize: 14,
-    color: '#A0A090',
     textAlign: 'center',
     marginBottom: 16,
   },
   analyzeButton: {
-    backgroundColor: '#A8B4C4',
     paddingVertical: 14,
     paddingHorizontal: 32,
     borderRadius: 25,
