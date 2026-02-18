@@ -462,9 +462,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 60,
   },
-  moonContainer: {
-    marginBottom: 24,
-  },
   appName: {
     fontSize: 42,
     fontWeight: '200',
