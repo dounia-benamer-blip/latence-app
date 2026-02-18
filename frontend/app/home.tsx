@@ -54,13 +54,6 @@ const MENU_ITEMS: MenuItem[] = [
     route: '/rituals',
   },
   {
-    id: 'dream-oracle',
-    title: 'Oracle des Rêves',
-    subtitle: 'Messages de l\'inconscient',
-    icon: 'eye-outline',
-    route: '/dream-oracle',
-  },
-  {
     id: 'meditation',
     title: 'Méditation',
     subtitle: 'Respiration guidée & calme',
@@ -91,7 +84,7 @@ const MENU_ITEMS: MenuItem[] = [
   {
     id: 'dreams',
     title: 'Rêves',
-    subtitle: 'Journal et interprétation',
+    subtitle: 'Journal, Oracle & interprétation',
     icon: 'cloudy-night-outline',
     route: '/dreams',
   },
