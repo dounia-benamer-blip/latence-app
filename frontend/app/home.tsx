@@ -47,6 +47,27 @@ interface MenuItem {
 
 const MENU_ITEMS: MenuItem[] = [
   {
+    id: 'tarot',
+    title: 'Tarot',
+    subtitle: 'Tirage en 3 cartes',
+    icon: 'sparkles-outline',
+    route: '/tarot',
+  },
+  {
+    id: 'rituals',
+    title: 'Rituels Lunaires',
+    subtitle: 'Selon la phase de lune',
+    icon: 'moon-outline',
+    route: '/rituals',
+  },
+  {
+    id: 'dream-oracle',
+    title: 'Oracle des Rêves',
+    subtitle: 'Messages de l\'inconscient',
+    icon: 'eye-outline',
+    route: '/dream-oracle',
+  },
+  {
     id: 'meditation',
     title: 'Méditation',
     subtitle: 'Respiration guidée & calme',
@@ -57,7 +78,7 @@ const MENU_ITEMS: MenuItem[] = [
     id: 'mirror',
     title: 'Miroir',
     subtitle: 'IA qui reflète ton âme',
-    icon: 'eye-outline',
+    icon: 'glasses-outline',
     route: '/mirror',
   },
   {
@@ -85,7 +106,7 @@ const MENU_ITEMS: MenuItem[] = [
     id: 'astro',
     title: 'Cosmos',
     subtitle: 'Lune, Celtique, Arabe, Maisons',
-    icon: 'moon-outline',
+    icon: 'planet-outline',
     route: '/astrology',
   },
   {
