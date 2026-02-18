@@ -216,9 +216,6 @@ export default function WelcomeScreen() {
       </TouchableOpacity>
 
       <View style={styles.brandingContainer}>
-        <Animated.View style={[styles.moonContainer, moonStyle]}>
-          <Ionicons name="moon" size={64} color={theme.accentWarm} />
-        </Animated.View>
         <Text style={[styles.appName, dynamicStyles.text]}>Latence</Text>
         <Text style={[styles.byLine, dynamicStyles.textMuted]}>by Atelier Benamer</Text>
       </View>
