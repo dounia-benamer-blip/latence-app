@@ -14,6 +14,7 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInUp, FadeInDown } from 'react-native-reanimated';
+import { useTheme } from '../../src/context/ThemeContext';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
@@ -26,10 +27,21 @@ function formatToday(): string {
 
 export default function WriteScreen() {
   const router = useRouter();
+  const { theme } = useTheme();
   const [content, setContent] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [interpretation, setInterpretation] = useState('');
   const [phase, setPhase] = useState<'write' | 'reflecting' | 'done'>('write');
+
+  const ds = {
+    container: { backgroundColor: theme.background },
+    card: { backgroundColor: theme.card },
+    text: { color: theme.text },
+    textSecondary: { color: theme.textSecondary },
+    textMuted: { color: theme.textMuted },
+    border: { borderColor: theme.border },
+    input: { backgroundColor: theme.inputBackground, color: theme.text },
+  };
 
   const handleSaveAndReflect = async () => {
     if (!content.trim()) return;
@@ -38,14 +50,12 @@ export default function WriteScreen() {
     setIsSaving(true);
 
     try {
-      // Save journal entry
       fetch(`${API_URL}/api/journal`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content: content.trim(), date: new Date().toISOString() }),
       });
 
-      // Get AI interpretation in parallel
       const res = await fetch(`${API_URL}/api/journal/interpret`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -66,30 +76,29 @@ export default function WriteScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, ds.container]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.flex}
       >
-        {/* Header */}
         <Animated.View entering={FadeIn.duration(300)} style={styles.header}>
           <TouchableOpacity
             onPress={() => router.back()}
             hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
             data-testid="write-back-btn"
           >
-            <Ionicons name="chevron-down" size={26} color="#8B8B7B" />
+            <Ionicons name="chevron-down" size={26} color={theme.iconColor} />
           </TouchableOpacity>
 
           {phase === 'write' && (
             <TouchableOpacity
-              style={[styles.saveBtn, !content.trim() && styles.saveBtnDisabled]}
+              style={[styles.saveBtn, { backgroundColor: theme.accent }, !content.trim() && { backgroundColor: theme.border }]}
               onPress={handleSaveAndReflect}
               disabled={!content.trim() || isSaving}
               data-testid="write-save-btn"
             >
-              <Ionicons name="sparkles" size={15} color={content.trim() ? '#fff' : '#B0B0A0'} />
-              <Text style={[styles.saveBtnText, !content.trim() && styles.saveBtnTextDisabled]}>
+              <Ionicons name="sparkles" size={15} color={content.trim() ? '#fff' : theme.textMuted} />
+              <Text style={[styles.saveBtnText, !content.trim() && { color: theme.textMuted }]}>
                 Déposer
               </Text>
             </TouchableOpacity>
@@ -97,11 +106,11 @@ export default function WriteScreen() {
 
           {phase === 'done' && (
             <TouchableOpacity
-              style={styles.doneBtn}
+              style={[styles.doneBtn, ds.card]}
               onPress={() => router.back()}
               data-testid="write-done-btn"
             >
-              <Text style={styles.doneBtnText}>Fermer</Text>
+              <Text style={[styles.doneBtnText, ds.textSecondary]}>Fermer</Text>
             </TouchableOpacity>
           )}
         </Animated.View>
@@ -111,14 +120,13 @@ export default function WriteScreen() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          {/* Writing phase */}
           {phase === 'write' && (
             <Animated.View entering={FadeInUp.duration(400)}>
-              <Text style={styles.date}>{formatToday()}</Text>
+              <Text style={[styles.date, ds.textMuted]}>{formatToday()}</Text>
               <TextInput
-                style={styles.textInput}
+                style={[styles.textInput, ds.text]}
                 placeholder="Qu'est-ce qui traverse ton esprit ?"
-                placeholderTextColor="#C4C4B4"
+                placeholderTextColor={theme.textMuted}
                 value={content}
                 onChangeText={setContent}
                 multiline
@@ -129,36 +137,32 @@ export default function WriteScreen() {
             </Animated.View>
           )}
 
-          {/* Reflecting phase - loading */}
           {phase === 'reflecting' && (
             <Animated.View entering={FadeIn.duration(500)} style={styles.reflectingContainer}>
-              <ActivityIndicator color="#C4A87C" size="large" />
-              <Text style={styles.reflectingTitle}>Lecture en cours...</Text>
-              <Text style={styles.reflectingSubtext}>L'IA lit tes mots avec attention</Text>
+              <ActivityIndicator color={theme.accentWarm} size="large" />
+              <Text style={[styles.reflectingTitle, { color: theme.accentWarm }]}>Lecture en cours...</Text>
+              <Text style={[styles.reflectingSubtext, ds.textMuted]}>L'IA lit tes mots avec attention</Text>
             </Animated.View>
           )}
 
-          {/* Done phase - show interpretation */}
           {phase === 'done' && (
             <Animated.View entering={FadeInDown.duration(600)}>
-              {/* Original text */}
-              <Text style={styles.date}>{formatToday()}</Text>
-              <Text style={styles.originalText}>{content}</Text>
+              <Text style={[styles.date, ds.textMuted]}>{formatToday()}</Text>
+              <Text style={[styles.originalText, ds.textSecondary, { borderBottomColor: theme.border }]}>{content}</Text>
 
-              {/* AI Interpretation */}
               {interpretation ? (
-                <Animated.View entering={FadeInUp.duration(600).delay(200)} style={styles.interpretCard}>
+                <Animated.View entering={FadeInUp.duration(600).delay(200)} style={[styles.interpretCard, ds.card, { borderLeftColor: theme.accentWarm }]}>
                   <View style={styles.interpretHeader}>
-                    <View style={styles.interpretIcon}>
-                      <Ionicons name="sparkles" size={18} color="#C4A87C" />
+                    <View style={[styles.interpretIcon, { backgroundColor: `${theme.accentWarm}18` }]}>
+                      <Ionicons name="sparkles" size={18} color={theme.accentWarm} />
                     </View>
-                    <Text style={styles.interpretTitle}>Reflet</Text>
+                    <Text style={[styles.interpretTitle, { color: theme.accentWarm }]}>Reflet</Text>
                   </View>
-                  <Text style={styles.interpretText}>{interpretation}</Text>
+                  <Text style={[styles.interpretText, ds.text]}>{interpretation}</Text>
                 </Animated.View>
               ) : (
-                <View style={styles.interpretCard}>
-                  <Text style={styles.interpretText}>Tes mots ont été déposés en silence.</Text>
+                <View style={[styles.interpretCard, ds.card]}>
+                  <Text style={[styles.interpretText, ds.text]}>Tes mots ont été déposés en silence.</Text>
                 </View>
               )}
             </Animated.View>
@@ -170,7 +174,7 @@ export default function WriteScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F5F0E8' },
+  container: { flex: 1 },
   flex: { flex: 1 },
   header: {
     flexDirection: 'row',
@@ -183,32 +187,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#8B9A7D',
     paddingHorizontal: 18,
     paddingVertical: 10,
     borderRadius: 20,
   },
-  saveBtnDisabled: { backgroundColor: '#E0E0D8' },
   saveBtnText: { color: '#fff', fontSize: 14, fontWeight: '500' },
-  saveBtnTextDisabled: { color: '#B0B0A0' },
   doneBtn: {
     paddingHorizontal: 18,
     paddingVertical: 10,
     borderRadius: 20,
-    backgroundColor: '#E8E0D4',
   },
-  doneBtnText: { color: '#6B6B5B', fontSize: 14, fontWeight: '500' },
+  doneBtnText: { fontSize: 14, fontWeight: '500' },
   scroll: { padding: 24, paddingTop: 8, flexGrow: 1 },
   date: {
     fontSize: 13,
-    color: '#A0A090',
     textTransform: 'capitalize',
     marginBottom: 20,
     letterSpacing: 0.5,
   },
   textInput: {
     fontSize: 18,
-    color: '#2A2A2A',
     lineHeight: 30,
     minHeight: 250,
     fontWeight: '400',
@@ -222,30 +220,24 @@ const styles = StyleSheet.create({
   },
   reflectingTitle: {
     fontSize: 18,
-    color: '#C4A87C',
     fontWeight: '400',
     letterSpacing: 0.3,
   },
   reflectingSubtext: {
     fontSize: 13,
-    color: '#A0A090',
   },
   originalText: {
     fontSize: 16,
-    color: '#6B6B5B',
     lineHeight: 26,
     fontWeight: '300',
     marginBottom: 32,
     paddingBottom: 24,
     borderBottomWidth: 1,
-    borderBottomColor: '#E8E0D4',
   },
   interpretCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 20,
     padding: 24,
     borderLeftWidth: 3,
-    borderLeftColor: '#C4A87C',
   },
   interpretHeader: {
     flexDirection: 'row',
@@ -257,20 +249,17 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#C4A87C18',
     alignItems: 'center',
     justifyContent: 'center',
   },
   interpretTitle: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#C4A87C',
     letterSpacing: 1,
     textTransform: 'uppercase',
   },
   interpretText: {
     fontSize: 15,
-    color: '#3A3A3A',
     lineHeight: 26,
     fontStyle: 'italic',
   },

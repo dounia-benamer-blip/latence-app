@@ -11,6 +11,7 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+import { useTheme } from '../../src/context/ThemeContext';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
@@ -41,8 +42,17 @@ interface Capsule {
 
 export default function CapsuleListScreen() {
   const router = useRouter();
+  const { theme } = useTheme();
   const [capsules, setCapsules] = useState<Capsule[]>([]);
   const [refreshing, setRefreshing] = useState(false);
+
+  const ds = {
+    container: { backgroundColor: theme.background },
+    card: { backgroundColor: theme.card },
+    text: { color: theme.text },
+    textSecondary: { color: theme.textSecondary },
+    textMuted: { color: theme.textMuted },
+  };
 
   const fetchCapsules = async () => {
     try {
@@ -85,20 +95,20 @@ export default function CapsuleListScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, ds.container]}>
       <Animated.View entering={FadeInDown.duration(500)} style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => router.back()}
         >
-          <Ionicons name="arrow-back" size={24} color="#6B6B5B" />
+          <Ionicons name="arrow-back" size={24} color={theme.iconColor} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Capsules</Text>
+        <Text style={[styles.headerTitle, ds.text]}>Capsules</Text>
         <TouchableOpacity
           style={styles.addButton}
           onPress={() => router.push('/capsule/create')}
         >
-          <Ionicons name="add" size={24} color="#8B9A7D" />
+          <Ionicons name="add" size={24} color={theme.accent} />
         </TouchableOpacity>
       </Animated.View>
 
@@ -106,18 +116,18 @@ export default function CapsuleListScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#8B9A7D" />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.accent} />
         }
       >
         {capsules.length === 0 ? (
           <Animated.View entering={FadeInUp.duration(600)} style={styles.emptyState}>
-            <Ionicons name="lock-closed-outline" size={48} color="#C4C4B4" />
-            <Text style={styles.emptyTitle}>Aucune capsule</Text>
-            <Text style={styles.emptyText}>
+            <Ionicons name="lock-closed-outline" size={48} color={theme.textMuted} />
+            <Text style={[styles.emptyTitle, ds.text]}>Aucune capsule</Text>
+            <Text style={[styles.emptyText, ds.textMuted]}>
               Dépose ta première pensée pour le futur
             </Text>
             <TouchableOpacity
-              style={styles.createButton}
+              style={[styles.createButton, { backgroundColor: theme.accent }]}
               onPress={() => router.push('/capsule/create')}
               activeOpacity={0.8}
             >
@@ -132,7 +142,7 @@ export default function CapsuleListScreen() {
                 entering={FadeInUp.duration(500).delay(index * 80)}
               >
                 <TouchableOpacity
-                  style={styles.capsuleCard}
+                  style={[styles.capsuleCard, ds.card]}
                   onPress={() => router.push(`/capsule/${capsule.id}`)}
                   activeOpacity={0.7}
                 >
@@ -140,23 +150,23 @@ export default function CapsuleListScreen() {
                     <Ionicons
                       name={capsule.is_sealed ? 'lock-closed-outline' : 'lock-open-outline'}
                       size={18}
-                      color={capsule.is_sealed ? '#D4A574' : '#8B9A7D'}
+                      color={capsule.is_sealed ? theme.accentWarm : theme.accent}
                     />
                     {capsule.days_remaining != null && capsule.days_remaining > 0 ? (
-                      <Text style={styles.durationBadge}>
+                      <Text style={[styles.durationBadge, { backgroundColor: theme.background, color: theme.textMuted }]}>
                         {capsule.days_remaining}j restants
                       </Text>
                     ) : capsule.duration_days ? (
-                      <Text style={styles.durationBadge}>
+                      <Text style={[styles.durationBadge, { backgroundColor: theme.background, color: theme.textMuted }]}>
                         {getDurationLabel(capsule.duration_days)}
                       </Text>
                     ) : null}
                   </View>
 
-                  <Text style={styles.capsuleTitle}>{capsule.title}</Text>
+                  <Text style={[styles.capsuleTitle, ds.text]}>{capsule.title}</Text>
 
                   <View style={styles.capsuleMeta}>
-                    <Text style={styles.metaText}>
+                    <Text style={[styles.metaText, ds.textMuted]}>
                       {timeAgo(capsule.created_at)}
                     </Text>
                   </View>
@@ -173,7 +183,6 @@ export default function CapsuleListScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F0E8',
   },
   header: {
     flexDirection: 'row',
@@ -191,7 +200,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#4A4A4A',
     letterSpacing: 0.5,
   },
   addButton: {
@@ -211,18 +219,15 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 18,
     fontWeight: '500',
-    color: '#4A4A4A',
     marginTop: 20,
     marginBottom: 8,
   },
   emptyText: {
     fontSize: 14,
-    color: '#A0A090',
     textAlign: 'center',
     marginBottom: 24,
   },
   createButton: {
-    backgroundColor: '#8B9A7D',
     paddingVertical: 14,
     paddingHorizontal: 32,
     borderRadius: 30,
@@ -237,7 +242,6 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   capsuleCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 20,
     shadowColor: '#000',
@@ -254,8 +258,6 @@ const styles = StyleSheet.create({
   },
   durationBadge: {
     fontSize: 11,
-    color: '#A0A090',
-    backgroundColor: '#F5F0E8',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 10,
@@ -263,7 +265,6 @@ const styles = StyleSheet.create({
   capsuleTitle: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#4A4A4A',
     marginBottom: 12,
   },
   capsuleMeta: {
@@ -272,11 +273,5 @@ const styles = StyleSheet.create({
   },
   metaText: {
     fontSize: 12,
-    color: '#A0A090',
-  },
-  remainingText: {
-    fontSize: 12,
-    color: '#D4A574',
-    fontWeight: '500',
   },
 });

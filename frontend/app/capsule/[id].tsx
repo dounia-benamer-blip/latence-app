@@ -11,6 +11,7 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
+import { useTheme } from '../../src/context/ThemeContext';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
@@ -51,9 +52,18 @@ interface CapsuleDetail {
 
 export default function CapsuleDetailScreen() {
   const router = useRouter();
+  const { theme } = useTheme();
   const { id } = useLocalSearchParams();
   const [capsule, setCapsule] = useState<CapsuleDetail | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const ds = {
+    container: { backgroundColor: theme.background },
+    card: { backgroundColor: theme.card },
+    text: { color: theme.text },
+    textSecondary: { color: theme.textSecondary },
+    textMuted: { color: theme.textMuted },
+  };
 
   useEffect(() => {
     fetchCapsule();
@@ -86,9 +96,9 @@ export default function CapsuleDetailScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, ds.container]}>
         <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Chargement...</Text>
+          <Text style={[styles.loadingText, ds.textMuted]}>Chargement...</Text>
         </View>
       </SafeAreaView>
     );
@@ -96,11 +106,11 @@ export default function CapsuleDetailScreen() {
 
   if (!capsule) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, ds.container]}>
         <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Capsule introuvable</Text>
+          <Text style={[styles.loadingText, ds.textMuted]}>Capsule introuvable</Text>
           <TouchableOpacity onPress={() => router.back()}>
-            <Text style={styles.backLink}>Retour</Text>
+            <Text style={[styles.backLink, { color: theme.accent }]}>Retour</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -108,16 +118,16 @@ export default function CapsuleDetailScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, ds.container]}>
       <Animated.View entering={FadeIn.duration(500)} style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => router.back()}
         >
-          <Ionicons name="arrow-back" size={24} color="#6B6B5B" />
+          <Ionicons name="arrow-back" size={24} color={theme.iconColor} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
-          <Ionicons name="share-outline" size={22} color="#8B9A7D" />
+          <Ionicons name="share-outline" size={22} color={theme.accent} />
         </TouchableOpacity>
       </Animated.View>
 
@@ -127,57 +137,57 @@ export default function CapsuleDetailScreen() {
       >
         {capsule.is_sealed ? (
           <Animated.View entering={FadeInUp.duration(600)} style={styles.sealedContainer}>
-            <View style={styles.sealedIcon}>
-              <Ionicons name="lock-closed" size={40} color="#D4A574" />
+            <View style={[styles.sealedIcon, ds.card]}>
+              <Ionicons name="lock-closed" size={40} color={theme.accentWarm} />
             </View>
             
-            <Text style={styles.sealedTitle}>{capsule.title}</Text>
+            <Text style={[styles.sealedTitle, ds.text]}>{capsule.title}</Text>
             
-            <View style={styles.sealedBadge}>
-              <Text style={styles.sealedBadgeText}>
+            <View style={[styles.sealedBadge, { backgroundColor: `${theme.accentWarm}20` }]}>
+              <Text style={[styles.sealedBadgeText, { color: theme.accentWarm }]}>
                 {capsule.days_remaining} jours restants
               </Text>
             </View>
             
-            <View style={styles.infoCard}>
+            <View style={[styles.infoCard, ds.card]}>
               <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Déposée</Text>
-                <Text style={styles.infoValue}>
+                <Text style={[styles.infoLabel, ds.textMuted]}>Déposée</Text>
+                <Text style={[styles.infoValue, ds.text]}>
                   {safeDateFormat(capsule.created_at)}
                 </Text>
               </View>
-              <View style={styles.infoDivider} />
+              <View style={[styles.infoDivider, { backgroundColor: theme.border }]} />
               <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Ouverture</Text>
-                <Text style={styles.infoValue}>
+                <Text style={[styles.infoLabel, ds.textMuted]}>Ouverture</Text>
+                <Text style={[styles.infoValue, ds.text]}>
                   {safeDateFormat(capsule.unlock_at)}
                 </Text>
               </View>
             </View>
             
-            <Text style={styles.sealedMessage}>
+            <Text style={[styles.sealedMessage, ds.textMuted]}>
               Patience, le temps fait son œuvre...
             </Text>
           </Animated.View>
         ) : (
           <Animated.View entering={FadeInUp.duration(600)} style={styles.unlockedContainer}>
-            <View style={styles.unlockedIcon}>
-              <Ionicons name="lock-open" size={40} color="#8B9A7D" />
+            <View style={[styles.unlockedIcon, ds.card]}>
+              <Ionicons name="lock-open" size={40} color={theme.accent} />
             </View>
             
-            <Text style={styles.unlockedTitle}>{capsule.title}</Text>
+            <Text style={[styles.unlockedTitle, ds.text]}>{capsule.title}</Text>
             
             {capsule.prompt_used && (
-              <View style={styles.promptCard}>
-                <Text style={styles.promptText}>{capsule.prompt_used}</Text>
+              <View style={[styles.promptCard, { backgroundColor: theme.cardSelected, borderColor: theme.border }]}>
+                <Text style={[styles.promptText, ds.textSecondary]}>{capsule.prompt_used}</Text>
               </View>
             )}
             
-            <View style={styles.contentCard}>
-              <Text style={styles.contentText}>{capsule.content}</Text>
+            <View style={[styles.contentCard, ds.card]}>
+              <Text style={[styles.contentText, ds.text]}>{capsule.content}</Text>
             </View>
             
-            <Text style={styles.metaText}>
+            <Text style={[styles.metaText, ds.textMuted]}>
               Déposée {timeAgo(capsule.created_at)}
             </Text>
           </Animated.View>
@@ -190,7 +200,6 @@ export default function CapsuleDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F0E8',
   },
   loadingContainer: {
     flex: 1,
@@ -199,10 +208,8 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 14,
-    color: '#A0A090',
   },
   backLink: {
-    color: '#8B9A7D',
     fontSize: 14,
     marginTop: 16,
   },
@@ -236,7 +243,6 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 24,
@@ -249,13 +255,11 @@ const styles = StyleSheet.create({
   sealedTitle: {
     fontSize: 24,
     fontWeight: '300',
-    color: '#4A4A4A',
     textAlign: 'center',
     marginBottom: 16,
     letterSpacing: 0.5,
   },
   sealedBadge: {
-    backgroundColor: '#D4A57420',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
@@ -264,10 +268,8 @@ const styles = StyleSheet.create({
   sealedBadgeText: {
     fontSize: 13,
     fontWeight: '500',
-    color: '#D4A574',
   },
   infoCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 20,
     width: '100%',
@@ -285,21 +287,17 @@ const styles = StyleSheet.create({
   },
   infoLabel: {
     fontSize: 13,
-    color: '#A0A090',
   },
   infoValue: {
     fontSize: 13,
     fontWeight: '500',
-    color: '#4A4A4A',
   },
   infoDivider: {
     height: 1,
-    backgroundColor: '#F0EBE3',
     marginVertical: 16,
   },
   sealedMessage: {
     fontSize: 14,
-    color: '#A0A090',
     fontStyle: 'italic',
   },
   unlockedContainer: {
@@ -309,7 +307,6 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 24,
@@ -322,27 +319,22 @@ const styles = StyleSheet.create({
   unlockedTitle: {
     fontSize: 24,
     fontWeight: '300',
-    color: '#4A4A4A',
     textAlign: 'center',
     marginBottom: 24,
     letterSpacing: 0.5,
   },
   promptCard: {
-    backgroundColor: '#FDF9F3',
     borderRadius: 12,
     padding: 16,
     width: '100%',
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#E8E0D4',
   },
   promptText: {
     fontSize: 13,
-    color: '#8B8B7D',
     fontStyle: 'italic',
   },
   contentCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 24,
     width: '100%',
@@ -355,11 +347,9 @@ const styles = StyleSheet.create({
   },
   contentText: {
     fontSize: 15,
-    color: '#4A4A4A',
     lineHeight: 24,
   },
   metaText: {
     fontSize: 12,
-    color: '#A0A090',
   },
 });
