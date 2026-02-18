@@ -841,6 +841,9 @@ export default function AstrologyScreen() {
 
   return (
     <SafeAreaView style={[styles.container, ds.container]}>
+      {/* Twinkling Stars Background (visible in dark modes) */}
+      <TwinklingStars starCount={25} minSize={1} maxSize={2.5} />
+      
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
@@ -849,7 +852,11 @@ export default function AstrologyScreen() {
         >
           <Ionicons name="chevron-down" size={28} color={theme.iconColor} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, ds.text]}>Cosmos</Text>
+        <View style={styles.headerTitleContainer}>
+          <CandleFlame size="small" intensity="gentle" />
+          <Text style={[styles.headerTitle, ds.text]}>Cosmos</Text>
+          <CandleFlame size="small" intensity="gentle" />
+        </View>
         <View style={styles.placeholder} />
       </View>
 
