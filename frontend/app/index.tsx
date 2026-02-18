@@ -176,10 +176,6 @@ export default function WelcomeScreen() {
     router.push('/home');
   };
 
-  const moonStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: moonScale.value }],
-  }));
-
   // Dynamic styles based on theme
   const dynamicStyles = {
     container: { backgroundColor: theme.background },
