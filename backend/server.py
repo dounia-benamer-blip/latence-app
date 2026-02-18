@@ -625,6 +625,30 @@ async def save_dream_interpretation(dream_id: str, interpretation: str):
         raise HTTPException(status_code=404, detail="Dream not found")
     return {"success": True}
 
+@api_router.put("/dream/{dream_id}")
+async def update_dream(dream_id: str, dream: DreamCreate):
+    """Update an existing dream"""
+    result = await db.dreams.update_one(
+        {"id": dream_id},
+        {"$set": {
+            "title": dream.title,
+            "content": dream.content,
+            "dream_type": dream.dream_type,
+            "emotions": dream.emotions,
+        }}
+    )
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Dream not found")
+    return {"success": True}
+
+@api_router.delete("/dream/{dream_id}")
+async def delete_dream(dream_id: str):
+    """Delete a dream"""
+    result = await db.dreams.delete_one({"id": dream_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Dream not found")
+    return {"success": True}
+
 # --- Astrology Routes ---
 
 # Database of major world cities for birth place selection
