@@ -65,6 +65,8 @@ Journal intime immersif centré sur la lune, l'introspection et la sagesse unive
 
 ### Cadence
 - GET /api/cadence/daily
+- GET /api/cadence/streak (NEW)
+- POST /api/cadence/complete (NEW)
 
 ### Citations
 - GET /api/sacred-quote
@@ -101,8 +103,43 @@ Journal intime immersif centré sur la lune, l'introspection et la sagesse unive
 
 ## Design
 - Thème beige/crème chaleureux
-- Animations : bougies, lune, étoiles, orbes
-- Focus lunaire et mystique
+- Animations : bougies, étoiles, orbes
+- Focus mystique et introspectif
+- **Logo épuré** : "Latence" + "by Atelier Benamer" (sans lune)
+
+---
+
+## Changelog
+
+### 18 Février 2026 - Itération 4
+- ✅ Bug fix: "Lettre à Moi-Même" - envoi fonctionnel
+- ✅ Design: Lune retirée du logo d'accueil
+- ✅ Backend: Ajout endpoints `/api/cadence/streak` et `/api/cadence/complete`
+- ✅ Testing: 100% des tests passent (frontend + backend)
+
+---
+
+## Prochaines étapes (Backlog)
+
+### P0 - Prioritaire
+- [ ] Améliorer le module Cadence avec 6 nouvelles fonctionnalités:
+  - Intention du jour
+  - Suivi de streaks avancé
+  - Rituels astraux personnalisés
+  - Sagesse intégrée
+  - Journal de gratitude
+  - Bilan du soir
+
+### P1 - Planifié
+- [ ] Maisons Astrologiques dans Cosmos
+
+### P2 - Future
+- [ ] Rapport de l'Âme (Soul Report)
+- [ ] Dictionnaire Onirique (Dream Dictionary)
+
+### Refactoring
+- [ ] Supprimer fichiers inutilisés: `tarot.tsx`, `compatibility.tsx`
+- [ ] Restructurer backend en modules
 
 ---
 
