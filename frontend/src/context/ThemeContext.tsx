@@ -4,55 +4,67 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // Theme modes: 'light' | 'dark' | 'silence'
 export type ThemeMode = 'light' | 'dark' | 'silence';
 
-// Light theme - elegant beige
+// Light theme - Warm cozy candle-lit ambiance
 export const lightTheme = {
-  background: '#F5F0E8',
-  card: '#FFFFFF',
-  cardSelected: '#FDF9F3',
-  text: '#4A4A4A',
-  textSecondary: '#8B8B7D',
-  textMuted: '#A0A090',
-  border: '#D4C4A8',
-  accent: '#8B9A7D',
-  accentWarm: '#D4A574',
-  inputBackground: '#FFFFFF',
-  headerBackground: '#F5F0E8',
-  shadow: '#000',
-  iconColor: '#6B6B5B',
+  background: '#FAF6F0',        // Warm cream white
+  card: '#FFFBF5',              // Soft white with warmth
+  cardSelected: '#FFF8ED',      // Slightly warmer selected
+  text: '#4A4036',              // Warm dark brown
+  textSecondary: '#7D7164',     // Muted warm brown
+  textMuted: '#A69E92',         // Light warm gray
+  border: '#E8DFD4',            // Soft beige border
+  accent: '#A8B89A',            // Soft sage green (nature)
+  accentWarm: '#D4A574',        // Warm candle orange
+  accentCandle: '#E8C4A0',      // Soft candle glow
+  accentSoft: '#C9B896',        // Warm neutral
+  inputBackground: '#FFFCF8',   // Very soft white
+  headerBackground: '#FAF6F0',  // Same as background
+  shadow: 'rgba(74, 64, 54, 0.08)',  // Soft warm shadow
+  iconColor: '#8B7E6E',         // Warm icon color
+  gradientStart: '#FAF6F0',     // For gradients
+  gradientEnd: '#F5EDE3',       // Warmer end
 };
 
-// Dark theme - night mode
+// Dark theme - Cozy evening by candlelight
 export const darkTheme = {
-  background: '#0D1117',
-  card: '#161B22',
-  cardSelected: '#1C2128',
-  text: '#E8E0D4',
-  textSecondary: '#A8A090',
-  textMuted: '#6B6B5B',
-  border: '#30363D',
-  accent: '#8B9A7D',
-  accentWarm: '#D4A574',
-  inputBackground: '#21262D',
-  headerBackground: '#0D1117',
-  shadow: '#000',
-  iconColor: '#A8A090',
+  background: '#1A1612',        // Warm dark brown
+  card: '#251F1A',              // Slightly lighter warm dark
+  cardSelected: '#2D2520',      // Warm selected state
+  text: '#E8DED0',              // Warm off-white
+  textSecondary: '#B8A898',     // Warm muted text
+  textMuted: '#7A6E62',         // Very muted warm
+  border: '#3A322A',            // Warm dark border
+  accent: '#8B9A7D',            // Sage green
+  accentWarm: '#D4A574',        // Candle flame orange
+  accentCandle: '#C49660',      // Deep candle glow
+  accentSoft: '#9A8A72',        // Soft warm accent
+  inputBackground: '#2A231D',   // Dark input
+  headerBackground: '#1A1612',  // Same as background
+  shadow: 'rgba(0, 0, 0, 0.3)', // Dark shadow
+  iconColor: '#B8A898',         // Warm icon
+  gradientStart: '#1A1612',
+  gradientEnd: '#252018',
 };
 
-// Silence theme - AMOLED pure black, ultra gentle on eyes
+// Silence theme - Gentle midnight, like a distant candle
 export const silenceTheme = {
-  background: '#000000',
-  card: '#080808',
-  cardSelected: '#101010',
-  text: '#8A8478',            // Very muted warm text
-  textSecondary: '#5A564E',   // Even more muted
-  textMuted: '#3A3834',       // Very dim
-  border: '#151515',
-  accent: '#5A6A4D',          // Very muted green
-  accentWarm: '#8A7548',      // Dimmed warm accent
-  inputBackground: '#080808',
-  headerBackground: '#000000',
-  shadow: '#000',
-  iconColor: '#5A564E',
+  background: '#0C0A08',        // Almost black with warmth
+  card: '#141210',              // Very dark warm
+  cardSelected: '#1A1814',      // Slightly lighter
+  text: '#9A9080',              // Muted warm text
+  textSecondary: '#6A6256',     // Very muted
+  textMuted: '#4A443C',         // Barely visible
+  border: '#1E1C18',            // Dark border
+  accent: '#6A7A5C',            // Muted sage
+  accentWarm: '#9A7A50',        // Dim candle
+  accentCandle: '#8A6A40',      // Very dim candle
+  accentSoft: '#6A5A48',        // Muted soft
+  inputBackground: '#121010',   // Very dark input
+  headerBackground: '#0C0A08',  // Same as background
+  shadow: 'rgba(0, 0, 0, 0.5)', // Dark shadow
+  iconColor: '#6A6256',         // Muted icon
+  gradientStart: '#0C0A08',
+  gradientEnd: '#100E0A',
 };
 
 export type Theme = typeof lightTheme;
