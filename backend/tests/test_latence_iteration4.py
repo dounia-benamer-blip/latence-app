@@ -97,7 +97,8 @@ class TestCadenceAPI:
         """Test marking a ritual as completed"""
         payload = {
             "ritual_id": "TEST_breath",
-            "input": "Test completion input"
+            "ritual_type": "respiration",  # Required field
+            "completed_at": None
         }
         response = requests.post(
             f"{BASE_URL}/api/cadence/complete",
