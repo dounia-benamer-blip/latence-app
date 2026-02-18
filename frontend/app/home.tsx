@@ -47,6 +47,13 @@ interface MenuItem {
 
 const MENU_ITEMS: MenuItem[] = [
   {
+    id: 'meditation',
+    title: 'Méditation',
+    subtitle: 'Respiration guidée & calme',
+    icon: 'flame-outline',
+    route: '/meditation',
+  },
+  {
     id: 'mirror',
     title: 'Miroir',
     subtitle: 'IA qui reflète ton âme',
@@ -80,6 +87,20 @@ const MENU_ITEMS: MenuItem[] = [
     subtitle: 'Lune, Celtique, Arabe, Maisons',
     icon: 'moon-outline',
     route: '/astrology',
+  },
+  {
+    id: 'compatibility',
+    title: 'Compatibilité',
+    subtitle: 'Alchimie entre deux âmes',
+    icon: 'heart-outline',
+    route: '/compatibility',
+  },
+  {
+    id: 'stats',
+    title: 'Statistiques',
+    subtitle: 'Ton évolution émotionnelle',
+    icon: 'bar-chart-outline',
+    route: '/stats',
   },
 ];
 
