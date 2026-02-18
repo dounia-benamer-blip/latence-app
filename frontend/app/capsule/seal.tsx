@@ -26,18 +26,20 @@ import Animated, {
   withRepeat,
   Easing,
   interpolate,
-  runOnJS,
 } from 'react-native-reanimated';
+import { useTheme } from '../../src/context/ThemeContext';
 
 const { width, height } = Dimensions.get('window');
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
+// Duration options with colored keys
 const DURATION_OPTIONS = [
-  { days: 7, label: '7 jours' },
-  { days: 30, label: '1 mois' },
-  { days: 90, label: '3 mois' },
-  { days: 180, label: '6 mois' },
-  { days: 365, label: '1 an' },
+  { days: 7, label: '7 jours', keyColor: '#A8D4A8', keyName: 'Clé Émeraude' },
+  { days: 15, label: '15 jours', keyColor: '#A8C4D4', keyName: 'Clé Saphir' },
+  { days: 30, label: '1 mois', keyColor: '#D4A8D4', keyName: 'Clé Améthyste' },
+  { days: 90, label: '3 mois', keyColor: '#D4C4A8', keyName: 'Clé Ambre' },
+  { days: 180, label: '6 mois', keyColor: '#C47C7C', keyName: 'Clé Rubis' },
+  { days: 365, label: '1 an', keyColor: '#D4A574', keyName: 'Clé Or' },
 ];
 
 const PROMPTS = [
@@ -47,21 +49,90 @@ const PROMPTS = [
   "Qu'est-ce que tu te pardonnes aujourd'hui ?",
 ];
 
+// Animated Candle Component
+const AnimatedCandle = ({ size = 60 }: { size?: number }) => {
+  const flicker = useSharedValue(0);
+  const glow = useSharedValue(0);
+
+  useEffect(() => {
+    flicker.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration: 150, easing: Easing.inOut(Easing.ease) }),
+        withTiming(0.6, { duration: 100 }),
+        withTiming(0.9, { duration: 120 }),
+        withTiming(0.7, { duration: 80 }),
+        withTiming(1, { duration: 100 })
+      ),
+      -1,
+      false
+    );
+    glow.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration: 1500, easing: Easing.inOut(Easing.ease) }),
+        withTiming(0.6, { duration: 1200, easing: Easing.inOut(Easing.ease) })
+      ),
+      -1,
+      true
+    );
+  }, []);
+
+  const flameStyle = useAnimatedStyle(() => ({
+    transform: [
+      { scaleX: interpolate(flicker.value, [0.6, 1], [0.85, 1.1]) },
+      { scaleY: interpolate(flicker.value, [0.6, 1], [0.9, 1.15]) },
+    ],
+    opacity: interpolate(flicker.value, [0.6, 1], [0.85, 1]),
+  }));
+
+  const glowStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(glow.value, [0.6, 1], [0.3, 0.6]),
+    transform: [{ scale: interpolate(glow.value, [0.6, 1], [1, 1.3]) }],
+  }));
+
+  return (
+    <View style={[styles.candleContainer, { width: size * 1.5, height: size * 2.5 }]}>
+      {/* Glow */}
+      <Animated.View style={[styles.candleGlow, glowStyle, { width: size * 2, height: size * 2 }]} />
+      {/* Candle body */}
+      <View style={[styles.candleBody, { width: size * 0.4, height: size * 1.2 }]}>
+        <View style={styles.candleWax} />
+      </View>
+      {/* Wick */}
+      <View style={[styles.candleWick, { height: size * 0.15, bottom: size * 1.2 }]} />
+      {/* Flame */}
+      <Animated.View style={[styles.flameContainer, flameStyle, { bottom: size * 1.25 }]}>
+        <View style={[styles.flameOuter, { width: size * 0.25, height: size * 0.45 }]} />
+        <View style={[styles.flameInner, { width: size * 0.12, height: size * 0.25 }]} />
+      </Animated.View>
+    </View>
+  );
+};
+
 export default function SealScreen() {
   const router = useRouter();
+  const { theme } = useTheme();
   const [step, setStep] = useState<'write' | 'duration' | 'sealing' | 'done'>('write');
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [duration, setDuration] = useState<number | null>(null);
+  const [selectedKey, setSelectedKey] = useState<typeof DURATION_OPTIONS[0] | null>(null);
 
-  // Animation values for the magical sealing animation
-  const letterY = useSharedValue(0);
-  const letterScale = useSharedValue(1);
-  const letterRotateZ = useSharedValue(0);
-  const letterOpacity = useSharedValue(1);
+  const ds = {
+    container: { backgroundColor: theme.background },
+    card: { backgroundColor: theme.card },
+    text: { color: theme.text },
+    textSecondary: { color: theme.textSecondary },
+    textMuted: { color: theme.textMuted },
+  };
+
+  // Animation values
+  const papyrusY = useSharedValue(0);
+  const papyrusScale = useSharedValue(1);
+  const papyrusRotate = useSharedValue(0);
+  const papyrusOpacity = useSharedValue(1);
   
-  const boxY = useSharedValue(100);
-  const boxScale = useSharedValue(0.8);
+  const boxY = useSharedValue(150);
+  const boxScale = useSharedValue(0.7);
   const boxOpacity = useSharedValue(0);
   
   const lidRotation = useSharedValue(0);
@@ -70,24 +141,22 @@ export default function SealScreen() {
   const glowOpacity = useSharedValue(0);
   const glowScale = useSharedValue(0.5);
   
-  const lockScale = useSharedValue(0);
-  const lockOpacity = useSharedValue(0);
-  
-  const particlesOpacity = useSharedValue(0);
+  const keyScale = useSharedValue(0);
+  const keyOpacity = useSharedValue(0);
+  const keyRotate = useSharedValue(-180);
   
   const sealTextOpacity = useSharedValue(0);
+  const candleOpacity = useSharedValue(1);
 
-  // Letter animation - starts floating, then rolls and enters the box
-  const letterStyle = useAnimatedStyle(() => ({
+  const papyrusStyle = useAnimatedStyle(() => ({
     transform: [
-      { translateY: letterY.value },
-      { scale: letterScale.value },
-      { rotateZ: `${letterRotateZ.value}deg` },
+      { translateY: papyrusY.value },
+      { scale: papyrusScale.value },
+      { rotateZ: `${papyrusRotate.value}deg` },
     ],
-    opacity: letterOpacity.value,
+    opacity: papyrusOpacity.value,
   }));
 
-  // Box animation
   const boxStyle = useAnimatedStyle(() => ({
     transform: [
       { translateY: boxY.value },
@@ -96,132 +165,98 @@ export default function SealScreen() {
     opacity: boxOpacity.value,
   }));
 
-  // Lid animation - opens and closes
   const lidStyle = useAnimatedStyle(() => ({
     transform: [
       { translateY: lidY.value },
+      { perspective: 500 },
       { rotateX: `${lidRotation.value}deg` },
     ],
   }));
 
-  // Golden glow animation
   const glowStyle = useAnimatedStyle(() => ({
     opacity: glowOpacity.value,
     transform: [{ scale: glowScale.value }],
   }));
 
-  // Lock animation
-  const lockStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: lockScale.value }],
-    opacity: lockOpacity.value,
+  const keyStyle = useAnimatedStyle(() => ({
+    transform: [
+      { scale: keyScale.value },
+      { rotateZ: `${keyRotate.value}deg` },
+    ],
+    opacity: keyOpacity.value,
   }));
 
-  // Particles animation
-  const particlesStyle = useAnimatedStyle(() => ({
-    opacity: particlesOpacity.value,
-  }));
-
-  // Seal text
   const sealTextStyle = useAnimatedStyle(() => ({
     opacity: sealTextOpacity.value,
   }));
 
+  const candleStyle = useAnimatedStyle(() => ({
+    opacity: candleOpacity.value,
+  }));
+
   const startSealAnimation = () => {
+    if (!duration) return;
+    const key = DURATION_OPTIONS.find(d => d.days === duration);
+    setSelectedKey(key || null);
     setStep('sealing');
-    
-    // =========== PHASE 1: L'Apparition Majestueuse (0-800ms) ===========
-    // La boîte émerge avec une élégance douce et un léger rebond
-    boxOpacity.value = withTiming(1, { duration: 600, easing: Easing.out(Easing.cubic) });
-    boxY.value = withTiming(0, { duration: 800, easing: Easing.out(Easing.back(1.5)) });
-    boxScale.value = withTiming(1, { duration: 800, easing: Easing.out(Easing.back(1.5)) });
-    
-    // =========== PHASE 2: L'Ouverture Cérémonieuse (800-1600ms) ===========
-    // Le couvercle s'ouvre avec grâce, comme une fleur qui s'épanouit
-    lidRotation.value = withDelay(800, withTiming(-75, { 
-      duration: 800, 
-      easing: Easing.bezier(0.34, 1.56, 0.64, 1) 
-    }));
-    lidY.value = withDelay(800, withTiming(-12, { duration: 600, easing: Easing.out(Easing.cubic) }));
-    
-    // =========== PHASE 3: L'Envol de la Lettre (1600-3000ms) ===========
-    // La lettre s'élève doucement, tourne avec grâce et descend dans l'écrin
-    letterY.value = withDelay(1600, withSequence(
-      // Élévation douce avec suspension
-      withTiming(-50, { duration: 600, easing: Easing.out(Easing.cubic) }),
-      // Flottement suspendu
-      withTiming(-55, { duration: 300, easing: Easing.inOut(Easing.sine) }),
-      // Descente gracieuse
-      withTiming(100, { duration: 800, easing: Easing.bezier(0.25, 0.1, 0.25, 1) })
+
+    // Phase 1: Box appears
+    boxOpacity.value = withTiming(1, { duration: 600 });
+    boxY.value = withTiming(0, { duration: 800, easing: Easing.out(Easing.back(1.2)) });
+    boxScale.value = withTiming(1, { duration: 800, easing: Easing.out(Easing.back(1.2)) });
+
+    // Phase 2: Lid opens
+    lidRotation.value = withDelay(800, withTiming(-70, { duration: 700 }));
+    lidY.value = withDelay(800, withTiming(-10, { duration: 500 }));
+
+    // Phase 3: Papyrus floats and enters box
+    papyrusY.value = withDelay(1500, withSequence(
+      withTiming(-40, { duration: 500 }),
+      withTiming(-50, { duration: 200 }),
+      withTiming(120, { duration: 700, easing: Easing.in(Easing.cubic) })
     ));
-    letterScale.value = withDelay(1600, withSequence(
-      withTiming(1.15, { duration: 500, easing: Easing.out(Easing.cubic) }),
-      withTiming(1.1, { duration: 300 }),
-      withTiming(0.35, { duration: 800, easing: Easing.in(Easing.cubic) })
+    papyrusScale.value = withDelay(1500, withSequence(
+      withTiming(1.1, { duration: 500 }),
+      withTiming(1.05, { duration: 200 }),
+      withTiming(0.3, { duration: 700 })
     ));
-    // Rotation élégante en spirale
-    letterRotateZ.value = withDelay(1600, withTiming(360, { 
-      duration: 1400, 
-      easing: Easing.bezier(0.4, 0, 0.2, 1) 
-    }));
-    letterOpacity.value = withDelay(2900, withTiming(0, { duration: 200, easing: Easing.out(Easing.cubic) }));
-    
-    // =========== PHASE 4: La Fermeture Solennelle (3100-4000ms) ===========
-    // Le couvercle se referme avec une lenteur cérémoniale
-    lidRotation.value = withDelay(3100, withTiming(0, { 
-      duration: 900, 
-      easing: Easing.bezier(0.4, 0, 0.2, 1) 
-    }));
-    lidY.value = withDelay(3100, withTiming(0, { duration: 700, easing: Easing.out(Easing.cubic) }));
-    
-    // =========== PHASE 5: L'Aura Dorée (4000-5200ms) ===========
-    // Une lumière dorée pulse doucement autour de la boîte scellée
-    glowOpacity.value = withDelay(4000, withSequence(
-      withTiming(0.8, { duration: 500, easing: Easing.out(Easing.cubic) }),
-      withTiming(0.5, { duration: 400 }),
-      withTiming(0.7, { duration: 300 })
+    papyrusRotate.value = withDelay(1500, withTiming(180, { duration: 1200 }));
+    papyrusOpacity.value = withDelay(2600, withTiming(0, { duration: 200 }));
+
+    // Phase 4: Lid closes
+    lidRotation.value = withDelay(2800, withTiming(0, { duration: 600 }));
+    lidY.value = withDelay(2800, withTiming(0, { duration: 500 }));
+
+    // Phase 5: Golden glow
+    glowOpacity.value = withDelay(3500, withSequence(
+      withTiming(0.7, { duration: 400 }),
+      withTiming(0.4, { duration: 300 }),
+      withTiming(0.5, { duration: 200 })
     ));
-    glowScale.value = withDelay(4000, withSequence(
-      withTiming(1.8, { duration: 500, easing: Easing.out(Easing.cubic) }),
-      withTiming(1.5, { duration: 400 }),
+    glowScale.value = withDelay(3500, withSequence(
+      withTiming(1.6, { duration: 400 }),
       withTiming(1.3, { duration: 300 })
     ));
-    
-    // =========== PHASE 6: Le Scellement Magique (4200-5000ms) ===========
-    // La boîte pulse comme un cœur, imprégnée de magie
-    boxScale.value = withDelay(4200, withSequence(
-      withSpring(0.92, { damping: 8, stiffness: 180 }),
-      withSpring(1.08, { damping: 8, stiffness: 180 }),
-      withSpring(0.96, { damping: 10, stiffness: 150 }),
-      withSpring(1, { damping: 12, stiffness: 100 })
+
+    // Phase 6: Box pulses
+    boxScale.value = withDelay(3700, withSequence(
+      withSpring(0.95, { damping: 8 }),
+      withSpring(1.05, { damping: 8 }),
+      withSpring(1, { damping: 10 })
     ));
-    
-    // =========== PHASE 7: Les Étoiles Éphémères (4500-5500ms) ===========
-    // Des particules scintillantes s'échappent comme des étoiles filantes
-    particlesOpacity.value = withDelay(4500, withSequence(
-      withTiming(1, { duration: 400, easing: Easing.out(Easing.cubic) }),
-      withTiming(0, { duration: 700, easing: Easing.in(Easing.cubic) })
-    ));
-    
-    // =========== PHASE 8: Le Cadenas Céleste (5000-5800ms) ===========
-    // Le cadenas apparaît avec une rotation élégante et un rebond doux
-    lockScale.value = withDelay(5000, withSequence(
-      withSpring(1.3, { damping: 6, stiffness: 120 }),
-      withSpring(0.9, { damping: 8, stiffness: 150 }),
-      withSpring(1, { damping: 12, stiffness: 100 })
-    ));
-    lockOpacity.value = withDelay(5000, withTiming(1, { duration: 400, easing: Easing.out(Easing.cubic) }));
-    
-    // =========== PHASE 9: Le Murmure Final (5500-6200ms) ===========
-    // Le texte apparaît en fondu, comme un souffle
-    sealTextOpacity.value = withDelay(5500, withTiming(1, { 
-      duration: 700, 
-      easing: Easing.out(Easing.cubic) 
-    }));
-    
-    // Sauvegarde et transition après l'animation complète
-    setTimeout(() => {
-      saveCapsule();
-    }, 6500);
+
+    // Phase 7: Colored key appears with rotation
+    keyOpacity.value = withDelay(4200, withTiming(1, { duration: 400 }));
+    keyScale.value = withDelay(4200, withSpring(1, { damping: 8, stiffness: 100 }));
+    keyRotate.value = withDelay(4200, withTiming(0, { duration: 800, easing: Easing.out(Easing.back(1.5)) }));
+
+    // Phase 8: Text appears
+    sealTextOpacity.value = withDelay(5000, withTiming(1, { duration: 600 }));
+
+    // Dim candle
+    candleOpacity.value = withDelay(3000, withTiming(0.3, { duration: 1500 }));
+
+    setTimeout(() => saveCapsule(), 6000);
   };
 
   const saveCapsule = async () => {
@@ -243,32 +278,37 @@ export default function SealScreen() {
 
   const renderWrite = () => (
     <Animated.View entering={FadeIn.duration(400)} style={styles.content}>
-      <Text style={styles.stepTitle}>Ta pensée</Text>
+      {/* Candle at top */}
+      <View style={styles.candleSection}>
+        <AnimatedCandle size={50} />
+      </View>
+
+      <Text style={[styles.stepTitle, ds.text]}>Ta pensée</Text>
       
       <View style={styles.promptsRow}>
         {PROMPTS.slice(0, 2).map((prompt, i) => (
           <TouchableOpacity
             key={i}
-            style={styles.promptChip}
+            style={[styles.promptChip, ds.card]}
             onPress={() => setContent(prompt + '\n\n')}
           >
-            <Text style={styles.promptText} numberOfLines={2}>{prompt}</Text>
+            <Text style={[styles.promptText, ds.textMuted]} numberOfLines={2}>{prompt}</Text>
           </TouchableOpacity>
         ))}
       </View>
 
       <TextInput
-        style={styles.titleInput}
+        style={[styles.titleInput, ds.card, ds.text]}
         placeholder="Titre (optionnel)"
-        placeholderTextColor="#B0B0A0"
+        placeholderTextColor={theme.textMuted}
         value={title}
         onChangeText={setTitle}
       />
 
       <TextInput
-        style={styles.contentInput}
+        style={[styles.contentInput, ds.card, ds.text]}
         placeholder="Ce que tu veux confier au temps..."
-        placeholderTextColor="#B0B0A0"
+        placeholderTextColor={theme.textMuted}
         value={content}
         onChangeText={setContent}
         multiline
@@ -276,7 +316,7 @@ export default function SealScreen() {
       />
 
       <TouchableOpacity
-        style={[styles.nextButton, !content.trim() && styles.buttonDisabled]}
+        style={[styles.nextButton, { backgroundColor: theme.accent }, !content.trim() && styles.buttonDisabled]}
         onPress={() => setStep('duration')}
         disabled={!content.trim()}
       >
@@ -287,113 +327,139 @@ export default function SealScreen() {
 
   const renderDuration = () => (
     <Animated.View entering={FadeIn.duration(400)} style={styles.content}>
-      <Text style={styles.stepTitle}>Quand l'ouvrir ?</Text>
-      <Text style={styles.stepSubtitle}>Cette capsule restera scellée jusqu'à la date choisie</Text>
+      <View style={styles.candleSection}>
+        <AnimatedCandle size={50} />
+      </View>
 
-      <View style={styles.durationGrid}>
+      <Text style={[styles.stepTitle, ds.text]}>Choisis ta clé</Text>
+      <Text style={[styles.stepSubtitle, ds.textMuted]}>Chaque durée a sa clé unique. Elle sera gardée dans ton profil.</Text>
+
+      <View style={styles.keysGrid}>
         {DURATION_OPTIONS.map((opt, i) => (
           <Animated.View key={opt.days} entering={FadeInUp.duration(300).delay(i * 60)}>
             <TouchableOpacity
               style={[
-                styles.durationCard,
-                duration === opt.days && styles.durationCardSelected,
+                styles.keyCard,
+                ds.card,
+                duration === opt.days && { borderColor: opt.keyColor, borderWidth: 2 },
               ]}
               onPress={() => setDuration(opt.days)}
             >
-              <Text style={[
-                styles.durationText,
-                duration === opt.days && styles.durationTextSelected,
-              ]}>
-                {opt.label}
-              </Text>
+              <View style={[styles.keyIcon, { backgroundColor: opt.keyColor }]}>
+                <Ionicons name="key" size={20} color="#fff" />
+              </View>
+              <Text style={[styles.keyLabel, ds.text]}>{opt.label}</Text>
+              <Text style={[styles.keyName, { color: opt.keyColor }]}>{opt.keyName}</Text>
             </TouchableOpacity>
           </Animated.View>
         ))}
       </View>
 
       <TouchableOpacity
-        style={[styles.sealButton, !duration && styles.buttonDisabled]}
+        style={[styles.sealButton, { backgroundColor: theme.accentWarm }, !duration && styles.buttonDisabled]}
         onPress={startSealAnimation}
         disabled={!duration}
       >
-        <Text style={styles.sealButtonText}>✨ Sceller ✨</Text>
+        <Ionicons name="lock-closed" size={18} color="#fff" />
+        <Text style={styles.sealButtonText}>Sceller dans la boîte</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.backLink} onPress={() => setStep('write')}>
-        <Text style={styles.backLinkText}>Modifier le texte</Text>
+        <Text style={[styles.backLinkText, ds.textMuted]}>Modifier le texte</Text>
       </TouchableOpacity>
     </Animated.View>
   );
 
   const renderSealing = () => (
     <View style={styles.sealingContainer}>
-      {/* Background glow */}
+      {/* Candle */}
+      <Animated.View style={[styles.sealingCandle, candleStyle]}>
+        <AnimatedCandle size={40} />
+      </Animated.View>
+
+      {/* Glow */}
       <Animated.View style={[styles.glowCircle, glowStyle]} />
-      <Animated.View style={[styles.glowCircleInner, glowStyle]} />
-      
-      {/* Floating particles */}
-      <Animated.View style={[styles.particlesContainer, particlesStyle]}>
-        {[...Array(8)].map((_, i) => (
-          <View 
-            key={i} 
-            style={[
-              styles.particle, 
-              { 
-                top: 40 + Math.random() * 100,
-                left: 50 + Math.random() * 120,
-                backgroundColor: i % 2 === 0 ? '#D4A574' : '#FFD700',
-              }
-            ]} 
-          />
-        ))}
-      </Animated.View>
-      
-      {/* Letter that floats and enters the box */}
-      <Animated.View style={[styles.letterContainer, letterStyle]}>
-        <View style={styles.letter}>
-          <View style={styles.letterLines}>
-            <View style={styles.letterLine} />
-            <View style={[styles.letterLine, { width: '80%' }]} />
-            <View style={[styles.letterLine, { width: '60%' }]} />
+
+      {/* Papyrus */}
+      <Animated.View style={[styles.papyrusContainer, papyrusStyle]}>
+        <View style={styles.papyrus}>
+          <View style={styles.papyrusLines}>
+            <View style={styles.papyrusLine} />
+            <View style={[styles.papyrusLine, { width: '85%' }]} />
+            <View style={[styles.papyrusLine, { width: '70%' }]} />
+            <View style={[styles.papyrusLine, { width: '90%' }]} />
           </View>
+          <View style={styles.waxSeal} />
         </View>
       </Animated.View>
-      
-      {/* The magical box */}
+
+      {/* Wooden Box */}
       <Animated.View style={[styles.boxContainer, boxStyle]}>
-        <View style={styles.boxBody}>
-          <View style={styles.boxInner} />
-          <View style={styles.boxOrnament} />
+        <View style={styles.woodBox}>
+          {/* Box interior */}
+          <View style={styles.boxInterior} />
+          {/* Wood grain lines */}
+          <View style={styles.woodGrain}>
+            <View style={styles.grainLine} />
+            <View style={styles.grainLine} />
+            <View style={styles.grainLine} />
+          </View>
+          {/* Latence text engraved */}
+          <Text style={styles.latenceText}>Latence</Text>
+          {/* Metal corners */}
+          <View style={[styles.metalCorner, { top: 4, left: 4 }]} />
+          <View style={[styles.metalCorner, { top: 4, right: 4 }]} />
+          <View style={[styles.metalCorner, { bottom: 4, left: 4 }]} />
+          <View style={[styles.metalCorner, { bottom: 4, right: 4 }]} />
         </View>
+        {/* Lid */}
         <Animated.View style={[styles.boxLid, lidStyle]}>
-          <View style={styles.lidOrnament} />
+          <View style={styles.lidWoodGrain}>
+            <View style={styles.grainLine} />
+            <View style={styles.grainLine} />
+          </View>
+          <View style={styles.lidHandle} />
         </Animated.View>
       </Animated.View>
-      
-      {/* Lock that appears after sealing */}
-      <Animated.View style={[styles.lockWrapper, lockStyle]}>
-        <Text style={styles.lockEmoji}>🔒</Text>
+
+      {/* Colored Key */}
+      <Animated.View style={[styles.keyWrapper, keyStyle]}>
+        <View style={[styles.bigKey, { backgroundColor: selectedKey?.keyColor || '#D4A574' }]}>
+          <Ionicons name="key" size={32} color="#fff" />
+        </View>
       </Animated.View>
-      
+
       {/* Text */}
       <Animated.View style={[styles.sealTextContainer, sealTextStyle]}>
-        <Text style={styles.sealingText}>Scellée...</Text>
+        <Text style={[styles.sealingText, ds.textSecondary]}>Scellée...</Text>
+        <Text style={[styles.keyObtainedText, { color: selectedKey?.keyColor }]}>
+          {selectedKey?.keyName} obtenue
+        </Text>
       </Animated.View>
     </View>
   );
 
   const renderDone = () => (
     <Animated.View entering={FadeIn.duration(600)} style={styles.doneContainer}>
-      <View style={styles.doneIconContainer}>
-        <Text style={styles.doneEmoji}>✨</Text>
+      <View style={[styles.doneIconContainer, { backgroundColor: `${selectedKey?.keyColor}20` }]}>
+        <View style={[styles.doneKey, { backgroundColor: selectedKey?.keyColor }]}>
+          <Ionicons name="key" size={28} color="#fff" />
+        </View>
       </View>
-      <Text style={styles.doneTitle}>Scellée</Text>
-      <Text style={styles.doneSubtitle}>
+      <Text style={[styles.doneTitle, ds.text]}>Scellée</Text>
+      <Text style={[styles.doneKeyName, { color: selectedKey?.keyColor }]}>{selectedKey?.keyName}</Text>
+      <Text style={[styles.doneSubtitle, ds.textMuted]}>
         Ta pensée sera gardée précieusement.{'\n'}
         Ouverture dans {DURATION_OPTIONS.find(d => d.days === duration)?.label}
       </Text>
+      <View style={[styles.keyCollectionNote, ds.card]}>
+        <Ionicons name="information-circle-outline" size={16} color={theme.textMuted} />
+        <Text style={[styles.keyNoteText, ds.textMuted]}>
+          Cette clé est maintenant dans ton profil
+        </Text>
+      </View>
       <TouchableOpacity
-        style={styles.doneButton}
+        style={[styles.doneButton, { backgroundColor: theme.accent }]}
         onPress={() => router.replace('/home')}
       >
         <Text style={styles.doneButtonText}>Terminé</Text>
@@ -402,7 +468,7 @@ export default function SealScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, ds.container]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.flex}
@@ -412,11 +478,10 @@ export default function SealScreen() {
             <TouchableOpacity
               style={styles.backButton}
               onPress={() => router.back()}
-              hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
             >
-              <Ionicons name="chevron-down" size={28} color="#6B6B5B" />
+              <Ionicons name="chevron-down" size={28} color={theme.iconColor} />
             </TouchableOpacity>
-            <Text style={styles.headerTitle}>Sceller</Text>
+            <Text style={[styles.headerTitle, ds.text]}>Sceller</Text>
             <View style={styles.placeholder} />
           </View>
         )}
@@ -437,339 +502,89 @@ export default function SealScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F5F0E8',
-  },
-  flex: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-  },
-  backButton: {
-    padding: 4,
-  },
-  headerTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#4A4A4A',
-  },
-  placeholder: {
-    width: 36,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    padding: 24,
-  },
-  content: {
-    flex: 1,
-  },
-  stepTitle: {
-    fontSize: 26,
-    fontWeight: '200',
-    color: '#4A4A4A',
-    letterSpacing: 1,
-    marginBottom: 8,
-  },
-  stepSubtitle: {
-    fontSize: 14,
-    color: '#8B8B7D',
-    marginBottom: 28,
-  },
-  promptsRow: {
-    flexDirection: 'row',
-    gap: 10,
-    marginBottom: 24,
-  },
-  promptChip: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 14,
-  },
-  promptText: {
-    fontSize: 12,
-    color: '#8B8B7D',
-    lineHeight: 16,
-  },
-  titleInput: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    fontSize: 16,
-    color: '#4A4A4A',
-    marginBottom: 16,
-  },
-  contentInput: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    fontSize: 16,
-    color: '#4A4A4A',
-    minHeight: 160,
-    marginBottom: 24,
-  },
-  nextButton: {
-    backgroundColor: '#8B9A7D',
-    paddingVertical: 16,
-    borderRadius: 28,
-    alignItems: 'center',
-  },
-  buttonDisabled: {
-    backgroundColor: '#D4D4C4',
-  },
-  nextButtonText: {
-    color: '#fff',
-    fontSize: 15,
-    fontWeight: '500',
-  },
-  durationGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-    marginBottom: 32,
-  },
-  durationCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 14,
-    paddingVertical: 16,
-    paddingHorizontal: 22,
-  },
-  durationCardSelected: {
-    backgroundColor: '#4A4A4A',
-  },
-  durationText: {
-    fontSize: 14,
-    color: '#6B6B5B',
-    fontWeight: '500',
-  },
-  durationTextSelected: {
-    color: '#FFFFFF',
-  },
-  sealButton: {
-    backgroundColor: '#D4A574',
-    paddingVertical: 18,
-    borderRadius: 28,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-  },
-  sealButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '500',
-    letterSpacing: 1,
-  },
-  backLink: {
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  backLinkText: {
-    color: '#A0A090',
-    fontSize: 13,
-  },
+  container: { flex: 1 },
+  flex: { flex: 1 },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 12 },
+  backButton: { padding: 4 },
+  headerTitle: { fontSize: 16, fontWeight: '500' },
+  placeholder: { width: 36 },
+  scrollContent: { flexGrow: 1, padding: 24 },
+  content: { flex: 1 },
+
+  // Candle
+  candleSection: { alignItems: 'center', marginBottom: 20 },
+  candleContainer: { alignItems: 'center', justifyContent: 'flex-end' },
+  candleGlow: { position: 'absolute', borderRadius: 100, backgroundColor: 'rgba(255, 200, 100, 0.25)', bottom: '30%' },
+  candleBody: { backgroundColor: '#F5E6D3', borderRadius: 4, borderTopLeftRadius: 2, borderTopRightRadius: 2 },
+  candleWax: { position: 'absolute', top: 0, left: 0, right: 0, height: 8, backgroundColor: '#E8D9C5', borderTopLeftRadius: 2, borderTopRightRadius: 2 },
+  candleWick: { position: 'absolute', width: 2, backgroundColor: '#4A4A4A', borderRadius: 1 },
+  flameContainer: { position: 'absolute', alignItems: 'center' },
+  flameOuter: { backgroundColor: '#FF9500', borderRadius: 100, borderTopLeftRadius: 50, borderTopRightRadius: 50 },
+  flameInner: { position: 'absolute', backgroundColor: '#FFD700', borderRadius: 50, bottom: 2 },
+
+  stepTitle: { fontSize: 26, fontWeight: '200', letterSpacing: 1, marginBottom: 8 },
+  stepSubtitle: { fontSize: 14, marginBottom: 24, lineHeight: 20 },
   
-  // ======= SEALING ANIMATION STYLES - REFINED ELEGANCE =======
-  sealingContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 80,
-    minHeight: 450,
-  },
-  glowCircle: {
-    position: 'absolute',
-    width: 260,
-    height: 260,
-    borderRadius: 130,
-    backgroundColor: '#D4A57440',
-  },
-  glowCircleInner: {
-    position: 'absolute',
-    width: 180,
-    height: 180,
-    borderRadius: 90,
-    backgroundColor: '#FFD70030',
-  },
-  particlesContainer: {
-    position: 'absolute',
-    width: 240,
-    height: 240,
-  },
-  particle: {
-    position: 'absolute',
-    width: 5,
-    height: 5,
-    borderRadius: 2.5,
-  },
-  letterContainer: {
-    position: 'absolute',
-    top: 50,
-    zIndex: 10,
-  },
-  letter: {
-    width: 100,
-    height: 80,
-    backgroundColor: '#FFFDF5',
-    borderRadius: 6,
-    padding: 14,
-    shadowColor: '#D4A574',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 16,
-    elevation: 8,
-    borderWidth: 1,
-    borderColor: '#E8DFD0',
-  },
-  letterLines: {
-    flex: 1,
-    gap: 8,
-  },
-  letterLine: {
-    height: 3,
-    backgroundColor: '#DED5C5',
-    borderRadius: 1.5,
-    width: '100%',
-  },
-  boxContainer: {
-    alignItems: 'center',
-    marginTop: 70,
-  },
-  boxBody: {
-    width: 140,
-    height: 95,
-    backgroundColor: '#F5EDE2',
-    borderRadius: 12,
-    borderWidth: 2.5,
-    borderColor: '#D4A574',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#C49A6C',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.2,
-    shadowRadius: 16,
-    elevation: 8,
-  },
-  boxInner: {
-    width: 115,
-    height: 70,
-    backgroundColor: '#2A2520',
-    borderRadius: 6,
-    opacity: 0.25,
-  },
-  boxOrnament: {
-    position: 'absolute',
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: '#D4A574',
-    bottom: -12,
-    shadowColor: '#D4A574',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-  },
-  boxLid: {
-    position: 'absolute',
-    top: -14,
-    width: 152,
-    height: 26,
-    backgroundColor: '#FBF6EE',
-    borderTopLeftRadius: 14,
-    borderTopRightRadius: 14,
-    borderWidth: 2.5,
-    borderBottomWidth: 0,
-    borderColor: '#D4A574',
-    alignItems: 'center',
-    justifyContent: 'center',
-    transformOrigin: 'bottom',
-  },
-  lidOrnament: {
-    width: 36,
-    height: 7,
-    backgroundColor: '#D4A574',
-    borderRadius: 3.5,
-  },
-  lockWrapper: {
-    position: 'absolute',
-    bottom: 90,
-    width: 68,
-    height: 68,
-    borderRadius: 34,
-    backgroundColor: '#FFFDF8',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2.5,
-    borderColor: '#D4A574',
-    shadowColor: '#D4A574',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.35,
-    shadowRadius: 14,
-    elevation: 10,
-  },
-  lockEmoji: {
-    fontSize: 32,
-  },
-  sealTextContainer: {
-    position: 'absolute',
-    bottom: 40,
-  },
-  sealingText: {
-    fontSize: 22,
-    fontWeight: '200',
-    color: '#8B8570',
-    letterSpacing: 6,
-    textTransform: 'uppercase',
-  },
+  promptsRow: { flexDirection: 'row', gap: 10, marginBottom: 24 },
+  promptChip: { flex: 1, borderRadius: 12, padding: 14 },
+  promptText: { fontSize: 12, lineHeight: 16 },
+  titleInput: { borderRadius: 12, padding: 16, fontSize: 16, marginBottom: 16 },
+  contentInput: { borderRadius: 12, padding: 16, fontSize: 16, minHeight: 160, marginBottom: 24 },
+  nextButton: { paddingVertical: 16, borderRadius: 28, alignItems: 'center' },
+  buttonDisabled: { opacity: 0.5 },
+  nextButtonText: { color: '#fff', fontSize: 15, fontWeight: '500' },
+
+  // Keys Grid
+  keysGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 28 },
+  keyCard: { width: (width - 60) / 2, borderRadius: 16, padding: 16, alignItems: 'center' },
+  keyIcon: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', marginBottom: 10 },
+  keyLabel: { fontSize: 14, fontWeight: '500', marginBottom: 4 },
+  keyName: { fontSize: 11, fontWeight: '600' },
+
+  sealButton: { flexDirection: 'row', paddingVertical: 18, borderRadius: 28, alignItems: 'center', justifyContent: 'center', gap: 10 },
+  sealButtonText: { color: '#fff', fontSize: 16, fontWeight: '500' },
+  backLink: { alignItems: 'center', marginTop: 20 },
+  backLinkText: { fontSize: 13 },
+
+  // Sealing Animation
+  sealingContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', minHeight: 500, paddingVertical: 40 },
+  sealingCandle: { position: 'absolute', top: 20 },
+  glowCircle: { position: 'absolute', width: 200, height: 200, borderRadius: 100, backgroundColor: 'rgba(212, 165, 116, 0.35)' },
+
+  papyrusContainer: { position: 'absolute', top: 80, zIndex: 10 },
+  papyrus: { width: 100, height: 120, backgroundColor: '#F5E6D3', borderRadius: 4, padding: 12, borderWidth: 1, borderColor: '#E0D0B8' },
+  papyrusLines: { flex: 1, gap: 8 },
+  papyrusLine: { height: 2, backgroundColor: '#D4C4A8', borderRadius: 1, width: '100%' },
+  waxSeal: { position: 'absolute', bottom: 8, right: 8, width: 20, height: 20, borderRadius: 10, backgroundColor: '#C47C7C' },
+
+  boxContainer: { marginTop: 100 },
+  woodBox: { width: 160, height: 100, backgroundColor: '#8B6914', borderRadius: 8, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  boxInterior: { position: 'absolute', width: 140, height: 80, backgroundColor: '#2A2520', borderRadius: 4, opacity: 0.4 },
+  woodGrain: { position: 'absolute', width: '100%', height: '100%', justifyContent: 'space-evenly', paddingHorizontal: 10 },
+  grainLine: { height: 1, backgroundColor: 'rgba(0,0,0,0.15)', borderRadius: 1 },
+  latenceText: { color: '#D4A574', fontSize: 14, fontWeight: '300', letterSpacing: 3, textTransform: 'uppercase' },
+  metalCorner: { position: 'absolute', width: 12, height: 12, backgroundColor: '#B8860B', borderRadius: 2 },
   
-  // ======= DONE SCREEN STYLES =======
-  doneContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 80,
-  },
-  doneIconContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: '#D4A57420',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 24,
-  },
-  doneEmoji: {
-    fontSize: 48,
-  },
-  doneTitle: {
-    fontSize: 32,
-    fontWeight: '200',
-    color: '#4A4A4A',
-    letterSpacing: 3,
-    marginBottom: 12,
-  },
-  doneSubtitle: {
-    fontSize: 14,
-    color: '#8B8B7D',
-    textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: 40,
-  },
-  doneButton: {
-    backgroundColor: '#8B9A7D',
-    paddingVertical: 14,
-    paddingHorizontal: 40,
-    borderRadius: 28,
-  },
-  doneButtonText: {
-    color: '#fff',
-    fontSize: 15,
-    fontWeight: '500',
-  },
+  boxLid: { position: 'absolute', top: -16, width: 170, height: 24, backgroundColor: '#A07818', borderTopLeftRadius: 8, borderTopRightRadius: 8, alignItems: 'center', justifyContent: 'center', transformOrigin: 'bottom' },
+  lidWoodGrain: { position: 'absolute', width: '100%', height: '100%', flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', paddingHorizontal: 20 },
+  lidHandle: { width: 30, height: 6, backgroundColor: '#B8860B', borderRadius: 3 },
+
+  keyWrapper: { position: 'absolute', bottom: 120 },
+  bigKey: { width: 70, height: 70, borderRadius: 35, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 8 },
+
+  sealTextContainer: { position: 'absolute', bottom: 50, alignItems: 'center' },
+  sealingText: { fontSize: 22, fontWeight: '200', letterSpacing: 4, textTransform: 'uppercase', marginBottom: 8 },
+  keyObtainedText: { fontSize: 14, fontWeight: '600' },
+
+  // Done Screen
+  doneContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 60 },
+  doneIconContainer: { width: 100, height: 100, borderRadius: 50, alignItems: 'center', justifyContent: 'center', marginBottom: 20 },
+  doneKey: { width: 60, height: 60, borderRadius: 30, alignItems: 'center', justifyContent: 'center' },
+  doneTitle: { fontSize: 32, fontWeight: '200', letterSpacing: 3, marginBottom: 8 },
+  doneKeyName: { fontSize: 16, fontWeight: '600', marginBottom: 16 },
+  doneSubtitle: { fontSize: 14, textAlign: 'center', lineHeight: 22, marginBottom: 24 },
+  keyCollectionNote: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingVertical: 12, borderRadius: 12, marginBottom: 32 },
+  keyNoteText: { fontSize: 13 },
+  doneButton: { paddingVertical: 14, paddingHorizontal: 40, borderRadius: 28 },
+  doneButtonText: { color: '#fff', fontSize: 15, fontWeight: '500' },
 });
