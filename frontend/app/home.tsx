@@ -461,8 +461,10 @@ export default function HomeScreen() {
             // Check if this feature requires Premium
             const isPremiumFeature = PREMIUM_FEATURES.includes(item.id);
             const userTier = subscriptionStatus?.tier || 'free';
+            // Premium and Lifetime users have full access
             const hasPremiumAccess = userTier === 'premium' || userTier === 'lifetime';
-            const isLocked = isPremiumFeature && !hasPremiumAccess && userTier === 'essentiel';
+            // Feature is locked if it's premium and user doesn't have premium access
+            const isLocked = isPremiumFeature && !hasPremiumAccess;
             
             const handlePress = () => {
               if (isLocked) {
