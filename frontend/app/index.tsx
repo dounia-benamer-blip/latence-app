@@ -431,19 +431,9 @@ export default function WelcomeScreen() {
 
   return (
     <SafeAreaView style={[styles.container, dynamicStyles.container]}>
-      {renderLanguageModal()}
-      
-      {/* Header with language selector - always visible */}
+      {/* Header with theme toggle only */}
       <View style={styles.headerRow}>
-        <TouchableOpacity 
-          style={[styles.languageSelectorInline, dynamicStyles.card]}
-          onPress={() => setShowLanguageModal(true)}
-        >
-          <Text style={styles.languageFlag}>{currentLang.flag}</Text>
-          <Text style={[styles.languageCode, dynamicStyles.text]}>{currentLang.code.toUpperCase()}</Text>
-          <Ionicons name="chevron-down" size={14} color={theme.textMuted} />
-        </TouchableOpacity>
-        
+        <View style={{ width: 44 }} />
         <TouchableOpacity 
           style={[styles.themeToggleInline, dynamicStyles.card]}
           onPress={toggleTheme}
@@ -475,7 +465,7 @@ export default function WelcomeScreen() {
             disabled={!selectedMood}
             activeOpacity={0.8}
           >
-            <Text style={styles.continueButtonText}>{t('common.continue')}</Text>
+            <Text style={styles.continueButtonText}>Continuer</Text>
           </TouchableOpacity>
         </View>
       )}
