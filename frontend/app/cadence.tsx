@@ -203,6 +203,13 @@ export default function CadenceScreen() {
     setLoading(false);
   };
 
+  // Recalculate cadence when language changes
+  useEffect(() => {
+    if (!loading) {
+      setCadenceData(generateFallbackCadence());
+    }
+  }, [language]);
+
   const generateFallbackCadence = (): CadenceData => {
     const timeKey = timeOfDay === 'matin' ? 'morning' : timeOfDay === 'apres-midi' ? 'afternoon' : 'evening';
     const greetingKey = `cadence.greeting_${timeKey}`;
