@@ -98,6 +98,40 @@ Journal intime immersif centré sur la lune, l'introspection et la sagesse unive
 - **Backend**: FastAPI (Python)
 - **Database**: MongoDB
 - **AI**: OpenAI GPT-4o
+- **Paiements**: Stripe via emergentintegrations
+
+---
+
+## Système d'Abonnement
+
+### 🆓 Niveau Gratuit
+- 3 entrées journal/mois
+- 3 rêves/mois
+- IA Miroir basique (3 queries)
+- Pas d'Oracle, pas d'analyse avancée
+
+### ⭐ Essentiel - 4.99€/mois
+- Journal illimité
+- Rêves illimités
+- IA Miroir (20 queries)
+- Oracle des rêves
+- Analyse approfondie
+- Statistiques émotionnelles
+- Cycles lunaires
+- Archivage illimité
+- Scellés permanents
+
+### 💎 Premium - 14.99€/mois
+- Tout Essentiel +
+- IA Miroir illimitée
+- Arbre cosmique
+- Sync santé & sommeil
+
+### 🏅 Accès à Vie (Membre Fondateur)
+- Accès complet permanent
+- Badge "Membre Fondateur"
+- Via codes uniques `LATENCE-XXXX-XXXX-XXXX`
+- QR codes pour cartes physiques Atelier Benamer
 
 ---
 
@@ -110,6 +144,17 @@ Journal intime immersif centré sur la lune, l'introspection et la sagesse unive
 ---
 
 ## Changelog
+
+### 19 Février 2026 - Itération 6
+- ✅ **Système de paiement complet** :
+  - Authentification email/password + Google OAuth + Apple
+  - Page abonnement avec plans Essentiel (4.99€) et Premium (14.99€)
+  - Intégration Stripe checkout
+  - Codes d'accès à vie avec QR codes
+  - Dashboard admin protégé
+- ✅ Nouvelles pages : `/auth`, `/subscription`, `/admin`
+- ✅ Backend : auth.py avec 15+ endpoints
+- ✅ 23 tests API passent, frontend 100% fonctionnel
 
 ### 18 Février 2026 - Itération 5
 - ✅ **Mode Nuit Global** : Thème sombre fonctionne dans TOUS les modules
@@ -129,6 +174,7 @@ Journal intime immersif centré sur la lune, l'introspection et la sagesse unive
 ## Prochaines étapes (Backlog)
 
 ### P0 - Prioritaire
+- [x] Système de paiement (TERMINÉ)
 - [ ] Améliorer le module Cadence avec 6 nouvelles fonctionnalités:
   - Intention du jour
   - Suivi de streaks avancé
@@ -139,10 +185,12 @@ Journal intime immersif centré sur la lune, l'introspection et la sagesse unive
 
 ### P1 - Planifié
 - [ ] Maisons Astrologiques dans Cosmos
+- [ ] Restrictions d'accès selon le tier d'abonnement
 
 ### P2 - Future
 - [ ] Rapport de l'Âme (Soul Report)
 - [ ] Dictionnaire Onirique (Dream Dictionary)
+- [ ] Notifications de renouvellement d'abonnement
 
 ### Refactoring
 - [ ] Supprimer fichiers inutilisés: `tarot.tsx`, `compatibility.tsx`
@@ -151,4 +199,4 @@ Journal intime immersif centré sur la lune, l'introspection et la sagesse unive
 ---
 
 *Latence - by Atelier Benamer*
-*Dernière mise à jour: 18 février 2026*
+*Dernière mise à jour: 19 février 2026*
