@@ -26,6 +26,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../src/context/ThemeContext';
+import { useLanguage } from '../src/context/LanguageContext';
 import { TwinklingStars } from '../src/components/TwinklingStars';
 
 const { width } = Dimensions.get('window');
