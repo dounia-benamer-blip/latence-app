@@ -226,25 +226,25 @@ export default function CitationsScreen() {
               ) : (
                 <>
                   <Ionicons name="refresh" size={18} color="#fff" />
-                  <Text style={styles.newQuoteBtnText}>Une autre sagesse</Text>
+                  <Text style={styles.newQuoteBtnText}>{t('wisdom.new_quote')}</Text>
                 </>
               )}
             </TouchableOpacity>
 
             {/* Info */}
             <Text style={[styles.infoText, ds.textMuted]}>
-              Citations de poètes soufis, textes sacrés, philosophes et sages de toutes traditions.
+              {t('wisdom.info')}
             </Text>
           </>
         ) : (
           // Saved Quotes
           <Animated.View entering={FadeIn.duration(400)}>
-            <Text style={[styles.savedTitle, ds.text]}>Tes sagesses gardées</Text>
+            <Text style={[styles.savedTitle, ds.text]}>{t('wisdom.saved_title')}</Text>
             {savedQuotes.length === 0 ? (
               <View style={styles.emptyState}>
                 <Ionicons name="heart-outline" size={48} color={theme.textMuted} />
                 <Text style={[styles.emptyText, ds.textMuted]}>
-                  Aucune citation sauvegardée
+                  {t('wisdom.no_saved')}
                 </Text>
               </View>
             ) : (
