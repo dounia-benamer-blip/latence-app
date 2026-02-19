@@ -426,7 +426,7 @@ export default function CadenceScreen() {
         {/* Progress */}
         <Animated.View entering={FadeInUp.duration(600).delay(400)} style={styles.progressSection}>
           <View style={styles.progressHeader}>
-            <Text style={[styles.progressLabel, ds.textMuted]}>TA CADENCE DU JOUR</Text>
+            <Text style={[styles.progressLabel, ds.textMuted]}>{t('cadence.your_daily_cadence')}</Text>
             <Text style={[styles.progressCount, ds.text]}>
               {completedRituals.length}/{cadenceData?.rituals.length}
             </Text>
@@ -442,7 +442,7 @@ export default function CadenceScreen() {
         </Animated.View>
 
         {/* Rituals */}
-        <Text style={[styles.sectionTitle, ds.text]}>Tes micro-rituels</Text>
+        <Text style={[styles.sectionTitle, ds.text]}>{t('cadence.your_micro_rituals')}</Text>
         {cadenceData?.rituals.map((ritual, i) => {
           const typeInfo = RITUAL_TYPES[ritual.type];
           const isCompleted = completedRituals.includes(ritual.id);
@@ -499,7 +499,7 @@ export default function CadenceScreen() {
                           setExpandedRitual(null);
                         }}
                       >
-                        <Text style={styles.saveInputText}>Valider</Text>
+                        <Text style={styles.saveInputText}>{t('common.validate')}</Text>
                       </TouchableOpacity>
                     </Animated.View>
                   )}
@@ -515,8 +515,8 @@ export default function CadenceScreen() {
         {/* Gratitude Modal */}
         {showGratitude && (
           <Animated.View entering={FadeIn.duration(300)} style={[styles.inputModal, ds.card]}>
-            <Text style={[styles.inputModalTitle, ds.text]}>Tes 3 gratitudes</Text>
-            <Text style={[styles.inputModalSubtitle, ds.textMuted]}>Même les petites choses comptent</Text>
+            <Text style={[styles.inputModalTitle, ds.text]}>{t('cadence.gratitude_modal_title')}</Text>
+            <Text style={[styles.inputModalSubtitle, ds.textMuted]}>{t('cadence.gratitude_modal_subtitle')}</Text>
             {[0, 1, 2].map((idx) => (
               <View key={idx} style={styles.gratitudeRow}>
                 <Text style={[styles.gratitudeNumber, { color: theme.accentWarm }]}>{idx + 1}.</Text>
