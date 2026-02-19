@@ -352,8 +352,8 @@ export default function HomeScreen() {
 
   const moonPhase = getMoonPhase();
   
-  // Get current language from i18next
-  const currentLanguage = t('home.day_wed'); // This will force re-render on language change
+  // Use language context to force re-render when language changes
+  const { language } = useLanguage();
   const today = formatToday(t);
 
   // Dynamic styles based on theme
