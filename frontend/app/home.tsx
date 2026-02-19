@@ -143,11 +143,16 @@ interface BookRecommendation {
 export default function HomeScreen() {
   const router = useRouter();
   const { theme, themeMode, isDark, toggleTheme } = useTheme();
+  const { subscriptionStatus, isAuthenticated } = useAuth();
   const [userName, setUserName] = useState('');
   const [currentMood, setCurrentMood] = useState<any>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [capsuleCount, setCapsuleCount] = useState(0);
   const [dreamCount, setDreamCount] = useState(0);
+  
+  // Premium popup
+  const [showPremiumPopup, setShowPremiumPopup] = useState(false);
+  const [blockedFeature, setBlockedFeature] = useState('');
   
   // AI Companion
   const [showCompanion, setShowCompanion] = useState(false);
