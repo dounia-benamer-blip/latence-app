@@ -67,11 +67,10 @@ Application mobile de journaling immersive avec focus sur l'astrologie, le bien-
 - [x] Fichiers JSON de traduction complets
 - [x] UI traduite pour tous les modules
 - [x] IA Mirror répond dans la langue choisie
-- [x] Endpoint /api/sacred-quote multilingue
-- [x] Phases lunaires traduites
 - [x] Menus et modals traduits
+- [x] Jours et mois traduits (nécessite refresh page)
 
-### Modules Principaux
+### Modules Principaux ✅
 - [x] **Cadence**: Rituels quotidiens avec traduction i18n + activités physiques
 - [x] **Sagesse**: Citations sacrées multilingues
 - [x] **Lettre à Moi**: Message futur avec dates localisées
@@ -86,68 +85,61 @@ Application mobile de journaling immersive avec focus sur l'astrologie, le bien-
 - [x] **Rapport de l'Âme (Soul Report)**: Résumé hebdomadaire IA du parcours émotionnel
 - [x] **Dictionnaire Onirique (Dream Dictionary)**: Dictionnaire personnel de symboles de rêves
 
-### Push Notifications (Base) ✅
-- [x] Structure expo-notifications
-- [x] Endpoints backend pour tokens
+### Préparation App Store ✅
+- [x] app.json configuré avec bundleIdentifier, permissions, localisations
+- [x] eas.json créé pour EAS Build
+- [x] Guide complet APP_STORE_GUIDE.md avec instructions étape par étape
+- [x] Métadonnées App Store préparées en FR, EN, ES
 
-## Fichiers Clés
+## Fichiers de Configuration App Store
 
-### Frontend
-- `/app/frontend/src/i18n/locales/fr.json` - Traductions FR
-- `/app/frontend/src/i18n/locales/en.json` - Traductions EN
-- `/app/frontend/src/i18n/locales/es.json` - Traductions ES
-- `/app/frontend/src/context/LanguageContext.tsx` - Context langue
-- `/app/frontend/src/components/LanguageSelector.tsx` - Sélecteur
-- `/app/frontend/app/home.tsx` - Page d'accueil
-- `/app/frontend/app/cadence.tsx` - Module Cadence
-- `/app/frontend/app/citations.tsx` - Module Sagesse
-- `/app/frontend/app/mirror/index.tsx` - IA Miroir
-- `/app/frontend/app/soul-report.tsx` - Rapport de l'Âme
-- `/app/frontend/app/dream-dictionary.tsx` - Dictionnaire Onirique
-- `/app/frontend/app/subscription.tsx` - Page Abonnement
+### `/frontend/app.json`
+- Bundle ID: `com.atelierbenamer.latence`
+- Localisations: FR, EN, ES
+- Permissions iOS configurées
+- Plugins Expo configurés
 
-### Backend
-- `/app/backend/server.py` - API principale avec endpoints multilingues
+### `/frontend/eas.json`
+- Profils: development, preview, production
+- Configuration submit pour App Store
 
-## APIs Multilingues
+### `/frontend/APP_STORE_GUIDE.md`
+- Guide complet de soumission
+- Commandes EAS à exécuter
+- Métadonnées à remplir dans App Store Connect
+- Configuration des In-App Purchases
 
-| Endpoint | Paramètre langue |
-|----------|------------------|
-| `/api/sacred-quote` | `?lang=fr\|en\|es` |
-| `/api/mirror/reflect` | `language` dans body |
-| `/api/mirror/analyze-writing` | `language` dans body |
-| `/api/mirror/deep-question` | `language` dans body |
-| `/api/soul-report/generate` | `?lang=fr\|en\|es` |
-| `/api/dream-dictionary` | `language` dans body (POST) |
-
-## APIs Nouvelles
+## APIs 
 
 | Endpoint | Méthode | Description |
 |----------|---------|-------------|
-| `/api/soul-report/latest` | GET | Retourne le dernier rapport |
-| `/api/soul-reports` | GET | Liste tous les rapports |
-| `/api/soul-report/generate` | POST | Génère un nouveau rapport |
-| `/api/dream-dictionary` | GET | Liste les symboles |
-| `/api/dream-dictionary` | POST | Ajoute un symbole |
-| `/api/dream-dictionary/{id}` | DELETE | Supprime un symbole |
+| `/api/soul-report/latest` | GET | Dernier rapport |
+| `/api/soul-reports` | GET | Liste des rapports |
+| `/api/soul-report/generate` | POST | Génère un rapport |
+| `/api/dream-dictionary` | GET/POST | Liste/Ajoute symboles |
+| `/api/dream-dictionary/{id}` | DELETE | Supprime symbole |
+| `/api/sacred-quote?lang=` | GET | Citation multilingue |
+| `/api/mirror/reflect` | POST | IA Mirror |
 
 ## Prochaines Étapes
 
-### P0 - Priorité Haute
-- [ ] Configuration pour App Store Connect (eas.json)
-- [ ] Instructions de build production iOS
+### P0 - Fait ✅
+- [x] Rapport de l'Âme fonctionnel
+- [x] Dictionnaire Onirique fonctionnel
+- [x] Préparation App Store (app.json, eas.json, guide)
 
-### P1 - Priorité Moyenne
-- [ ] Améliorer module Cadence (streaks, rituels astraux)
-- [ ] Notification quotidienne traduite (backend)
+### P1 - À Faire
+- [ ] Tester build EAS sur Mac (utilisateur)
+- [ ] Créer app dans App Store Connect (utilisateur)
+- [ ] Configurer In-App Purchases (utilisateur)
+- [ ] Traduire les notifications poétiques du backend
 
 ### P2 - Backlog
 - [ ] Maisons astrologiques détaillées
-- [ ] Refactor backend en modules (routes/)
-- [ ] Nettoyage fichiers inutilisés (tarot.tsx, compatibility.tsx)
+- [ ] Refactor backend (découpage server.py)
+- [ ] Nettoyage fichiers inutilisés
 
 ## Credentials Test
-
 - **Admin**: admin@latence.app / adminpassword
 - **Preview URL**: https://dream-journal-ai-3.preview.emergentagent.com
 
@@ -156,10 +148,21 @@ Application mobile de journaling immersive avec focus sur l'astrologie, le bien-
 - Stripe en mode test
 - Emergent LLM Key pour toutes les intégrations IA
 
+## Issues Connues (Mineures)
+- La date en haut de la page d'accueil peut rester en français après changement de langue (nécessite refresh)
+- Les notifications poétiques du backend sont en français uniquement
+
 ## Historique des mises à jour
 
-### 19 Février 2026
+### 19 Février 2026 - Session 2
+- ✅ Correction traductions jours/mois manquantes
+- ✅ Configuration app.json pour App Store
+- ✅ Création eas.json pour EAS Build
+- ✅ Guide complet de soumission App Store (APP_STORE_GUIDE.md)
+- ✅ Métadonnées FR, EN, ES préparées
+
+### 19 Février 2026 - Session 1
 - ✅ Implémentation complète du Rapport de l'Âme (Soul Report)
 - ✅ Implémentation complète du Dictionnaire Onirique (Dream Dictionary)
-- ✅ Correction visibilité champ "Accès à Vie" sur page abonnement
+- ✅ Correction visibilité champ "Accès à Vie"
 - ✅ Tests passés: Backend 100% (13/13), Frontend 100%
