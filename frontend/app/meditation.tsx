@@ -174,7 +174,7 @@ export default function MeditationScreen() {
         </TouchableOpacity>
         <View style={styles.headerCenter}>
           <CandleFlame size="small" intensity="gentle" />
-          <Text style={[styles.headerTitle, ds.text]}>Méditation</Text>
+          <Text style={[styles.headerTitle, ds.text]}>{t('meditation.title')}</Text>
           <CandleFlame size="small" intensity="gentle" />
         </View>
         <View style={styles.placeholder} />
