@@ -127,7 +127,7 @@ Application mobile de journaling immersive avec focus sur l'astrologie, le bien-
 ## Credentials Test
 
 - **Admin**: admin@latence.app / adminpassword
-- **Preview URL**: https://latence-i18n.preview.emergentagent.com
+- **Preview URL**: https://dream-journal-ai-3.preview.emergentagent.com
 
 ## Notes Techniques
 - MongoDB via MONGO_URL en env

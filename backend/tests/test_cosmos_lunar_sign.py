@@ -11,7 +11,7 @@ import requests
 import os
 import json
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://latence-i18n.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://dream-journal-ai-3.preview.emergentagent.com').rstrip('/')
 
 class TestCosmosLunarSign:
     """Test lunar sign and Cosmos module features"""
