@@ -124,6 +124,14 @@ export default function WriteScreen() {
           {phase === 'write' && (
             <Animated.View entering={FadeInUp.duration(400)}>
               <Text style={[styles.date, ds.textMuted]}>{formatToday()}</Text>
+              
+              {/* Voice Recorder */}
+              <VoiceRecorder
+                onTranscription={(text) => setContent(prev => prev ? `${prev}\n${text}` : text)}
+                theme={theme}
+                placeholder="🎙️ Dicte tes pensées..."
+              />
+              
               <TextInput
                 style={[styles.textInput, ds.text]}
                 placeholder="Qu'est-ce qui traverse ton esprit ?"
