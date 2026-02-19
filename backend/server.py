@@ -2828,13 +2828,16 @@ async def complete_cadence_ritual(completion: CadenceComplete):
 # ==================== SACRED QUOTES ROUTES ====================
 
 @api_router.get("/sacred-quote")
-async def get_sacred_quote():
-    """Get a personalized sacred quote based on user mood"""
+async def get_sacred_quote(lang: str = "fr"):
+    """Get a personalized sacred quote based on user mood and language"""
     # Get latest mood
     mood_data = await db.moods.find_one(sort=[("date", -1)])
     mood = mood_data.get("mood", "neutre") if mood_data else "neutre"
     
-    system_prompt = """Tu es un sage qui connaît les textes sacrés et la poésie spirituelle de toutes les traditions.
+    # Language-specific prompts
+    prompts = {
+        "fr": {
+            "system": """Tu es un sage qui connaît les textes sacrés et la poésie spirituelle de toutes les traditions.
 Tu choisis UNE citation adaptée à l'état émotionnel de la personne.
 
 IMPORTANT:
@@ -2842,20 +2845,57 @@ IMPORTANT:
 - Cite simplement l'auteur ou la tradition
 - Mélange : poètes soufis (Rumi, Hafiz), sages anciens, textes sacrés, philosophes
 - La citation doit être profonde, poétique, réconfortante
+- Réponds EN FRANÇAIS
 
 Réponds UNIQUEMENT en JSON:
-{"text": "citation ici", "author": "auteur ou tradition"}"""
+{"text": "citation ici", "author": "auteur ou tradition"}""",
+            "user": f"La personne ressent : {mood}. Donne une citation sacrée ou poétique qui résonne avec cet état.",
+            "fallback": {"text": "Ce que tu cherches te cherche aussi.", "author": "Rumi"}
+        },
+        "en": {
+            "system": """You are a sage who knows sacred texts and spiritual poetry from all traditions.
+You choose ONE quote adapted to the person's emotional state.
 
+IMPORTANT:
+- Never explicitly categorize the source (no "Quran", "Bible", "Torah")
+- Simply cite the author or tradition
+- Mix: Sufi poets (Rumi, Hafiz), ancient sages, sacred texts, philosophers
+- The quote must be profound, poetic, comforting
+- Respond IN ENGLISH
+
+Respond ONLY in JSON:
+{"text": "quote here", "author": "author or tradition"}""",
+            "user": f"The person feels: {mood}. Give a sacred or poetic quote that resonates with this state.",
+            "fallback": {"text": "What you seek is seeking you.", "author": "Rumi"}
+        },
+        "es": {
+            "system": """Eres un sabio que conoce los textos sagrados y la poesía espiritual de todas las tradiciones.
+Eliges UNA cita adaptada al estado emocional de la persona.
+
+IMPORTANTE:
+- Nunca categorices explícitamente la fuente (no "Corán", "Biblia", "Torá")
+- Simplemente cita al autor o la tradición
+- Mezcla: poetas sufíes (Rumi, Hafiz), sabios antiguos, textos sagrados, filósofos
+- La cita debe ser profunda, poética, reconfortante
+- Responde EN ESPAÑOL
+
+Responde ÚNICAMENTE en JSON:
+{"text": "cita aquí", "author": "autor o tradición"}""",
+            "user": f"La persona siente: {mood}. Da una cita sagrada o poética que resuene con este estado.",
+            "fallback": {"text": "Lo que buscas también te busca a ti.", "author": "Rumi"}
+        }
+    }
+    
+    lang_config = prompts.get(lang, prompts["fr"])
+    
     chat = LlmChat(
         api_key=EMERGENT_LLM_KEY,
         session_id=f"quote-{uuid.uuid4()}",
-        system_message=system_prompt
+        system_message=lang_config["system"]
     ).with_model("openai", "gpt-4o")
 
-    prompt = f"La personne ressent : {mood}. Donne une citation sacrée ou poétique qui résonne avec cet état."
-
     try:
-        response = await chat.send_message(UserMessage(text=prompt))
+        response = await chat.send_message(UserMessage(text=lang_config["user"]))
         clean_response = response.strip()
         if clean_response.startswith("```json"):
             clean_response = clean_response[7:]
@@ -2868,10 +2908,7 @@ Réponds UNIQUEMENT en JSON:
         return result
     except Exception as e:
         logging.error(f"Sacred quote error: {e}")
-        return {
-            "text": "Ce que tu cherches te cherche aussi.",
-            "author": "Rumi"
-        }
+        return lang_config["fallback"]
 
 # ==================== LETTER TO SELF ROUTES ====================
 
