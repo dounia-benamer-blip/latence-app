@@ -24,45 +24,12 @@ import Animated, {
   Easing,
   interpolate,
 } from 'react-native-reanimated';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../src/context/ThemeContext';
 import { TwinklingStars } from '../src/components/TwinklingStars';
 
 const { width } = Dimensions.get('window');
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
-
-// Universal sacred quotes - no categorization, just wisdom
-const SACRED_QUOTES = [
-  { text: "Ce que tu cherches te cherche aussi.", author: "Rumi" },
-  { text: "La blessure est l'endroit par où la lumière entre en toi.", author: "Rumi" },
-  { text: "Sois le changement que tu veux voir dans le monde.", author: "Gandhi" },
-  { text: "Ne sois pas triste, car ce que tu as perdu reviendra sous une autre forme.", author: "Rumi" },
-  { text: "L'œil par lequel je vois Dieu est le même œil par lequel Dieu me voit.", author: "Maître Eckhart" },
-  { text: "Le silence est la langue de Dieu, tout le reste n'est que mauvaise traduction.", author: "Rumi" },
-  { text: "Ce n'est pas la longueur de la vie, mais sa profondeur.", author: "Ralph Waldo Emerson" },
-  { text: "Connais-toi toi-même.", author: "Temple de Delphes" },
-  { text: "La véritable générosité envers l'avenir consiste à tout donner au présent.", author: "Albert Camus" },
-  { text: "L'amour ne diminue jamais en se partageant.", author: "Proverbe soufi" },
-  { text: "Là où est ton trésor, là aussi sera ton cœur.", author: "Matthieu 6:21" },
-  { text: "Celui qui se connaît connaît son Seigneur.", author: "Hadith" },
-  { text: "La paix vient de l'intérieur. Ne la cherche pas à l'extérieur.", author: "Bouddha" },
-  { text: "L'âme qui voit la beauté peut parfois marcher seule.", author: "Goethe" },
-  { text: "Sois patient, car ce qui est destiné à toi te trouvera.", author: "Sagesse soufie" },
-  { text: "L'essentiel est invisible pour les yeux.", author: "Saint-Exupéry" },
-  { text: "Aime et fais ce que tu veux.", author: "Saint Augustin" },
-  { text: "La porte du changement ne peut s'ouvrir que de l'intérieur.", author: "Proverbe chinois" },
-  { text: "Ceux qui dansent sont vus comme fous par ceux qui n'entendent pas la musique.", author: "Nietzsche" },
-  { text: "Le cœur a ses raisons que la raison ne connaît point.", author: "Pascal" },
-  { text: "Meurs avant de mourir et découvre qu'il n'y a pas de mort.", author: "Rumi" },
-  { text: "La vie est un songe dont la mort nous réveille.", author: "Proverbe persan" },
-  { text: "Tu ne peux pas arrêter les vagues, mais tu peux apprendre à surfer.", author: "Jon Kabat-Zinn" },
-  { text: "Le voyage de mille lieues commence par un pas.", author: "Lao Tseu" },
-  { text: "Celui qui regarde à l'extérieur rêve. Celui qui regarde à l'intérieur s'éveille.", author: "Carl Jung" },
-  { text: "Il n'y a qu'un héroïsme au monde : voir le monde tel qu'il est et l'aimer.", author: "Romain Rolland" },
-  { text: "Le bonheur n'est pas quelque chose de prêt à l'emploi. Il vient de tes propres actions.", author: "Dalaï Lama" },
-  { text: "Toute l'humanité est une seule famille.", author: "Talmud" },
-  { text: "Dans la lumière de la connaissance, le cœur trouve la paix.", author: "Bhagavad Gita" },
-  { text: "Si tu n'as pas ce que tu aimes, aime ce que tu as.", author: "Proverbe arabe" },
-];
 
 interface Quote {
   text: string;
