@@ -114,16 +114,16 @@ export default function MirrorScreen() {
           <TouchableOpacity onPress={() => router.back()} hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}>
             <Ionicons name="chevron-down" size={28} color={theme.iconColor} />
           </TouchableOpacity>
-          <Text style={[styles.headerTitle, ds.text]}>IA Miroir</Text>
+          <Text style={[styles.headerTitle, ds.text]}>{t('mirror.title')}</Text>
           <View style={styles.placeholder} />
         </View>
 
         {/* Mode Selector */}
         <View style={styles.modeContainer}>
           {[
-            { id: 'reflect', icon: 'eye-outline', label: 'Reflet' },
-            { id: 'analyze', icon: 'document-text-outline', label: 'Analyse' },
-            { id: 'question', icon: 'help-circle-outline', label: 'Question' },
+            { id: 'reflect', icon: 'eye-outline', labelKey: 'reflect' },
+            { id: 'analyze', icon: 'document-text-outline', labelKey: 'analyze' },
+            { id: 'question', icon: 'help-circle-outline', labelKey: 'question' },
           ].map((m) => (
             <TouchableOpacity
               key={m.id}
@@ -144,7 +144,7 @@ export default function MirrorScreen() {
                   { color: mode === m.id ? '#fff' : theme.textMuted },
                 ]}
               >
-                {m.label}
+                {t(`mirror.modes.${m.labelKey}`)}
               </Text>
             </TouchableOpacity>
           ))}
@@ -162,11 +162,11 @@ export default function MirrorScreen() {
               <View style={[styles.mirrorIcon, { backgroundColor: `${theme.accentWarm}15` }]}>
                 <Ionicons name="eye" size={48} color={theme.accentWarm} />
               </View>
-              <Text style={[styles.emptyTitle, ds.text]}>Le Miroir t'attend</Text>
+              <Text style={[styles.emptyTitle, ds.text]}>{t('mirror.empty_title')}</Text>
               <Text style={[styles.emptySubtitle, ds.textSecondary]}>
-                {mode === 'reflect' && 'Confie ce qui traverse ton esprit. Je te le refléterai avec douceur.'}
-                {mode === 'analyze' && 'Écris librement. Je lirai ce que tes mots révèlent de toi.'}
-                {mode === 'question' && 'Partage ton état. Je te poserai LA question qui peut tout éclairer.'}
+                {mode === 'reflect' && t('mirror.empty_reflect')}
+                {mode === 'analyze' && t('mirror.empty_analyze')}
+                {mode === 'question' && t('mirror.empty_question')}
               </Text>
             </Animated.View>
           )}
