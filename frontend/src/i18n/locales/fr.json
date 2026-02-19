@@ -28,7 +28,42 @@
     "yesterday": "Hier",
     "days": "jours",
     "min": "min",
-    "breaths": "Respirations"
+    "breaths": "Respirations",
+    "language": "Langue"
+  },
+  "auth": {
+    "continue_apple": "Continuer avec Apple",
+    "continue_guest": "Continuer en invité"
+  },
+  "welcome": {
+    "greeting_morning": "L'aube se lève",
+    "greeting_afternoon": "Le soleil veille",
+    "greeting_evening": "Le crépuscule approche",
+    "greeting_night": "La nuit t'accueille",
+    "question_morning": "Comment traverse ton âme ce matin ?",
+    "question_afternoon": "Que porte ton cœur en ce moment ?",
+    "question_evening": "Quel murmure habite ton esprit ?",
+    "question_night": "Que confies-tu aux étoiles ce soir ?",
+    "your_energy": "Ton énergie",
+    "energy_question": "Où se situe ta vitalité en ce moment ?",
+    "exhausted": "Épuisé",
+    "full_energy": "Plein d'énergie",
+    "light_for_moment": "Une lumière pour ce moment",
+    "begin_journey": "Commencer le voyage"
+  },
+  "moods": {
+    "serein": "Serein",
+    "joyeux": "Joyeux",
+    "reveur": "Rêveur",
+    "melancolique": "Mélancolique",
+    "fatigue": "Fatigué",
+    "inspire": "Inspiré",
+    "anxieux": "Anxieux",
+    "nostalgique": "Nostalgique",
+    "perdu": "Perdu",
+    "reconnaissant": "Reconnaissant",
+    "contemplatif": "Contemplatif",
+    "eveille": "Éveillé"
   },
   "days_of_week": ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"],
   "months": ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"],
