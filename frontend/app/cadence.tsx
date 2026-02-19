@@ -152,44 +152,33 @@ export default function CadenceScreen() {
   const { language } = useLanguage();
   const [loading, setLoading] = useState(true);
   
-  // Local translations for rituals to ensure they update with language
-  const ritualTranslations: Record<string, Record<string, { title: string; desc: string }>> = {
-    fr: {
-      breath: { title: 'Trois respirations conscientes', desc: 'Inspire profondément par le nez, retiens un instant, expire lentement par la bouche. Répète trois fois.' },
-      question: { title: 'Question du jour', desc: 'De quoi as-tu besoin de te libérer ?' },
-      gratitude: { title: 'Un moment de gratitude', desc: 'Pense à une chose, même infime, pour laquelle tu ressens de la reconnaissance.' },
-      silence: { title: 'Une minute de silence', desc: 'Ferme les yeux. Écoute le silence entre les sons. Ne fais rien, sois juste présent.' },
-      intention: { title: 'Intention du jour', desc: 'Pose une intention pour aujourdhui. Quest-ce qui compte vraiment pour toi maintenant ?' },
-      bilan: { title: 'Bilan du soir', desc: 'Quest-ce qui sest bien passé ? Quaurais-tu pu faire différemment ? De quoi as-tu besoin demain ?' },
-      walk: { title: 'Marche consciente', desc: 'Marche lentement, en pleine conscience. Ressens chaque pas, écoute les sons autour de toi.' },
-      nature: { title: 'Sortie nature', desc: 'Sors quelques minutes. Respire lair frais, touche un arbre, regarde le ciel. Reconnecte-toi à la terre.' },
-      exercise: { title: 'Exercice énergisant', desc: 'Quelques mouvements dynamiques pour réveiller ton corps: sauts, squats, ou simplement secoue tes membres.' },
-      stretch: { title: 'Étirements doux', desc: 'Étire doucement ta nuque, tes épaules, ton dos. Relâche les tensions accumulées dans ton corps.' },
-    },
-    en: {
-      breath: { title: 'Three conscious breaths', desc: 'Breathe deeply through your nose (4s), hold (4s), exhale slowly through your mouth (6s). Repeat three times.' },
-      question: { title: 'Question of the moment', desc: 'How do you really feel right now? Listen to your body.' },
-      gratitude: { title: 'Three gratitudes', desc: 'Note three things, however small, for which you feel grateful.' },
-      silence: { title: 'One minute of silence', desc: 'Close your eyes. Listen to the silence between sounds. Do nothing but be present.' },
-      intention: { title: 'Daily intention', desc: 'Set an intention for today. What truly matters to you right now?' },
-      bilan: { title: 'Evening review', desc: 'What went well? What could you have done differently? What do you need tomorrow?' },
-      walk: { title: 'Conscious walk', desc: 'Walk slowly, mindfully. Feel each step, listen to the sounds around you, observe without judging.' },
-      nature: { title: 'Nature outing', desc: 'Step outside for a few minutes. Breathe fresh air, touch a tree, look at the sky. Reconnect with the earth.' },
-      exercise: { title: 'Energizing exercise', desc: 'A few dynamic movements to wake up your body: jumps, squats, or simply shake your limbs.' },
-      stretch: { title: 'Gentle stretches', desc: 'Gently stretch your neck, shoulders, back. Release the tensions accumulated in your body.' },
-    },
-  };
-  
-  const getRitualText = (ritualId: string, field: 'title' | 'desc'): string => {
-    const keyMap: Record<string, string> = {
-      'breath': 'breath', 'intention': 'intention', 'introspection': 'question',
-      'gratitude': 'gratitude', 'silence': 'silence', 'bilan': 'bilan',
-      'marche': 'walk', 'nature': 'nature', 'exercice': 'exercise', 'etirement': 'stretch',
-    };
-    const key = keyMap[ritualId] || ritualId;
-    // Use i18n.language directly for most current value
-    const lang = i18n.language || language || 'fr';
-    return ritualTranslations[lang]?.[key]?.[field] || '';
+  // Rituels en français uniquement - enrichis et intelligents
+  const RITUELS = {
+    matin: [
+      { id: 'reveil', type: 'intention', icon: 'sunny-outline', color: '#D4A574', title: 'Réveil en conscience', desc: 'Avant de te lever, prends 30 secondes pour ressentir ton corps. Étire-toi doucement comme un chat.', duration: '1 min' },
+      { id: 'intention', type: 'intention', icon: 'compass-outline', color: '#8B9A7D', title: 'Intention du jour', desc: 'Pose une intention claire pour ta journée. Pas un objectif, mais une manière d\'être.', duration: '2 min', requiresInput: true, inputPlaceholder: 'Aujourd\'hui, je choisis de...' },
+      { id: 'breath', type: 'respiration', icon: 'leaf-outline', color: '#A8D4A8', title: 'Souffle vital', desc: 'Inspire 4 secondes par le nez, retiens 4 secondes, expire 6 secondes par la bouche. Répète 5 fois.', duration: '2 min' },
+      { id: 'hydratation', type: 'meditation', icon: 'water-outline', color: '#7DADD4', title: 'Premier verre d\'eau', desc: 'Bois un grand verre d\'eau tiède en conscience. Visualise cette eau qui réveille chaque cellule.', duration: '1 min' },
+      { id: 'mouvement', type: 'exercice', icon: 'body-outline', color: '#D49A7C', title: 'Éveil du corps', desc: 'Quelques rotations douces : cou, épaules, hanches. Réveille ton corps sans le brusquer.', duration: '3 min' },
+      { id: 'gratitude_matin', type: 'gratitude', icon: 'heart-outline', color: '#C47C7C', title: 'Gratitude matinale', desc: 'Nomme une chose simple pour laquelle tu es reconnaissant ce matin.', duration: '1 min', requiresInput: true, inputPlaceholder: 'Ce matin, je suis reconnaissant pour...' },
+    ],
+    'apres-midi': [
+      { id: 'pause', type: 'silence', icon: 'pause-outline', color: '#A8B4C4', title: 'Pause sacrée', desc: 'Arrête tout. Ferme les yeux. 3 respirations profondes. C\'est ta pause à toi.', duration: '2 min' },
+      { id: 'scan', type: 'introspection', icon: 'body-outline', color: '#9A7CD4', title: 'Scan corporel rapide', desc: 'Parcours mentalement ton corps de la tête aux pieds. Où sont les tensions ? Relâche-les.', duration: '3 min' },
+      { id: 'marche', type: 'marche', icon: 'walk-outline', color: '#7DB38B', title: 'Marche consciente', desc: 'Marche quelques minutes en sentant chaque pas. Pieds nus si possible.', duration: '5 min' },
+      { id: 'nature', type: 'nature', icon: 'leaf-outline', color: '#5D8A66', title: 'Connexion nature', desc: 'Touche une plante, regarde le ciel, écoute les oiseaux. Reconnecte-toi au vivant.', duration: '3 min' },
+      { id: 'introspection', type: 'introspection', icon: 'eye-outline', color: '#A8B4C4', title: 'Check-in émotionnel', desc: 'Comment te sens-tu vraiment, là maintenant ? Pas de jugement, juste observer.', duration: '2 min', requiresInput: true, inputPlaceholder: 'En ce moment, je ressens...' },
+      { id: 'creativite', type: 'ecriture', icon: 'color-palette-outline', color: '#D4A8D4', title: 'Minute créative', desc: 'Dessine un gribouillis, écris un mot, chante une note. Exprime quelque chose sans réfléchir.', duration: '2 min' },
+    ],
+    soir: [
+      { id: 'transition', type: 'silence', icon: 'moon-outline', color: '#D4A8D4', title: 'Transition douce', desc: 'Éteins les écrans. Allume une bougie ou tamise les lumières. C\'est l\'heure de ralentir.', duration: '2 min' },
+      { id: 'detox', type: 'meditation', icon: 'phone-portrait-outline', color: '#7D7D8B', title: 'Détox digitale', desc: 'Pose ton téléphone loin de toi. Tu n\'en as plus besoin ce soir.', duration: '1 min' },
+      { id: 'bilan', type: 'bilan', icon: 'journal-outline', color: '#A8C4D4', title: 'Bilan du jour', desc: '3 choses bien : qu\'est-ce qui s\'est bien passé ? 1 apprentissage : qu\'as-tu appris ?', duration: '5 min', requiresInput: true, inputPlaceholder: 'Aujourd\'hui, j\'ai appris que...' },
+      { id: 'pardon', type: 'gratitude', icon: 'heart-half-outline', color: '#C4A87C', title: 'Pardon du soir', desc: 'Pardonne-toi pour ce que tu n\'as pas fait ou mal fait. Demain est un nouveau jour.', duration: '2 min' },
+      { id: 'gratitude_soir', type: 'gratitude', icon: 'heart-outline', color: '#9AAD8B', title: 'Gratitudes du jour', desc: 'Note 3 moments de ta journée pour lesquels tu ressens de la gratitude.', duration: '3 min', requiresInput: true, inputPlaceholder: '1. ...\n2. ...\n3. ...' },
+      { id: 'silence_soir', type: 'silence', icon: 'volume-mute-outline', color: '#B8A090', title: 'Minute de silence', desc: 'Ferme les yeux. Écoute le silence. Laisse tes pensées passer comme des nuages.', duration: '2 min' },
+      { id: 'visualisation', type: 'meditation', icon: 'sparkles-outline', color: '#C4B4D4', title: 'Visualisation demain', desc: 'Imagine ta journée de demain se dérouler parfaitement. Comment te sens-tu ?', duration: '3 min' },
+    ],
   };
   const [cadenceData, setCadenceData] = useState<CadenceData | null>(null);
   const [completedRituals, setCompletedRituals] = useState<string[]>([]);
