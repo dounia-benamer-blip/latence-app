@@ -651,7 +651,7 @@ export default function HomeScreen() {
             </Text>
             
             <Text style={[styles.premiumFeatures, dynamicStyles.textMuted]}>
-              Accède à l'IA Miroir, l'Oracle des Rêves, l'Astrologie complète et bien plus.
+              {t('premium_modal.features')}
             </Text>
             
             <TouchableOpacity
@@ -663,14 +663,14 @@ export default function HomeScreen() {
               activeOpacity={0.8}
             >
               <Ionicons name="diamond" size={18} color="#fff" />
-              <Text style={styles.premiumButtonText}>Découvrir Premium</Text>
+              <Text style={styles.premiumButtonText}>{t('premium_modal.button')}</Text>
             </TouchableOpacity>
             
             <TouchableOpacity
               style={styles.premiumCloseButton}
               onPress={() => setShowPremiumPopup(false)}
             >
-              <Text style={[styles.premiumCloseText, dynamicStyles.textMuted]}>Plus tard</Text>
+              <Text style={[styles.premiumCloseText, dynamicStyles.textMuted]}>{t('premium_modal.later')}</Text>
             </TouchableOpacity>
           </Animated.View>
         </View>
