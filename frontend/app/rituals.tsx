@@ -155,6 +155,7 @@ const AnimatedMoon = ({ phase, size = 100 }: { phase: string; size?: number }) =
 export default function RitualsScreen() {
   const router = useRouter();
   const { theme } = useTheme();
+  const { t, i18n } = useTranslation();
   const [currentPhase, setCurrentPhase] = useState(getMoonPhase());
   const [phaseData, setPhaseData] = useState<PhaseData | null>(null);
   const [generatedRitual, setGeneratedRitual] = useState<GeneratedRitual | null>(null);
@@ -163,6 +164,32 @@ export default function RitualsScreen() {
   const [loadingRitual, setLoadingRitual] = useState(false);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [showRitual, setShowRitual] = useState(false);
+
+  // Moon phases for UI (using translation keys)
+  const MOON_PHASES_DATA = [
+    { key: 'new', icon: '🌑' },
+    { key: 'waxing_crescent', icon: '🌒' },
+    { key: 'first_quarter', icon: '🌓' },
+    { key: 'waxing_gibbous', icon: '🌔' },
+    { key: 'full', icon: '🌕' },
+    { key: 'waning_gibbous', icon: '🌖' },
+    { key: 'last_quarter', icon: '🌗' },
+    { key: 'waning_crescent', icon: '🌘' },
+  ];
+
+  const getMoonPhaseKey = (phaseName: string): string => {
+    const mapping: Record<string, string> = {
+      'Nouvelle Lune': 'new',
+      'Premier Croissant': 'waxing_crescent',
+      'Premier Quartier': 'first_quarter',
+      'Gibbeuse Croissante': 'waxing_gibbous',
+      'Pleine Lune': 'full',
+      'Gibbeuse Décroissante': 'waning_gibbous',
+      'Dernier Quartier': 'last_quarter',
+      'Dernier Croissant': 'waning_crescent',
+    };
+    return mapping[phaseName] || 'full';
+  };
 
   const ds = {
     container: { backgroundColor: theme.background },
