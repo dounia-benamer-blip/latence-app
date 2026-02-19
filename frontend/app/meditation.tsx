@@ -35,6 +35,7 @@ const BREATHING_PATTERNS = {
 export default function MeditationScreen() {
   const router = useRouter();
   const { theme, isDark } = useTheme();
+  const { t } = useTranslation();
   const [isActive, setIsActive] = useState(false);
   const [currentPhase, setCurrentPhase] = useState<'inhale' | 'hold' | 'exhale' | 'holdOut'>('inhale');
   const [pattern, setPattern] = useState<keyof typeof BREATHING_PATTERNS>('calm');
