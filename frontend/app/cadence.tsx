@@ -522,7 +522,7 @@ export default function CadenceScreen() {
                 <Text style={[styles.gratitudeNumber, { color: theme.accentWarm }]}>{idx + 1}.</Text>
                 <TextInput
                   style={[styles.gratitudeInput, ds.text, { backgroundColor: theme.background, borderColor: theme.border }]}
-                  placeholder={`Gratitude ${idx + 1}...`}
+                  placeholder={`${t('cadence.rituals.gratitude_placeholder')} ${idx + 1}...`}
                   placeholderTextColor={theme.textMuted}
                   value={gratitudes[idx]}
                   onChangeText={(text) => handleGratitudeChange(idx, text)}
@@ -531,10 +531,10 @@ export default function CadenceScreen() {
             ))}
             <View style={styles.modalButtons}>
               <TouchableOpacity style={[styles.modalCancelBtn, { borderColor: theme.border }]} onPress={() => setShowGratitude(false)}>
-                <Text style={[styles.modalCancelText, ds.textMuted]}>Annuler</Text>
+                <Text style={[styles.modalCancelText, ds.textMuted]}>{t('common.cancel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.modalSaveBtn, { backgroundColor: theme.accentWarm }]} onPress={saveGratitudes}>
-                <Text style={styles.modalSaveText}>Enregistrer</Text>
+                <Text style={styles.modalSaveText}>{t('common.save')}</Text>
               </TouchableOpacity>
             </View>
           </Animated.View>
@@ -543,11 +543,11 @@ export default function CadenceScreen() {
         {/* Intention Modal */}
         {showIntention && (
           <Animated.View entering={FadeIn.duration(300)} style={[styles.inputModal, ds.card]}>
-            <Text style={[styles.inputModalTitle, ds.text]}>Ton intention du jour</Text>
-            <Text style={[styles.inputModalSubtitle, ds.textMuted]}>Qu'est-ce qui compte vraiment pour toi aujourd'hui ?</Text>
+            <Text style={[styles.inputModalTitle, ds.text]}>{t('cadence.intention_modal_title')}</Text>
+            <Text style={[styles.inputModalSubtitle, ds.textMuted]}>{t('cadence.intention_modal_subtitle')}</Text>
             <TextInput
               style={[styles.intentionInput, ds.text, { backgroundColor: theme.background, borderColor: theme.border }]}
-              placeholder="Aujourd'hui, je choisis de..."
+              placeholder={t('cadence.rituals.intention_placeholder')}
               placeholderTextColor={theme.textMuted}
               value={intention}
               onChangeText={setIntention}
@@ -555,10 +555,10 @@ export default function CadenceScreen() {
             />
             <View style={styles.modalButtons}>
               <TouchableOpacity style={[styles.modalCancelBtn, { borderColor: theme.border }]} onPress={() => setShowIntention(false)}>
-                <Text style={[styles.modalCancelText, ds.textMuted]}>Annuler</Text>
+                <Text style={[styles.modalCancelText, ds.textMuted]}>{t('common.cancel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.modalSaveBtn, { backgroundColor: theme.accentWarm }]} onPress={saveIntention}>
-                <Text style={styles.modalSaveText}>Poser l'intention</Text>
+                <Text style={styles.modalSaveText}>{t('cadence.set_intention')}</Text>
               </TouchableOpacity>
             </View>
           </Animated.View>
@@ -568,7 +568,7 @@ export default function CadenceScreen() {
         {timeOfDay === 'soir' && cadenceData?.eveningReflection && !allCompleted && (
           <Animated.View entering={FadeInUp.duration(600).delay(800)} style={[styles.reflectionCard, ds.card]}>
             <Ionicons name="moon-outline" size={20} color={theme.accentWarm} />
-            <Text style={[styles.reflectionTitle, ds.text]}>Pensée du soir</Text>
+            <Text style={[styles.reflectionTitle, ds.text]}>{t('cadence.evening_thought')}</Text>
             <Text style={[styles.reflectionText, ds.textSecondary]}>{cadenceData.eveningReflection}</Text>
           </Animated.View>
         )}
@@ -578,10 +578,10 @@ export default function CadenceScreen() {
           <Animated.View entering={FadeIn.duration(600)} style={[styles.completionCard, { backgroundColor: `${theme.accentWarm}15` }]}>
             <Text style={styles.completionEmoji}>✨</Text>
             <Text style={[styles.completionTitle, { color: theme.accentWarm }]}>
-              Cadence honorée
+              {t('cadence.cadence_honored')}
             </Text>
             <Text style={[styles.completionText, ds.textSecondary]}>
-              Tu as pris soin de toi aujourd'hui. {streak > 0 && `${streak + 1} jours de suite !`}
+              {t('cadence.cadence_honored_sub')} {streak > 0 && t('cadence.days_streak', { count: streak + 1 })}
             </Text>
           </Animated.View>
         )}
