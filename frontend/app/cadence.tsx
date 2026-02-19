@@ -524,12 +524,47 @@ export default function CadenceScreen() {
                 <View style={styles.ritualContent}>
                   <View style={styles.ritualHeader}>
                     <Text style={[styles.ritualTitle, ds.text, isCompleted && styles.textCompleted]}>
-                      {t(`cadence.rituals.${ritual.id}_title`, ritual.title)}
+                      {(() => {
+                        // Map ritual IDs to translation keys
+                        const keyMap: Record<string, string> = {
+                          'breath': 'breath',
+                          'intention': 'intention',
+                          'introspection': 'question',
+                          'gratitude': 'gratitude',
+                          'silence': 'silence',
+                          'bilan': 'bilan',
+                          'marche': 'walk',
+                          'nature': 'nature',
+                          'exercice': 'exercise',
+                          'etirement': 'stretch',
+                        };
+                        const key = keyMap[ritual.id] || ritual.id;
+                        return t(`cadence.rituals.${key}_title`, ritual.title);
+                      })()}
                     </Text>
                     <Text style={[styles.ritualDuration, { color: typeInfo.color }]}>{ritual.duration}</Text>
                   </View>
                   <Text style={[styles.ritualDescription, ds.textSecondary, isCompleted && styles.textCompleted]}>
-                    {t(`cadence.rituals.${ritual.id}_desc`, ritual.description)}
+                    {(() => {
+                      const keyMap: Record<string, string> = {
+                        'breath': 'breath',
+                        'intention': 'intention',
+                        'introspection': timeOfDay === 'matin' ? 'introspection_morning' : timeOfDay === 'apres-midi' ? 'introspection_afternoon' : 'introspection_evening',
+                        'gratitude': 'gratitude',
+                        'silence': 'silence',
+                        'bilan': 'bilan',
+                        'marche': 'walk',
+                        'nature': 'nature',
+                        'exercice': 'exercise',
+                        'etirement': 'stretch',
+                      };
+                      const key = keyMap[ritual.id] || ritual.id;
+                      // For introspection, use the full key (no _desc suffix)
+                      if (ritual.id === 'introspection') {
+                        return t(`cadence.rituals.${key}`, ritual.description);
+                      }
+                      return t(`cadence.rituals.${key}_desc`, ritual.description);
+                    })()}
                   </Text>
                   
                   {/* Expanded input for bilan type */}
