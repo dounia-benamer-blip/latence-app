@@ -504,5 +504,40 @@
     "dream-oracle": "Dream Oracle",
     "meditation": "Meditation",
     "rituals": "Lunar Rituals"
+  },
+  "soul_report": {
+    "title": "Soul Report",
+    "summary": "Summary",
+    "emotional_journey": "Emotional journey",
+    "mood_distribution": "Mood distribution",
+    "themes": "Dominant themes",
+    "dream_insights": "Dream insights",
+    "growth_areas": "Growth areas",
+    "focus": "Recommended focus",
+    "affirmation": "Affirmation",
+    "generate": "Generate new report",
+    "generate_first": "Generate my first report",
+    "history": "Previous reports",
+    "empty_title": "Your first report awaits",
+    "empty_subtitle": "Generate a soul report to discover the trends of your inner world this week."
+  },
+  "dream_dictionary": {
+    "title": "Dream Dictionary",
+    "search_placeholder": "Search a symbol...",
+    "subtitle": "{{count}} symbols in your dictionary",
+    "empty_title": "Your dictionary is empty",
+    "empty_subtitle": "Add recurring symbols from your dreams and their personal meaning.",
+    "add_first": "Add a symbol",
+    "add_symbol": "New symbol",
+    "symbol_name": "Symbol name",
+    "symbol_placeholder": "e.g.: water, moon, house...",
+    "meaning_label": "Your personal meaning",
+    "meaning_placeholder": "What does this symbol represent for you?",
+    "your_meaning": "Your meaning",
+    "universal_meaning": "Universal meaning",
+    "ai_insight": "AI insight",
+    "occurrences": "Occurrences",
+    "last_seen": "Last seen",
+    "emotions": "Associated emotions"
   }
 }
