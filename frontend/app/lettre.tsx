@@ -133,21 +133,21 @@ export default function LettreScreen() {
     <Animated.View entering={FadeIn.duration(400)}>
       <FloatingEnvelope size={60} />
 
-      <Text style={[styles.title, ds.text]}>Lettre à Moi-Même</Text>
+      <Text style={[styles.title, ds.text]}>{t('letter.title')}</Text>
       <Text style={[styles.subtitle, ds.textSecondary]}>
-        Écris une lettre à ton futur toi. Elle sera livrée à la date que tu choisis.
+        {t('letter.intro')}
       </Text>
 
       <View style={[styles.promptCard, ds.card]}>
         <Ionicons name="bulb-outline" size={18} color={theme.accentWarm} />
         <Text style={[styles.promptText, ds.textMuted]}>
-          Que voudrais-tu te rappeler ? Quels rêves portes-tu ? Comment te sens-tu en ce moment ?
+          {t('letter.prompts')}
         </Text>
       </View>
 
       <TextInput
         style={[styles.letterInput, ds.card, ds.text]}
-        placeholder="Cher moi du futur..."
+        placeholder={t('letter.placeholder')}
         placeholderTextColor={theme.textMuted}
         value={content}
         onChangeText={setContent}
@@ -160,31 +160,31 @@ export default function LettreScreen() {
         onPress={() => setStep('schedule')}
         disabled={!content.trim()}
       >
-        <Text style={styles.nextButtonText}>Choisir la date de livraison</Text>
+        <Text style={styles.nextButtonText}>{t('letter.choose_date')}</Text>
       </TouchableOpacity>
     </Animated.View>
   );
 
   const renderSchedule = () => (
     <Animated.View entering={FadeIn.duration(400)}>
-      <Text style={[styles.title, ds.text]}>Quand veux-tu la recevoir ?</Text>
+      <Text style={[styles.title, ds.text]}>{t('letter.choose_date')}</Text>
       <Text style={[styles.subtitle, ds.textSecondary]}>
-        Choisis le moment où cette lettre te sera délivrée.
+        {t('letter.choose_date_sub')}
       </Text>
 
       <View style={styles.optionsGrid}>
-        {DELIVERY_OPTIONS.map((opt, i) => (
-          <Animated.View key={opt.months} entering={FadeInUp.duration(300).delay(i * 60)}>
+        {DELIVERY_KEYS.map((key, i) => (
+          <Animated.View key={key} entering={FadeInUp.duration(300).delay(i * 60)}>
             <TouchableOpacity
               style={[
                 styles.optionCard,
                 ds.card,
-                deliveryMonths === opt.months && { borderColor: theme.accentWarm, borderWidth: 2 },
+                deliveryMonths === DELIVERY_MONTHS[i] && { borderColor: theme.accentWarm, borderWidth: 2 },
               ]}
-              onPress={() => setDeliveryMonths(opt.months)}
+              onPress={() => setDeliveryMonths(DELIVERY_MONTHS[i])}
             >
-              <Text style={[styles.optionLabel, ds.text]}>{opt.label}</Text>
-              <Text style={[styles.optionDescription, ds.textMuted]}>{opt.description}</Text>
+              <Text style={[styles.optionLabel, ds.text]}>{t(`letter.delivery_options.${key}`)}</Text>
+              <Text style={[styles.optionDescription, ds.textMuted]}>{t(`letter.delivery_options.${key}_desc`)}</Text>
             </TouchableOpacity>
           </Animated.View>
         ))}
@@ -193,7 +193,7 @@ export default function LettreScreen() {
       {deliveryMonths && (
         <Animated.View entering={FadeIn.duration(300)} style={[styles.datePreview, ds.card]}>
           <Ionicons name="calendar-outline" size={18} color={theme.accentWarm} />
-          <Text style={[styles.dateText, ds.text]}>Livraison le {getDeliveryDate()}</Text>
+          <Text style={[styles.dateText, ds.text]}>{t('letter.delivery_on', { date: getDeliveryDate() })}</Text>
         </Animated.View>
       )}
 
@@ -207,13 +207,13 @@ export default function LettreScreen() {
         ) : (
           <>
             <Ionicons name="paper-plane" size={18} color="#fff" />
-            <Text style={styles.sendButtonText}>Envoyer vers le futur</Text>
+            <Text style={styles.sendButtonText}>{t('letter.send')}</Text>
           </>
         )}
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.backLink} onPress={() => setStep('write')}>
-        <Text style={[styles.backLinkText, ds.textMuted]}>Modifier la lettre</Text>
+        <Text style={[styles.backLinkText, ds.textMuted]}>{t('letter.edit')}</Text>
       </TouchableOpacity>
     </Animated.View>
   );
@@ -223,21 +223,21 @@ export default function LettreScreen() {
       <View style={[styles.sentIconContainer, { backgroundColor: `${theme.accentWarm}20` }]}>
         <Text style={styles.sentEmoji}>💌</Text>
       </View>
-      <Text style={[styles.sentTitle, ds.text]}>Lettre envoyée</Text>
+      <Text style={[styles.sentTitle, ds.text]}>{t('letter.sent_title')}</Text>
       <Text style={[styles.sentSubtitle, ds.textSecondary]}>
-        Ta lettre voyagera dans le temps{'\n'}et te sera livrée le {getDeliveryDate()}.
+        {t('letter.sent_message', { date: getDeliveryDate() })}
       </Text>
       <View style={[styles.sentNote, ds.card]}>
         <Ionicons name="time-outline" size={16} color={theme.textMuted} />
         <Text style={[styles.sentNoteText, ds.textMuted]}>
-          Tu recevras une notification le jour de la livraison.
+          {t('letter.notification_note')}
         </Text>
       </View>
       <TouchableOpacity
         style={[styles.doneButton, { backgroundColor: theme.accent }]}
         onPress={() => router.replace('/home')}
       >
-        <Text style={styles.doneButtonText}>Retour</Text>
+        <Text style={styles.doneButtonText}>{t('letter.return')}</Text>
       </TouchableOpacity>
     </Animated.View>
   );
