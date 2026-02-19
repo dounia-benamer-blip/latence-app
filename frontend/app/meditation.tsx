@@ -148,10 +148,10 @@ export default function MeditationScreen() {
 
   const getPhaseText = () => {
     switch (currentPhase) {
-      case 'inhale': return 'Inspire...';
-      case 'hold': return 'Retiens...';
-      case 'exhale': return 'Expire...';
-      case 'holdOut': return 'Pause...';
+      case 'inhale': return t('meditation.inhale');
+      case 'hold': return t('meditation.hold');
+      case 'exhale': return t('meditation.exhale');
+      case 'holdOut': return t('meditation.hold_out');
     }
   };
 
