@@ -42,6 +42,12 @@ const RITUAL_TYPES: Record<string, { icon: string; color: string; label: string 
   nature: { icon: 'leaf-outline', color: '#5D8A66', label: 'Nature' },
   exercice: { icon: 'fitness-outline', color: '#D49A7C', label: 'Exercice' },
   etirement: { icon: 'body-outline', color: '#9A7CD4', label: 'Étirement' },
+  ancrage: { icon: 'earth-outline', color: '#8B7355', label: 'Ancrage' },
+  sonore: { icon: 'musical-notes-outline', color: '#7C9AC4', label: 'Sonore' },
+  energie: { icon: 'flash-outline', color: '#E8B839', label: 'Énergie' },
+  liberation: { icon: 'water-outline', color: '#6BA3BE', label: 'Libération' },
+  affirmation: { icon: 'sparkles-outline', color: '#D4A574', label: 'Affirmation' },
+  sensoriel: { icon: 'hand-left-outline', color: '#C49A9A', label: 'Sensoriel' },
 };
 
 interface DailyRitual {
