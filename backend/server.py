@@ -3133,6 +3133,42 @@ async def delete_dream_symbol(symbol_id: str):
 
 app.include_router(api_router)
 
+# ==================== VOICE TRANSCRIPTION ====================
+from fastapi import File, UploadFile
+from emergentintegrations.llm.openai import OpenAISpeechToText
+import tempfile
+
+@api_router.post("/voice/transcribe")
+async def transcribe_voice(audio: UploadFile = File(...)):
+    """Transcribe audio to text using OpenAI Whisper"""
+    try:
+        # Save uploaded file temporarily
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".webm") as tmp:
+            content = await audio.read()
+            tmp.write(content)
+            tmp_path = tmp.name
+        
+        # Initialize STT
+        stt = OpenAISpeechToText(api_key=EMERGENT_LLM_KEY)
+        
+        # Transcribe
+        with open(tmp_path, "rb") as audio_file:
+            response = await stt.transcribe(
+                file=audio_file,
+                model="whisper-1",
+                response_format="json",
+                language="fr"
+            )
+        
+        # Cleanup temp file
+        import os as os_module
+        os_module.unlink(tmp_path)
+        
+        return {"text": response.text, "success": True}
+    except Exception as e:
+        logging.error(f"Transcription error: {e}")
+        return {"text": "", "success": False, "error": str(e)}
+
 # Mount static files for fonts
 app.mount("/api/static", StaticFiles(directory=str(ROOT_DIR / "static")), name="static")
 
