@@ -498,13 +498,13 @@ export default function HomeScreen() {
                     <Ionicons name={item.icon as any} size={24} color={isLocked ? theme.textMuted : theme.iconColor} />
                   </View>
                   <View style={styles.menuText}>
-                    <Text style={[styles.menuTitle, dynamicStyles.text, isLocked && { color: theme.textMuted }]}>{item.title}</Text>
-                    <Text style={[styles.menuSubtitle, dynamicStyles.textMuted]}>{item.subtitle}</Text>
+                    <Text style={[styles.menuTitle, dynamicStyles.text, isLocked && { color: theme.textMuted }]}>{t(item.titleKey)}</Text>
+                    <Text style={[styles.menuSubtitle, dynamicStyles.textMuted]}>{t(item.subtitleKey)}</Text>
                   </View>
                   {isLocked ? (
                     <View style={[styles.lockBadge, { backgroundColor: '#9B59B620' }]}>
                       <Ionicons name="lock-closed" size={14} color="#9B59B6" />
-                      <Text style={styles.lockBadgeText}>Premium</Text>
+                      <Text style={styles.lockBadgeText}>{t('common.premium')}</Text>
                     </View>
                   ) : (
                     <Ionicons name="chevron-forward" size={20} color={theme.textMuted} />
@@ -526,8 +526,8 @@ export default function HomeScreen() {
                 <Ionicons name="book-outline" size={20} color={theme.accentWarm} />
               </View>
               <View style={styles.booksHeader}>
-                <Text style={[styles.booksTitle, dynamicStyles.text]}>Lectures suggérées</Text>
-                <Text style={[styles.booksSubtitle, dynamicStyles.textMuted]}>Pour prolonger ce moment</Text>
+                <Text style={[styles.booksTitle, dynamicStyles.text]}>{t('home.books_title', 'Lectures suggérées')}</Text>
+                <Text style={[styles.booksSubtitle, dynamicStyles.textMuted]}>{t('home.books_subtitle', 'Pour prolonger ce moment')}</Text>
               </View>
               <Ionicons name="chevron-forward" size={20} color={theme.textMuted} />
             </TouchableOpacity>
@@ -544,7 +544,7 @@ export default function HomeScreen() {
       >
         <SafeAreaView style={[styles.modalContainer, dynamicStyles.modalBg]}>
           <View style={[styles.modalHeader, { borderBottomColor: theme.border }]}>
-            <Text style={[styles.modalTitle, dynamicStyles.text]}>Dialogue intérieur</Text>
+            <Text style={[styles.modalTitle, dynamicStyles.text]}>{t('home.inner_dialogue')}</Text>
             <TouchableOpacity onPress={() => setShowCompanion(false)}>
               <Ionicons name="close" size={28} color={theme.iconColor} />
             </TouchableOpacity>
@@ -554,7 +554,7 @@ export default function HomeScreen() {
             <View style={styles.companionIntro}>
               <Ionicons name="moon-outline" size={48} color={theme.accentWarm} style={{ marginBottom: 16 }} />
               <Text style={[styles.companionIntroText, dynamicStyles.textSecondary]}>
-                Un espace pour explorer tes pensées et émotions à travers un dialogue poétique et bienveillant.
+                {t('home.companion_intro', 'Un espace pour explorer tes pensées et émotions à travers un dialogue poétique et bienveillant.')}
               </Text>
             </View>
 
