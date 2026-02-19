@@ -499,6 +499,54 @@ export default function DreamOracleScreen() {
           </ScrollView>
         </Animated.View>
       </ScrollView>
+
+      {/* Premium Upgrade Modal */}
+      <Modal
+        visible={showPremiumModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowPremiumModal(false)}
+      >
+        <View style={styles.premiumOverlay}>
+          <Animated.View entering={FadeIn.duration(300)} style={[styles.premiumPopup, ds.card]}>
+            <View style={styles.premiumIconContainer}>
+              <Ionicons name="diamond" size={40} color="#9B59B6" />
+            </View>
+            
+            <Text style={[styles.premiumTitle, ds.text]}>
+              Oracle des Rêves
+            </Text>
+            
+            <Text style={[styles.premiumDescription, ds.textSecondary]}>
+              L'Oracle des Rêves fait partie de l'offre Premium. Découvre les messages cachés de ton inconscient.
+            </Text>
+            
+            <Text style={[styles.premiumFeatures, ds.textMuted]}>
+              Analyse des patterns • Symboles révélés • Guidance personnalisée
+            </Text>
+            
+            <TouchableOpacity
+              style={styles.premiumButton}
+              onPress={() => {
+                setShowPremiumModal(false);
+                router.push('/subscription');
+              }}
+              activeOpacity={0.8}
+              data-testid="upgrade-premium-btn"
+            >
+              <Ionicons name="diamond" size={18} color="#fff" />
+              <Text style={styles.premiumButtonText}>Découvrir Premium</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              style={styles.premiumCloseButton}
+              onPress={() => setShowPremiumModal(false)}
+            >
+              <Text style={[styles.premiumCloseText, ds.textMuted]}>Plus tard</Text>
+            </TouchableOpacity>
+          </Animated.View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
