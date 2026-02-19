@@ -141,6 +141,7 @@ SUBSCRIPTION_TIERS = {
             "journal_entries": -1,
             "dreams": -1,
             "mirror_queries": -1,
+            "astrology": True,
             "oracle": True,
             "advanced_analysis": True,
             "statistics": True,
@@ -149,6 +150,9 @@ SUBSCRIPTION_TIERS = {
             "unlimited_archive": True,
             "seal_permanent": True,
             "health_sync": True,
+            "cadence": True,
+            "sagesse": True,
+            "lettre": True,
         }
     }
 }
