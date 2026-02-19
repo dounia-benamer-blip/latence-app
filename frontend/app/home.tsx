@@ -350,7 +350,12 @@ export default function HomeScreen() {
   };
 
   const moonPhase = getMoonPhase();
-  const today = formatToday(t);
+  
+  // Dynamically format today's date based on current language
+  const { i18n } = useTranslation();
+  const today = React.useMemo(() => {
+    return formatToday(t);
+  }, [t, i18n.language]);
 
   // Dynamic styles based on theme
   const dynamicStyles = {
