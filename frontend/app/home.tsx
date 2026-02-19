@@ -22,11 +22,12 @@ import AuraAvatar, { AURA_DATABASE } from './components/AuraAvatar';
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
 // Features that require Premium subscription
-const PREMIUM_FEATURES = ['mirror', 'astro', 'dreams'];  // dreams includes Oracle
+// Note: 'dreams' module allows WRITING for Essentiel users, but Oracle is Premium-only
+const PREMIUM_FEATURES = ['mirror', 'astro', 'dream-oracle'];
 const PREMIUM_FEATURE_NAMES: Record<string, string> = {
   mirror: 'IA Miroir',
   astro: 'Astrologie & Cosmos',
-  dreams: 'Oracle des Rêves',
+  'dream-oracle': 'Oracle des Rêves',
 };
 
 function formatToday(): string {
