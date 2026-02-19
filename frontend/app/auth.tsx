@@ -74,8 +74,38 @@ export default function AuthScreen() {
     }
   };
 
-  const handleGoogleLogin = () => {
-    loginWithGoogle();
+  const handleGoogleLogin = async () => {
+    setError('');
+    setIsLoading(true);
+    try {
+      const result = await loginWithGoogle();
+      if (result.success) {
+        router.replace('/home');
+      } else if (result.error) {
+        setError(result.error);
+      }
+    } catch (err) {
+      setError('Erreur de connexion Google');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAppleLogin = async () => {
+    setError('');
+    setIsLoading(true);
+    try {
+      const result = await loginWithApple();
+      if (result.success) {
+        router.replace('/home');
+      } else if (result.error) {
+        setError(result.error);
+      }
+    } catch (err) {
+      setError('Erreur de connexion Apple');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
