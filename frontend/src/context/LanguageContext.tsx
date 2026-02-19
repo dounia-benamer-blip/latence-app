@@ -29,7 +29,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const loadSavedLanguage = async () => {
     try {
       const saved = await AsyncStorage.getItem('app_language');
-      if (saved && ['fr', 'en', 'es'].includes(saved)) {
+      if (saved && ['fr', 'en'].includes(saved)) {
         setLanguageState(saved as Language);
         i18n.changeLanguage(saved);
       }
