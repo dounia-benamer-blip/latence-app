@@ -11,7 +11,15 @@
     "or": "ou",
     "premium": "Premium",
     "free": "Gratuit",
-    "close": "Fermer"
+    "close": "Fermer",
+    "share": "Partager",
+    "new": "Nouveau",
+    "refresh": "Actualiser",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "complete": "Terminé",
+    "start": "Commencer",
+    "stop": "Arrêter"
   },
   "home": {
     "greeting_morning": "Bonjour",
@@ -31,7 +39,10 @@
     "capsules": "capsules",
     "dreams": "rêves",
     "stats_capsules": "capsules",
-    "stats_dreams": "rêves"
+    "stats_dreams": "rêves",
+    "books_title": "Lectures suggérées",
+    "books_subtitle": "Pour prolonger ce moment",
+    "companion_intro": "Un espace pour explorer tes pensées et émotions à travers un dialogue poétique et bienveillant."
   },
   "menu": {
     "cadence": "Cadence",
@@ -110,6 +121,49 @@
     "button": "Découvrir Premium",
     "later": "Plus tard"
   },
+  "wisdom": {
+    "title": "Sagesse",
+    "subtitle": "Citations sacrées universelles",
+    "new_quote": "Nouvelle citation",
+    "save": "Sauvegarder",
+    "share": "Partager",
+    "saved": "Sauvegardée",
+    "quotes": [
+      {"text": "Ce que tu cherches te cherche aussi.", "author": "Rumi"},
+      {"text": "La blessure est l'endroit par où la lumière entre en toi.", "author": "Rumi"},
+      {"text": "Sois le changement que tu veux voir dans le monde.", "author": "Gandhi"},
+      {"text": "Ne sois pas triste, car ce que tu as perdu reviendra sous une autre forme.", "author": "Rumi"},
+      {"text": "Le silence est la langue de Dieu, tout le reste n'est que mauvaise traduction.", "author": "Rumi"},
+      {"text": "Ce n'est pas la longueur de la vie, mais sa profondeur.", "author": "Ralph Waldo Emerson"},
+      {"text": "Connais-toi toi-même.", "author": "Temple de Delphes"},
+      {"text": "La paix vient de l'intérieur. Ne la cherche pas à l'extérieur.", "author": "Bouddha"},
+      {"text": "L'essentiel est invisible pour les yeux.", "author": "Saint-Exupéry"},
+      {"text": "Le cœur a ses raisons que la raison ne connaît point.", "author": "Pascal"},
+      {"text": "Le voyage de mille lieues commence par un pas.", "author": "Lao Tseu"},
+      {"text": "Celui qui regarde à l'extérieur rêve. Celui qui regarde à l'intérieur s'éveille.", "author": "Carl Jung"}
+    ]
+  },
+  "cadence": {
+    "title": "Cadence",
+    "subtitle": "Ton rythme intérieur",
+    "daily_rituals": "Rituels du jour",
+    "evening_reflection": "Réflexion du soir",
+    "complete_ritual": "Marquer comme fait",
+    "completed": "Terminé",
+    "ritual_types": {
+      "respiration": "Respiration",
+      "introspection": "Introspection",
+      "ecriture": "Écriture",
+      "gratitude": "Gratitude",
+      "meditation": "Méditation",
+      "silence": "Silence",
+      "intention": "Intention",
+      "bilan": "Bilan"
+    },
+    "duration": "{{minutes}} min",
+    "streak": "Série en cours",
+    "days": "jours"
+  },
   "capsule": {
     "write_title": "Écrire",
     "write_subtitle": "Dépose tes pensées",
@@ -132,7 +186,11 @@
       "gold_duration": "1 an"
     },
     "seal_button": "Sceller la capsule",
-    "sealed_message": "Ta capsule est scellée. Elle s'ouvrira le {{date}}."
+    "sealed_message": "Ta capsule est scellée. Elle s'ouvrira le {{date}}.",
+    "my_capsules": "Mes capsules",
+    "sealed": "Scellée",
+    "opens_in": "S'ouvre dans",
+    "ready_to_open": "Prête à ouvrir"
   },
   "dreams": {
     "title": "Carnet des Rêves",
@@ -145,7 +203,11 @@
     "type_recurring": "Récurrent",
     "describe": "Décris ton rêve...",
     "emotions": "Émotions ressenties",
-    "save": "Enregistrer le rêve"
+    "save": "Enregistrer le rêve",
+    "delete_confirm": "Supprimer ce rêve ?",
+    "last_night": "La nuit dernière",
+    "intensity": "Intensité",
+    "tags": "Tags"
   },
   "oracle": {
     "title": "Oracle des Rêves",
@@ -160,18 +222,28 @@
     "symbols": "Symboles récurrents & leur signification",
     "patterns": "Patterns émotionnels cachés",
     "messages": "Messages de l'inconscient",
-    "guidance": "Guidance personnalisée"
+    "guidance": "Guidance personnalisée",
+    "new_reading": "Nouvelle consultation",
+    "synthesis": "Synthèse",
+    "symbols_revealed": "Symboles révélés"
   },
   "mirror": {
     "title": "Miroir",
     "subtitle": "IA qui reflète ton âme",
     "placeholder": "Confie-toi au Miroir...",
     "send": "Envoyer",
+    "thinking": "Le Miroir réfléchit...",
     "modes": {
       "reflect": "Reflet",
       "explore": "Explorer",
       "guide": "Guider"
-    }
+    },
+    "welcome": "Je suis ton Miroir intérieur. Que souhaites-tu explorer aujourd'hui ?",
+    "suggestions": [
+      "Comment te sens-tu en ce moment ?",
+      "Qu'est-ce qui occupe ton esprit ?",
+      "De quoi as-tu besoin aujourd'hui ?"
+    ]
   },
   "cosmos": {
     "title": "Cosmos",
@@ -183,15 +255,30 @@
       "arab": "Arabe"
     },
     "enter_birthdate": "Entre ta date de naissance",
-    "discover": "Découvrir mon profil"
+    "discover": "Découvrir mon profil",
+    "your_sign": "Ton signe",
+    "element": "Élément",
+    "planet": "Planète",
+    "characteristics": "Caractéristiques",
+    "compatibility": "Compatibilité",
+    "daily_horoscope": "Horoscope du jour",
+    "moon_sign": "Signe lunaire",
+    "celtic_sign": "Signe celtique",
+    "arab_sign": "Signe arabe"
   },
   "rituals": {
     "title": "Rituels Lunaires",
     "subtitle": "Guidés par la lune",
     "current_phase": "Phase actuelle",
     "generate": "Générer un rituel",
+    "generating": "Création du rituel...",
     "steps": "Étapes",
-    "affirmation": "Affirmation"
+    "affirmation": "Affirmation",
+    "preparation": "Préparation",
+    "ritual_for": "Rituel pour la {{phase}}",
+    "complete_step": "Marquer comme fait",
+    "all_completed": "Rituel terminé",
+    "new_ritual": "Nouveau rituel"
   },
   "meditation": {
     "title": "Méditation",
@@ -201,7 +288,20 @@
     "exhale": "Expire",
     "start": "Commencer",
     "pause": "Pause",
-    "resume": "Reprendre"
+    "resume": "Reprendre",
+    "stop": "Arrêter",
+    "cycles": "cycles",
+    "duration": "Durée",
+    "minutes": "minutes",
+    "choose_exercise": "Choisis un exercice",
+    "exercises": {
+      "calm": "Calme",
+      "calm_desc": "Respiration apaisante 4-4-4",
+      "focus": "Focus",
+      "focus_desc": "Concentration 4-7-8",
+      "energy": "Énergie",
+      "energy_desc": "Respiration dynamisante"
+    }
   },
   "letter": {
     "title": "Lettre à Moi",
@@ -209,7 +309,12 @@
     "placeholder": "Cher moi du futur...",
     "choose_date": "Choisis la date de livraison",
     "send": "Envoyer la lettre",
-    "sent_message": "Ta lettre sera livrée le {{date}}"
+    "sent_message": "Ta lettre sera livrée le {{date}}",
+    "my_letters": "Mes lettres",
+    "pending": "En attente",
+    "delivered": "Livrées",
+    "no_letters": "Aucune lettre pour le moment",
+    "write_first": "Écris ta première lettre à ton futur toi"
   },
   "settings": {
     "title": "Paramètres",
@@ -247,5 +352,16 @@
     "number_of_codes": "Nombre de codes",
     "batch_name": "Nom du lot (optionnel)",
     "generate_button": "Générer les codes"
+  },
+  "stats": {
+    "title": "Statistiques",
+    "subtitle": "Ton évolution émotionnelle",
+    "this_month": "Ce mois",
+    "capsules_written": "Capsules écrites",
+    "dreams_recorded": "Rêves notés",
+    "rituals_completed": "Rituels accomplis",
+    "mood_evolution": "Évolution émotionnelle",
+    "most_used": "Le plus utilisé",
+    "streak": "Série actuelle"
   }
 }
