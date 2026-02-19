@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 24,
-    paddingBottom: 40,
+    paddingBottom: 100,
   },
   header: {
     flexDirection: 'row',
@@ -512,7 +512,8 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   codeInputContainer: {
-    marginTop: 12,
+    marginTop: 16,
+    marginBottom: 16,
     gap: 12,
   },
   codeInput: {
