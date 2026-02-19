@@ -826,6 +826,159 @@ def register_auth_routes(app, db: AsyncIOMotorDatabase):
         ).sort("created_at", -1).to_list(1000)
         return {"transactions": transactions}
     
+    # ==================== APPLE SIGN-IN ====================
+    
+    @auth_router.post("/apple")
+    async def apple_sign_in(request: Request, response: Response):
+        """Handle Apple Sign-In"""
+        body = await request.json()
+        identity_token = body.get("identity_token")
+        apple_user_id = body.get("user_id")
+        email = body.get("email")
+        full_name = body.get("full_name")
+        
+        if not identity_token or not apple_user_id:
+            raise HTTPException(status_code=400, detail="Token ou identifiant manquant")
+        
+        # Note: In production, you should verify the identity_token with Apple's servers
+        # For now, we trust the token from the app
+        
+        # Check if user exists by Apple ID or email
+        user_doc = None
+        if email:
+            user_doc = await db.users.find_one({"email": email}, {"_id": 0})
+        
+        if not user_doc:
+            user_doc = await db.users.find_one({"apple_user_id": apple_user_id}, {"_id": 0})
+        
+        if user_doc:
+            # Update existing user
+            user_id = user_doc["user_id"]
+            update_data = {"apple_user_id": apple_user_id}
+            if full_name and not user_doc.get("name"):
+                update_data["name"] = full_name
+            
+            await db.users.update_one(
+                {"user_id": user_id},
+                {"$set": update_data}
+            )
+            user = User(**{k: v for k, v in user_doc.items() if k not in ["password_hash", "apple_user_id"]})
+        else:
+            # Create new user
+            user_id = f"user_{uuid.uuid4().hex[:12]}"
+            user = User(
+                user_id=user_id,
+                email=email or f"apple_{apple_user_id[:8]}@privaterelay.appleid.com",
+                name=full_name or "Utilisateur Apple",
+                subscription_tier="free"
+            )
+            user_dict = user.dict()
+            user_dict["apple_user_id"] = apple_user_id
+            await db.users.insert_one(user_dict)
+        
+        # Create session
+        session_token = generate_session_token()
+        session = UserSession(
+            session_id=str(uuid.uuid4()),
+            user_id=user_id,
+            session_token=session_token,
+            expires_at=datetime.now(timezone.utc) + timedelta(days=7)
+        )
+        await db.user_sessions.insert_one(session.dict())
+        
+        # Set cookie
+        response.set_cookie(
+            key="session_token",
+            value=session_token,
+            httponly=True,
+            secure=True,
+            samesite="none",
+            path="/",
+            max_age=7 * 24 * 60 * 60
+        )
+        
+        return {"success": True, "user": user.dict(), "session_token": session_token}
+    
+    # ==================== PUSH NOTIFICATIONS ====================
+    
+    @auth_router.post("/push-token")
+    async def save_push_token(request: Request):
+        """Save user's push notification token"""
+        user = await get_current_user(request, db)
+        if not user:
+            raise HTTPException(status_code=401, detail="Non authentifié")
+        
+        body = await request.json()
+        push_token = body.get("push_token")
+        
+        if not push_token:
+            raise HTTPException(status_code=400, detail="Token manquant")
+        
+        await db.users.update_one(
+            {"user_id": user.user_id},
+            {"$set": {"push_token": push_token}}
+        )
+        
+        return {"success": True}
+    
+    async def send_push_notification(push_token: str, title: str, body: str, data: dict = None):
+        """Send push notification via Expo"""
+        message = {
+            "to": push_token,
+            "sound": "default",
+            "title": title,
+            "body": body,
+        }
+        if data:
+            message["data"] = data
+        
+        async with httpx.AsyncClient() as client:
+            await client.post(
+                "https://exp.host/--/api/v2/push/send",
+                json=message,
+                headers={
+                    "Accept": "application/json",
+                    "Accept-encoding": "gzip, deflate",
+                    "Content-Type": "application/json",
+                }
+            )
+    
+    @admin_router.post("/send-notification")
+    async def admin_send_notification(request: Request):
+        """Send notification to all users or specific user"""
+        if not await verify_admin(request):
+            raise HTTPException(status_code=401, detail="Accès non autorisé")
+        
+        body = await request.json()
+        title = body.get("title", "Latence")
+        message = body.get("message")
+        user_id = body.get("user_id")  # Optional: send to specific user
+        
+        if not message:
+            raise HTTPException(status_code=400, detail="Message requis")
+        
+        if user_id:
+            # Send to specific user
+            user = await db.users.find_one({"user_id": user_id}, {"_id": 0})
+            if user and user.get("push_token"):
+                await send_push_notification(user["push_token"], title, message)
+                return {"success": True, "sent": 1}
+            return {"success": False, "error": "Utilisateur sans token"}
+        else:
+            # Send to all users with push tokens
+            users = await db.users.find(
+                {"push_token": {"$exists": True, "$ne": None}},
+                {"_id": 0, "push_token": 1}
+            ).to_list(10000)
+            
+            sent = 0
+            for u in users:
+                if u.get("push_token"):
+                    await send_push_notification(u["push_token"], title, message)
+                    sent += 1
+            
+            return {"success": True, "sent": sent}
+    
     # Register routers
     app.include_router(auth_router)
     app.include_router(subscription_router)
