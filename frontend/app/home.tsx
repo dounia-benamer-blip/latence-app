@@ -574,7 +574,7 @@ export default function HomeScreen() {
           <View style={[styles.inputContainer, { borderTopColor: theme.border }]}>
             <TextInput
               style={[styles.companionInput, dynamicStyles.input]}
-              placeholder="Qu'habite ton esprit en ce moment ?"
+              placeholder={t('home.companion_placeholder')}
               placeholderTextColor={theme.textMuted}
               value={companionMessage}
               onChangeText={setCompanionMessage}
@@ -601,7 +601,7 @@ export default function HomeScreen() {
       >
         <SafeAreaView style={[styles.modalContainer, dynamicStyles.modalBg]}>
           <View style={[styles.modalHeader, { borderBottomColor: theme.border }]}>
-            <Text style={[styles.modalTitle, dynamicStyles.text]}>Lectures suggérées</Text>
+            <Text style={[styles.modalTitle, dynamicStyles.text]}>{t('home.books_title')}</Text>
             <TouchableOpacity onPress={() => setShowBooks(false)}>
               <Ionicons name="close" size={28} color={theme.iconColor} />
             </TouchableOpacity>
@@ -609,7 +609,7 @@ export default function HomeScreen() {
 
           <ScrollView style={styles.modalContent} contentContainerStyle={styles.booksContainer}>
             <Text style={[styles.booksIntro, dynamicStyles.textSecondary]}>
-              Basé sur ton humeur actuelle, voici quelques lectures qui pourraient résonner avec toi...
+              {t('home.books_intro')}
             </Text>
             
             {bookRecommendations.map((book, index) => (
@@ -641,13 +641,13 @@ export default function HomeScreen() {
             </View>
             
             <Text style={[styles.premiumTitle, dynamicStyles.text]}>
-              Fonctionnalité Premium
+              {t('premium_modal.title')}
             </Text>
             
             <Text style={[styles.premiumDescription, dynamicStyles.textSecondary]}>
-              {blockedFeature && PREMIUM_FEATURE_NAMES[blockedFeature] 
-                ? `${PREMIUM_FEATURE_NAMES[blockedFeature]} fait partie de l'offre Premium.`
-                : 'Cette fonctionnalité fait partie de l\'offre Premium.'}
+              {blockedFeature 
+                ? `${t(`premium_features.${blockedFeature}`)} - ${t('premium_modal.description')}`
+                : t('premium_modal.description')}
             </Text>
             
             <Text style={[styles.premiumFeatures, dynamicStyles.textMuted]}>
