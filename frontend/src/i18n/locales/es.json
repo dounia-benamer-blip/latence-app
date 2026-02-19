@@ -189,7 +189,11 @@
       "meditation": "Meditación",
       "silence": "Silencio",
       "intention": "Intención",
-      "bilan": "Balance"
+      "bilan": "Balance",
+      "marche": "Caminar",
+      "nature": "Naturaleza",
+      "exercice": "Ejercicio",
+      "etirement": "Estiramiento"
     },
     "rituals": {
       "intention_title": "Intención del día",
@@ -208,7 +212,15 @@
       "silence_desc": "Cierra los ojos. Escucha el silencio entre los sonidos. No hagas nada más que estar presente.",
       "bilan_title": "Balance de la noche",
       "bilan_desc": "¿Qué salió bien? ¿Qué podrías haber hecho diferente? ¿Qué necesitas mañana?",
-      "bilan_placeholder": "Hoy, noté que..."
+      "bilan_placeholder": "Hoy, noté que...",
+      "walk_title": "Caminata consciente",
+      "walk_desc": "Camina lentamente, con plena conciencia. Siente cada paso, escucha los sonidos a tu alrededor, observa sin juzgar.",
+      "nature_title": "Salida a la naturaleza",
+      "nature_desc": "Sal unos minutos. Respira aire fresco, toca un árbol, mira el cielo. Reconéctate con la tierra.",
+      "exercise_title": "Ejercicio energizante",
+      "exercise_desc": "Algunos movimientos dinámicos para despertar tu cuerpo: saltos, sentadillas, o simplemente sacude tus extremidades.",
+      "stretch_title": "Estiramientos suaves",
+      "stretch_desc": "Estira suavemente tu cuello, hombros, espalda. Libera las tensiones acumuladas en tu cuerpo."
     },
     "gratitude_modal_title": "Tus 3 gratitudes",
     "gratitude_modal_subtitle": "Incluso las pequeñas cosas cuentan",
