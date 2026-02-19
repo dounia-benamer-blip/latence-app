@@ -240,6 +240,28 @@ export default function CadenceScreen() {
       completed: false,
     });
 
+    // Physical: Stretching (morning/afternoon)
+    if (timeOfDay === 'matin' || timeOfDay === 'apres-midi') {
+      rituals.push({
+        id: 'etirement',
+        type: 'etirement',
+        title: t('cadence.rituals.stretch_title'),
+        description: t('cadence.rituals.stretch_desc'),
+        duration: '5 min',
+        completed: false,
+      });
+    }
+
+    // Physical: Conscious Walk (always)
+    rituals.push({
+      id: 'marche',
+      type: 'marche',
+      title: t('cadence.rituals.walk_title'),
+      description: t('cadence.rituals.walk_desc'),
+      duration: '10 min',
+      completed: false,
+    });
+
     // Introspection
     const questionKey = `cadence.rituals.introspection_${timeKey}`;
     rituals.push({
@@ -250,6 +272,30 @@ export default function CadenceScreen() {
       duration: '5 min',
       completed: false,
     });
+
+    // Physical: Nature (afternoon)
+    if (timeOfDay === 'apres-midi') {
+      rituals.push({
+        id: 'nature',
+        type: 'nature',
+        title: t('cadence.rituals.nature_title'),
+        description: t('cadence.rituals.nature_desc'),
+        duration: '15 min',
+        completed: false,
+      });
+    }
+
+    // Physical: Energizing Exercise (morning)
+    if (timeOfDay === 'matin') {
+      rituals.push({
+        id: 'exercice',
+        type: 'exercice',
+        title: t('cadence.rituals.exercise_title'),
+        description: t('cadence.rituals.exercise_desc'),
+        duration: '10 min',
+        completed: false,
+      });
+    }
 
     // Gratitude
     rituals.push({
