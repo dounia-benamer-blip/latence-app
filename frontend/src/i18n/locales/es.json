@@ -11,7 +11,31 @@
     "or": "o",
     "premium": "Premium",
     "free": "Gratis",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "share": "Compartir",
+    "new": "Nuevo",
+    "refresh": "Actualizar",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "complete": "Completado",
+    "start": "Comenzar",
+    "stop": "Detener",
+    "validate": "Validar",
+    "later": "Más tarde",
+    "discover": "Descubrir",
+    "continue": "Continuar",
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "days": "días",
+    "min": "min",
+    "breaths": "Respiraciones"
+  },
+  "days_of_week": ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"],
+  "months": ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+  "time_of_day": {
+    "morning": "Mañana",
+    "afternoon": "Tarde",
+    "evening": "Noche"
   },
   "home": {
     "greeting_morning": "Buenos días",
@@ -25,13 +49,15 @@
     "moon_waning_gibbous": "Gibosa Menguante",
     "moon_last_quarter": "Cuarto Menguante",
     "moon_waning_crescent": "Luna Menguante",
-    "moon_message": "Bajo la {{phase}}, las emociones danzan. Déjalas expresarse libremente.",
     "inner_dialogue": "Diálogo interior",
     "inner_dialogue_sub": "Habla con tu compañero poético",
     "capsules": "cápsulas",
     "dreams": "sueños",
-    "stats_capsules": "cápsulas",
-    "stats_dreams": "sueños"
+    "books_title": "Lecturas sugeridas",
+    "books_subtitle": "Para prolongar este momento",
+    "companion_intro": "Un espacio para explorar tus pensamientos y emociones a través de un diálogo poético y bondadoso.",
+    "companion_placeholder": "¿Qué ocupa tu mente en este momento?",
+    "books_intro": "Basado en tu estado de ánimo actual, aquí hay algunas lecturas que podrían resonar contigo..."
   },
   "menu": {
     "cadence": "Cadencia",
@@ -110,6 +136,86 @@
     "button": "Descubrir Premium",
     "later": "Más tarde"
   },
+  "wisdom": {
+    "title": "Sabiduría",
+    "subtitle": "Citas sagradas universales",
+    "new_quote": "Otra sabiduría",
+    "save": "Guardar",
+    "share": "Compartir",
+    "saved": "Guardada",
+    "saved_title": "Tus sabidurías guardadas",
+    "no_saved": "Ninguna cita guardada",
+    "info": "Citas de poetas sufíes, textos sagrados, filósofos y sabios de todas las tradiciones.",
+    "quotes": [
+      {"text": "Lo que buscas también te busca a ti.", "author": "Rumi"},
+      {"text": "La herida es el lugar por donde la Luz entra en ti.", "author": "Rumi"},
+      {"text": "Sé el cambio que deseas ver en el mundo.", "author": "Gandhi"},
+      {"text": "No te aflijas. Todo lo que pierdes vuelve de otra forma.", "author": "Rumi"},
+      {"text": "El ojo con el que veo a Dios es el mismo ojo con el que Dios me ve.", "author": "Maestro Eckhart"},
+      {"text": "El silencio es el lenguaje de Dios, todo lo demás es mala traducción.", "author": "Rumi"},
+      {"text": "No es la duración de la vida, sino su profundidad.", "author": "Ralph Waldo Emerson"},
+      {"text": "Conócete a ti mismo.", "author": "Templo de Delfos"},
+      {"text": "La verdadera generosidad con el futuro consiste en darlo todo al presente.", "author": "Albert Camus"},
+      {"text": "El amor nunca disminuye al compartirse.", "author": "Proverbio sufí"},
+      {"text": "Donde esté tu tesoro, allí estará también tu corazón.", "author": "Mateo 6:21"},
+      {"text": "La paz viene de dentro. No la busques fuera.", "author": "Buda"},
+      {"text": "Lo esencial es invisible a los ojos.", "author": "Saint-Exupéry"},
+      {"text": "Ama y haz lo que quieras.", "author": "San Agustín"},
+      {"text": "El corazón tiene razones que la razón no conoce.", "author": "Pascal"},
+      {"text": "Un viaje de mil millas comienza con un solo paso.", "author": "Lao Tzu"},
+      {"text": "Quien mira hacia afuera, sueña; quien mira hacia adentro, despierta.", "author": "Carl Jung"}
+    ]
+  },
+  "cadence": {
+    "title": "Cadencia",
+    "subtitle": "Tu ritmo interior",
+    "your_inner_rhythm": "TU RITMO INTERIOR",
+    "your_daily_cadence": "TU CADENCIA DEL DÍA",
+    "your_micro_rituals": "Tus micro-rituales",
+    "streak_badge": "{{days}}d",
+    "greeting_morning": "Amanece un nuevo día. Es momento de establecer tu intención y acoger lo que viene.",
+    "greeting_afternoon": "La tarde te invita a hacer una pausa. Vuelve a centrarte en lo esencial.",
+    "greeting_evening": "La noche se acerca. Es momento de hacer balance y soltar.",
+    "evening_thought": "Pensamiento nocturno",
+    "evening_reflection": "Mañana es un nuevo día. Deja ir lo que debe partir.",
+    "cadence_honored": "Cadencia honrada",
+    "cadence_honored_sub": "Hoy te has cuidado.",
+    "days_streak": "¡{{count}} días seguidos!",
+    "ritual_types": {
+      "respiration": "Respiración",
+      "introspection": "Introspección",
+      "ecriture": "Escritura",
+      "gratitude": "Gratitud",
+      "meditation": "Meditación",
+      "silence": "Silencio",
+      "intention": "Intención",
+      "bilan": "Balance"
+    },
+    "rituals": {
+      "intention_title": "Intención del día",
+      "intention_desc": "Establece una intención para hoy. ¿Qué es lo que realmente te importa ahora?",
+      "intention_placeholder": "Hoy, elijo...",
+      "breath_title": "Tres respiraciones conscientes",
+      "breath_desc": "Inhala profundamente por la nariz (4s), mantén (4s), exhala lentamente por la boca (6s). Repite tres veces.",
+      "introspection_morning": "¿Qué te emociona de este nuevo día?",
+      "introspection_afternoon": "¿Cómo te sientes realmente ahora mismo? Escucha tu cuerpo.",
+      "introspection_evening": "¿Qué aprendiste hoy, incluso en las pequeñas cosas?",
+      "question_title": "Pregunta del momento",
+      "gratitude_title": "Tres gratitudes",
+      "gratitude_desc": "Anota tres cosas, por pequeñas que sean, por las que sientes agradecimiento.",
+      "gratitude_placeholder": "Estoy agradecido/a por...",
+      "silence_title": "Un minuto de silencio",
+      "silence_desc": "Cierra los ojos. Escucha el silencio entre los sonidos. No hagas nada más que estar presente.",
+      "bilan_title": "Balance de la noche",
+      "bilan_desc": "¿Qué salió bien? ¿Qué podrías haber hecho diferente? ¿Qué necesitas mañana?",
+      "bilan_placeholder": "Hoy, noté que..."
+    },
+    "gratitude_modal_title": "Tus 3 gratitudes",
+    "gratitude_modal_subtitle": "Incluso las pequeñas cosas cuentan",
+    "intention_modal_title": "Tu intención del día",
+    "intention_modal_subtitle": "¿Qué es lo que realmente te importa hoy?",
+    "set_intention": "Establecer intención"
+  },
   "capsule": {
     "write_title": "Escribir",
     "write_subtitle": "Deja tus pensamientos",
@@ -132,7 +238,11 @@
       "gold_duration": "1 año"
     },
     "seal_button": "Sellar la cápsula",
-    "sealed_message": "Tu cápsula está sellada. Se abrirá el {{date}}."
+    "sealed_message": "Tu cápsula está sellada. Se abrirá el {{date}}.",
+    "my_capsules": "Mis cápsulas",
+    "sealed": "Sellada",
+    "opens_in": "Se abre en",
+    "ready_to_open": "Lista para abrir"
   },
   "dreams": {
     "title": "Diario de Sueños",
@@ -145,33 +255,59 @@
     "type_recurring": "Recurrente",
     "describe": "Describe tu sueño...",
     "emotions": "Emociones sentidas",
-    "save": "Guardar sueño"
+    "save": "Guardar sueño",
+    "delete_confirm": "¿Eliminar este sueño?",
+    "last_night": "Anoche",
+    "intensity": "Intensidad",
+    "tags": "Etiquetas"
   },
   "oracle": {
     "title": "Oráculo de Sueños",
     "subtitle": "El Ojo que ve más allá",
-    "description": "El Oráculo analiza tus sueños para revelar mensajes ocultos de tu inconsciente.",
+    "description": "El Oráculo analiza tus sueños para revelar mensajes ocultos de tu inconsciente. Los símbolos recurrentes dibujan un mapa de tu mundo interior.",
+    "premium_feature": "Función Premium",
     "dreams_recorded": "sueños registrados",
-    "ready_to_analyze": "listos para analizar",
-    "minimum_warning": "Registra al menos 3 sueños para una lectura significativa.",
+    "minimum_warning": "Registra al menos 3 sueños para una lectura significativa. El Oráculo necesita material para ver.",
     "consult": "Consultar el Oráculo",
     "upgrade": "Pasar a Premium",
-    "reveals": "LO QUE EL ORÁCULO REVELA",
-    "symbols": "Símbolos recurrentes y su significado",
-    "patterns": "Patrones emocionales ocultos",
-    "messages": "Mensajes del inconsciente",
-    "guidance": "Orientación personalizada"
+    "revelation": "Revelación del Oráculo",
+    "theme": "Tema",
+    "symbols_revealed": "Símbolos revelados",
+    "unconscious_message": "Mensaje del inconsciente",
+    "guidance": "Orientación",
+    "new_consultation": "Nueva consulta",
+    "add_dream": "Agregar un sueño",
+    "symbol_guide": "Guía de Símbolos",
+    "dream_symbols": {
+      "water": {"icon": "💧", "name": "agua", "meaning": "Emociones, inconsciente, purificación"},
+      "flight": {"icon": "🦅", "name": "vuelo", "meaning": "Libertad, ambición, escape"},
+      "fall": {"icon": "🌀", "name": "caída", "meaning": "Pérdida de control, soltar"},
+      "death": {"icon": "🦋", "name": "muerte", "meaning": "Transformación, renacimiento"},
+      "chase": {"icon": "🏃", "name": "persecución", "meaning": "Huida, conflicto interno"},
+      "house": {"icon": "🏠", "name": "casa", "meaning": "Yo, psique, seguridad"},
+      "animals": {"icon": "🐺", "name": "animales", "meaning": "Instintos, naturaleza salvaje"},
+      "snake": {"icon": "🐍", "name": "serpiente", "meaning": "Transformación, sabiduría"},
+      "fire": {"icon": "🔥", "name": "fuego", "meaning": "Pasión, purificación"},
+      "forest": {"icon": "🌲", "name": "bosque", "meaning": "Inconsciente, misterio"},
+      "moon": {"icon": "🌙", "name": "luna", "meaning": "Femenino, intuición, ciclos"},
+      "mirror": {"icon": "🪞", "name": "espejo", "meaning": "Reflexión, identidad, verdad"}
+    }
   },
   "mirror": {
-    "title": "Espejo",
+    "title": "Espejo IA",
     "subtitle": "IA que refleja tu alma",
-    "placeholder": "Confía en el Espejo...",
+    "placeholder": "Comparte lo que ocupa tu mente...",
     "send": "Enviar",
+    "thinking": "El Espejo está reflexionando...",
     "modes": {
       "reflect": "Reflejar",
-      "explore": "Explorar",
-      "guide": "Guiar"
-    }
+      "analyze": "Analizar",
+      "question": "Pregunta"
+    },
+    "empty_title": "El Espejo te espera",
+    "empty_reflect": "Comparte lo que pasa por tu mente. Te lo reflejaré con gentileza.",
+    "empty_analyze": "Escribe libremente. Leeré lo que tus palabras revelan sobre ti.",
+    "empty_question": "Comparte tu estado. Te haré LA pregunta que puede iluminarlo todo."
   },
   "cosmos": {
     "title": "Cosmos",
@@ -183,33 +319,124 @@
       "arab": "Árabe"
     },
     "enter_birthdate": "Ingresa tu fecha de nacimiento",
-    "discover": "Descubrir mi perfil"
+    "discover": "Descubrir mi perfil",
+    "your_sign": "Tu signo",
+    "element": "Elemento",
+    "planet": "Planeta",
+    "characteristics": "Características",
+    "compatibility": "Compatibilidad",
+    "daily_horoscope": "Horóscopo del día",
+    "moon_sign": "Signo lunar",
+    "celtic_sign": "Signo celta",
+    "arab_sign": "Signo árabe"
   },
   "rituals": {
     "title": "Rituales Lunares",
     "subtitle": "Guiados por la luna",
     "current_phase": "Fase actual",
-    "generate": "Generar un ritual",
-    "steps": "Pasos",
-    "affirmation": "Afirmación"
+    "phases_title": "Fases de la luna",
+    "intention_label": "Tu intención (opcional)",
+    "intention_placeholder": "¿Qué deseas manifestar?",
+    "generate": "Crear mi ritual",
+    "generating": "Creando ritual...",
+    "steps": "Pasos del ritual",
+    "affirmation": "AFIRMACIÓN",
+    "preparation": "Preparación",
+    "ritual_for": "Ritual para la {{phase}}",
+    "complete_step": "Marcar como hecho",
+    "all_completed": "Ritual completado",
+    "new_ritual": "Nuevo ritual",
+    "day_in_cycle": "Día {{day}}/29",
+    "moon_phases": {
+      "new": "Luna Nueva",
+      "waxing_crescent": "Luna Creciente",
+      "first_quarter": "Cuarto Creciente",
+      "waxing_gibbous": "Gibosa Creciente",
+      "full": "Luna Llena",
+      "waning_gibbous": "Gibosa Menguante",
+      "last_quarter": "Cuarto Menguante",
+      "waning_crescent": "Luna Menguante"
+    },
+    "moon_phases_short": {
+      "new": "Nueva",
+      "waxing_crescent": "Creciente",
+      "first_quarter": "Cuarto",
+      "waxing_gibbous": "Gibosa+",
+      "full": "Llena",
+      "waning_gibbous": "Gibosa-",
+      "last_quarter": "Cuarto",
+      "waning_crescent": "Menguante"
+    },
+    "fallback": {
+      "title": "Ritual para la {{phase}}",
+      "duration": "15 min",
+      "intention": "Conectar con la energía lunar",
+      "preparation": ["Una vela", "Un espacio tranquilo"],
+      "steps": [
+        "Enciende tu vela y toma 3 respiraciones profundas",
+        "Conéctate con la energía de la luna",
+        "Coloca tus manos sobre tu corazón",
+        "Formula tu intención",
+        "Agradece a la luna"
+      ],
+      "closing": "Que la luz de la luna guíe tus pasos.",
+      "affirmation": "Estoy alineado/a con los ciclos de la naturaleza."
+    }
   },
   "meditation": {
     "title": "Meditación",
     "subtitle": "Respiración guiada y calma",
-    "inhale": "Inhala",
-    "hold": "Sostén",
-    "exhale": "Exhala",
+    "inhale": "Inhala...",
+    "hold": "Sostén...",
+    "exhale": "Exhala...",
+    "hold_out": "Pausa...",
     "start": "Comenzar",
     "pause": "Pausar",
-    "resume": "Continuar"
+    "resume": "Continuar",
+    "stop": "Detener",
+    "duration": "Duración",
+    "breaths": "Respiraciones",
+    "choose_rhythm": "Elige tu ritmo",
+    "instructions": "Encuentra un lugar tranquilo, cierra los ojos y déjate guiar por el ritmo de la llama.",
+    "patterns": {
+      "calm": "Calma",
+      "energize": "Energía",
+      "sleep": "Sueño",
+      "focus": "Enfoque"
+    }
   },
   "letter": {
     "title": "Carta a Mí Mismo",
     "subtitle": "Mensaje para tu yo futuro",
+    "intro": "Escribe una carta a tu yo futuro. Se entregará en la fecha que elijas.",
+    "prompts": "¿Qué te gustaría recordar? ¿Qué sueños llevas contigo? ¿Cómo te sientes ahora mismo?",
     "placeholder": "Querido yo del futuro...",
-    "choose_date": "Elige la fecha de entrega",
-    "send": "Enviar la carta",
-    "sent_message": "Tu carta será entregada el {{date}}"
+    "choose_date": "¿Cuándo quieres recibirla?",
+    "choose_date_sub": "Elige cuándo te será entregada esta carta.",
+    "delivery_options": {
+      "1_month": "1 mes",
+      "1_month_desc": "Un mes para cambiar",
+      "3_months": "3 meses",
+      "3_months_desc": "El tiempo de una estación",
+      "6_months": "6 meses",
+      "6_months_desc": "Un semestre de crecimiento",
+      "1_year": "1 año",
+      "1_year_desc": "Una vuelta al sol",
+      "5_years": "5 años",
+      "5_years_desc": "Otra versión de ti"
+    },
+    "delivery_on": "Entrega el {{date}}",
+    "send": "Enviar al futuro",
+    "edit": "Editar la carta",
+    "sent_title": "Carta enviada",
+    "sent_message": "Tu carta viajará en el tiempo y te será entregada el {{date}}.",
+    "notification_note": "Recibirás una notificación el día de la entrega.",
+    "return": "Volver",
+    "my_letters": "Mis cartas",
+    "pending": "Pendientes",
+    "delivered": "Entregadas",
+    "no_letters": "Aún no hay cartas",
+    "write_first": "Escribe tu primera carta a tu yo futuro"
   },
   "settings": {
     "title": "Configuración",
@@ -247,5 +474,23 @@
     "number_of_codes": "Número de códigos",
     "batch_name": "Nombre del lote (opcional)",
     "generate_button": "Generar códigos"
+  },
+  "stats": {
+    "title": "Estadísticas",
+    "subtitle": "Tu evolución emocional",
+    "this_month": "Este mes",
+    "capsules_written": "Cápsulas escritas",
+    "dreams_recorded": "Sueños registrados",
+    "rituals_completed": "Rituales completados",
+    "mood_evolution": "Evolución del ánimo",
+    "most_used": "Más usado",
+    "streak": "Racha actual"
+  },
+  "premium_features": {
+    "mirror": "Espejo IA",
+    "astro": "Astrología",
+    "dream-oracle": "Oráculo de Sueños",
+    "meditation": "Meditación",
+    "rituals": "Rituales Lunares"
   }
 }
