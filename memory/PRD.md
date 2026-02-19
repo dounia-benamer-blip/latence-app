@@ -20,6 +20,7 @@ Journal intime immersif centré sur la lune, l'introspection et la sagesse unive
 | Restrictions Premium UI | ✅ Complet |
 | Stripe Payments | ✅ Complet |
 | Codes Lifetime (QR) | ✅ Complet |
+| **Multi-langues (FR/EN/ES)** | ✅ Complet |
 
 ---
 
