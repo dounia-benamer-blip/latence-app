@@ -176,10 +176,16 @@ const FloatingMist = () => {
 export default function DreamOracleScreen() {
   const router = useRouter();
   const { theme } = useTheme();
+  const { subscriptionStatus } = useAuth();
   const [dreams, setDreams] = useState<Dream[]>([]);
   const [loading, setLoading] = useState(true);
   const [analyzing, setAnalyzing] = useState(false);
   const [oracleReading, setOracleReading] = useState<OracleReading | null>(null);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+
+  // Check subscription access
+  const userTier = subscriptionStatus?.tier || 'free';
+  const hasPremiumAccess = userTier === 'premium' || userTier === 'lifetime';
 
   const ds = {
     container: { backgroundColor: theme.background },
