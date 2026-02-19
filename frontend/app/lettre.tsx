@@ -23,19 +23,16 @@ import Animated, {
   Easing,
   interpolate,
 } from 'react-native-reanimated';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../src/context/ThemeContext';
 import { TwinklingStars } from '../src/components/TwinklingStars';
 
 const { width } = Dimensions.get('window');
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
-const DELIVERY_OPTIONS = [
-  { months: 1, label: '1 mois', description: 'Un mois pour changer' },
-  { months: 3, label: '3 mois', description: 'Le temps d\'une saison' },
-  { months: 6, label: '6 mois', description: 'Un semestre de croissance' },
-  { months: 12, label: '1 an', description: 'Un tour de soleil' },
-  { months: 60, label: '5 ans', description: 'Une autre version de toi' },
-];
+// Delivery options with translation keys
+const DELIVERY_KEYS = ['1_month', '3_months', '6_months', '1_year', '5_years'];
+const DELIVERY_MONTHS = [1, 3, 6, 12, 60];
 
 // Floating envelope animation
 const FloatingEnvelope = ({ size = 80 }: { size?: number }) => {
