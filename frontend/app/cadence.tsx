@@ -206,12 +206,9 @@ export default function CadenceScreen() {
   };
 
   const generateFallbackCadence = (): CadenceData => {
-    const greetings = {
-      matin: "Le jour se lève. C'est le moment de poser ton intention et d'accueillir ce qui vient.",
-      'apres-midi': "L'après-midi t'invite à une pause. Recentre-toi sur l'essentiel.",
-      soir: "La nuit approche. C'est le moment de faire le bilan et de lâcher prise.",
-    };
-
+    const timeKey = timeOfDay === 'matin' ? 'morning' : timeOfDay === 'apres-midi' ? 'afternoon' : 'evening';
+    const greetingKey = `cadence.greeting_${timeKey}`;
+    
     const rituals: DailyRitual[] = [];
 
     // Morning: Intention
@@ -219,12 +216,12 @@ export default function CadenceScreen() {
       rituals.push({
         id: 'intention',
         type: 'intention',
-        title: 'Intention du jour',
-        description: 'Pose une intention pour cette journée. Qu\'est-ce qui compte vraiment pour toi aujourd\'hui ?',
+        title: t('cadence.rituals.intention_title'),
+        description: t('cadence.rituals.intention_desc'),
         duration: '3 min',
         completed: false,
         requiresInput: true,
-        inputPlaceholder: 'Aujourd\'hui, je choisis de...',
+        inputPlaceholder: t('cadence.rituals.intention_placeholder'),
       });
     }
 
@@ -232,23 +229,19 @@ export default function CadenceScreen() {
     rituals.push({
       id: 'breath',
       type: 'respiration',
-      title: 'Trois respirations conscientes',
-      description: 'Inspire profondément par le nez (4s), retiens (4s), expire lentement par la bouche (6s). Répète trois fois.',
+      title: t('cadence.rituals.breath_title'),
+      description: t('cadence.rituals.breath_desc'),
       duration: '2 min',
       completed: false,
     });
 
     // Introspection
-    const questions = {
-      matin: "Qu'est-ce qui t'excite dans cette journée qui commence ?",
-      'apres-midi': "Comment te sens-tu vraiment en ce moment ? Écoute ton corps.",
-      soir: "Qu'as-tu appris aujourd'hui, même dans les petites choses ?",
-    };
+    const questionKey = `cadence.rituals.introspection_${timeKey}`;
     rituals.push({
       id: 'introspection',
       type: 'introspection',
-      title: 'Question du moment',
-      description: questions[timeOfDay],
+      title: t('cadence.rituals.question_title'),
+      description: t(questionKey),
       duration: '5 min',
       completed: false,
     });
@@ -257,20 +250,20 @@ export default function CadenceScreen() {
     rituals.push({
       id: 'gratitude',
       type: 'gratitude',
-      title: 'Trois gratitudes',
-      description: 'Note trois choses, même infimes, pour lesquelles tu ressens de la reconnaissance.',
+      title: t('cadence.rituals.gratitude_title'),
+      description: t('cadence.rituals.gratitude_desc'),
       duration: '3 min',
       completed: false,
       requiresInput: true,
-      inputPlaceholder: 'Je suis reconnaissant(e) pour...',
+      inputPlaceholder: t('cadence.rituals.gratitude_placeholder'),
     });
 
     // Silence
     rituals.push({
       id: 'silence',
       type: 'silence',
-      title: 'Une minute de silence',
-      description: 'Ferme les yeux. Écoute le silence entre les sons. Ne fais rien d\'autre que d\'être présent(e).',
+      title: t('cadence.rituals.silence_title'),
+      description: t('cadence.rituals.silence_desc'),
       duration: '1 min',
       completed: false,
     });
@@ -280,25 +273,25 @@ export default function CadenceScreen() {
       rituals.push({
         id: 'bilan',
         type: 'bilan',
-        title: 'Bilan du soir',
-        description: 'Qu\'est-ce qui s\'est bien passé ? Qu\'aurais-tu pu faire différemment ? De quoi as-tu besoin demain ?',
+        title: t('cadence.rituals.bilan_title'),
+        description: t('cadence.rituals.bilan_desc'),
         duration: '5 min',
         completed: false,
         requiresInput: true,
-        inputPlaceholder: 'Aujourd\'hui, j\'ai remarqué que...',
+        inputPlaceholder: t('cadence.rituals.bilan_placeholder'),
       });
     }
 
     return {
-      greeting: greetings[timeOfDay],
-      moonInfluence: "La lune t'accompagne dans ton chemin intérieur.",
+      greeting: t(greetingKey),
+      moonInfluence: "",
       rituals,
-      eveningReflection: timeOfDay === 'soir' ? "Demain est un nouveau jour. Laisse aller ce qui doit partir." : '',
+      eveningReflection: timeOfDay === 'soir' ? t('cadence.evening_reflection') : '',
       wisdomQuote: {
-        text: "Ce que tu cherches te cherche aussi.",
-        author: "Rumi"
+        text: t('wisdom.quotes.0.text', "Ce que tu cherches te cherche aussi."),
+        author: t('wisdom.quotes.0.author', "Rumi")
       },
-      astralInsight: "Ton signe te guide vers l'introspection aujourd'hui.",
+      astralInsight: "",
     };
   };
 
