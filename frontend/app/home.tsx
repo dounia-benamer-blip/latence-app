@@ -114,10 +114,17 @@ const MENU_ITEMS: MenuItem[] = [
   },
   {
     id: 'dreams',
-    title: 'Rêves',
-    subtitle: 'Journal, Oracle & interprétation',
+    title: 'Carnet des Rêves',
+    subtitle: 'Enregistre tes rêves',
     icon: 'cloudy-night-outline',
     route: '/dreams',
+  },
+  {
+    id: 'dream-oracle',
+    title: 'Oracle des Rêves',
+    subtitle: 'Analyse & interprétation IA',
+    icon: 'eye-outline',
+    route: '/dream-oracle',
   },
   {
     id: 'astro',
