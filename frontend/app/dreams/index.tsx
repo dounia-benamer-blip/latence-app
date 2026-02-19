@@ -366,6 +366,13 @@ export default function DreamsScreen() {
             data-testid="dream-title-input"
           />
 
+          {/* Voice Recorder */}
+          <VoiceRecorder
+            onTranscription={(text) => setContent(prev => prev ? `${prev}\n${text}` : text)}
+            theme={theme}
+            placeholder="🎙️ Dicte ton rêve..."
+          />
+
           <TextInput
             style={[styles.dreamInput, ds.card, ds.text]}
             placeholder="J'ai rêvé que..."
