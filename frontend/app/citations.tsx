@@ -15,7 +15,6 @@ import { Ionicons } from '@expo/vector-icons';
 import Animated, {
   FadeIn,
   FadeInUp,
-  FadeOut,
   useSharedValue,
   useAnimatedStyle,
   withRepeat,
@@ -24,7 +23,6 @@ import Animated, {
   Easing,
   interpolate,
 } from 'react-native-reanimated';
-import { useTranslation } from 'react-i18next';
 import { useTheme } from '../src/context/ThemeContext';
 import { TwinklingStars } from '../src/components/TwinklingStars';
 
@@ -36,7 +34,17 @@ interface Quote {
   author: string;
 }
 
-// Glowing orb animation
+const QUOTES: Quote[] = [
+  { text: "Ce que tu cherches te cherche aussi.", author: "Rumi" },
+  { text: "Sois le changement que tu veux voir dans le monde.", author: "Gandhi" },
+  { text: "Le bonheur n'est pas une destination, c'est une façon de voyager.", author: "Margaret Lee Runbeck" },
+  { text: "Chaque jour est une nouvelle chance de tout recommencer.", author: "Proverbe" },
+  { text: "La paix vient de l'intérieur. Ne la cherche pas à l'extérieur.", author: "Bouddha" },
+  { text: "L'âme qui se donne entièrement à Dieu ne manque de rien.", author: "Sainte Thérèse d'Avila" },
+  { text: "La plus grande gloire n'est pas de ne jamais tomber, mais de se relever à chaque chute.", author: "Confucius" },
+  { text: "Le silence est la source de toute grande force.", author: "Lao Tseu" },
+];
+
 const GlowingOrb = ({ size = 100 }: { size?: number }) => {
   const glow = useSharedValue(0);
   const rotate = useSharedValue(0);
@@ -84,15 +92,11 @@ const GlowingOrb = ({ size = 100 }: { size?: number }) => {
 export default function CitationsScreen() {
   const router = useRouter();
   const { theme } = useTheme();
-  const { t, i18n } = useTranslation();
   const [currentQuote, setCurrentQuote] = useState<Quote | null>(null);
   const [savedQuotes, setSavedQuotes] = useState<Quote[]>([]);
   const [showSaved, setShowSaved] = useState(false);
   const [loading, setLoading] = useState(false);
   const [fadeKey, setFadeKey] = useState(0);
-
-  // Get quotes from translations
-  const quotes = t('wisdom.quotes', { returnObjects: true }) as Quote[];
 
   const ds = {
     container: { backgroundColor: theme.background },
@@ -104,14 +108,13 @@ export default function CitationsScreen() {
 
   useEffect(() => {
     getNewQuote();
-  }, [i18n.language]);
+  }, []);
 
   const getNewQuote = async () => {
     setLoading(true);
     
-    // Try to get AI-generated quote based on mood and language
     try {
-      const response = await fetch(`${API_URL}/api/sacred-quote?lang=${i18n.language}`);
+      const response = await fetch(`${API_URL}/api/sacred-quote?lang=fr`);
       if (response.ok) {
         const data = await response.json();
         setCurrentQuote(data);
@@ -120,14 +123,11 @@ export default function CitationsScreen() {
         return;
       }
     } catch (e) {
-      // Fallback to local quotes
+      // Fallback
     }
 
-    // Use local quotes from translations
-    if (quotes && quotes.length > 0) {
-      const randomIndex = Math.floor(Math.random() * quotes.length);
-      setCurrentQuote(quotes[randomIndex]);
-    }
+    const randomIndex = Math.floor(Math.random() * QUOTES.length);
+    setCurrentQuote(QUOTES[randomIndex]);
     setFadeKey(prev => prev + 1);
     setLoading(false);
   };
@@ -159,12 +159,11 @@ export default function CitationsScreen() {
     <SafeAreaView style={[styles.container, ds.container]}>
       <TwinklingStars starCount={40} minSize={1} maxSize={2.5} />
 
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-down" size={28} color={theme.iconColor} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, ds.text]}>{t('wisdom.title')}</Text>
+        <Text style={[styles.headerTitle, ds.text]}>Sagesse</Text>
         <TouchableOpacity onPress={() => setShowSaved(!showSaved)} style={styles.savedButton}>
           <Ionicons name={showSaved ? "book" : "book-outline"} size={24} color={theme.iconColor} />
           {savedQuotes.length > 0 && (
@@ -178,12 +177,10 @@ export default function CitationsScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {!showSaved ? (
           <>
-            {/* Glowing Orb */}
             <Animated.View entering={FadeIn.duration(800)} style={styles.orbSection}>
               <GlowingOrb size={60} />
             </Animated.View>
 
-            {/* Quote */}
             {currentQuote && (
               <Animated.View
                 key={fadeKey}
@@ -195,7 +192,6 @@ export default function CitationsScreen() {
               </Animated.View>
             )}
 
-            {/* Actions */}
             <View style={styles.actionsRow}>
               <TouchableOpacity
                 style={[styles.actionBtn, ds.card]}
@@ -215,7 +211,6 @@ export default function CitationsScreen() {
               </TouchableOpacity>
             </View>
 
-            {/* New Quote Button */}
             <TouchableOpacity
               style={[styles.newQuoteBtn, { backgroundColor: theme.accentWarm }]}
               onPress={getNewQuote}
@@ -226,25 +221,23 @@ export default function CitationsScreen() {
               ) : (
                 <>
                   <Ionicons name="refresh" size={18} color="#fff" />
-                  <Text style={styles.newQuoteBtnText}>{t('wisdom.new_quote')}</Text>
+                  <Text style={styles.newQuoteBtnText}>Nouvelle citation</Text>
                 </>
               )}
             </TouchableOpacity>
 
-            {/* Info */}
             <Text style={[styles.infoText, ds.textMuted]}>
-              {t('wisdom.info')}
+              Laisse ces paroles de sagesse guider ta réflexion et éclairer ton chemin intérieur.
             </Text>
           </>
         ) : (
-          // Saved Quotes
           <Animated.View entering={FadeIn.duration(400)}>
-            <Text style={[styles.savedTitle, ds.text]}>{t('wisdom.saved_title')}</Text>
+            <Text style={[styles.savedTitle, ds.text]}>Citations sauvegardées</Text>
             {savedQuotes.length === 0 ? (
               <View style={styles.emptyState}>
                 <Ionicons name="heart-outline" size={48} color={theme.textMuted} />
                 <Text style={[styles.emptyText, ds.textMuted]}>
-                  {t('wisdom.no_saved')}
+                  Aucune citation sauvegardée
                 </Text>
               </View>
             ) : (

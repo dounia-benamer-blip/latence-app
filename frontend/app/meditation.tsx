@@ -12,30 +12,25 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
-  withRepeat,
-  withSequence,
   Easing,
   interpolate,
 } from 'react-native-reanimated';
-import { useTranslation } from 'react-i18next';
 import { useTheme } from '../src/context/ThemeContext';
 import { CandleFlame } from '../src/components/CandleFlame';
 import { TwinklingStars } from '../src/components/TwinklingStars';
 
 const { width, height } = Dimensions.get('window');
 
-// Breathing patterns
 const BREATHING_PATTERNS = {
-  calm: { name: 'calm', inhale: 4, hold: 4, exhale: 6, holdOut: 2, color: '#8B9A7D' },
-  energize: { name: 'energize', inhale: 4, hold: 0, exhale: 4, holdOut: 0, color: '#D4A574' },
-  sleep: { name: 'sleep', inhale: 4, hold: 7, exhale: 8, holdOut: 0, color: '#6B7A9D' },
-  focus: { name: 'focus', inhale: 4, hold: 4, exhale: 4, holdOut: 4, color: '#9D8B7A' },
+  calm: { name: 'Calme', inhale: 4, hold: 4, exhale: 6, holdOut: 2, color: '#8B9A7D' },
+  energize: { name: 'Énergie', inhale: 4, hold: 0, exhale: 4, holdOut: 0, color: '#D4A574' },
+  sleep: { name: 'Sommeil', inhale: 4, hold: 7, exhale: 8, holdOut: 0, color: '#6B7A9D' },
+  focus: { name: 'Focus', inhale: 4, hold: 4, exhale: 4, holdOut: 4, color: '#9D8B7A' },
 };
 
 export default function MeditationScreen() {
   const router = useRouter();
   const { theme, isDark } = useTheme();
-  const { t } = useTranslation();
   const [isActive, setIsActive] = useState(false);
   const [currentPhase, setCurrentPhase] = useState<'inhale' | 'hold' | 'exhale' | 'holdOut'>('inhale');
   const [pattern, setPattern] = useState<keyof typeof BREATHING_PATTERNS>('calm');
@@ -49,7 +44,6 @@ export default function MeditationScreen() {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const phaseTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Dynamic styles
   const ds = {
     container: { backgroundColor: theme.background },
     text: { color: theme.text },
@@ -99,7 +93,6 @@ export default function MeditationScreen() {
       }
       
       phaseTimerRef.current = setTimeout(() => {
-        // Move to next phase
         if (phase === 'inhale') phase = p.hold > 0 ? 'hold' : 'exhale';
         else if (phase === 'hold') phase = 'exhale';
         else if (phase === 'exhale') {
@@ -117,7 +110,6 @@ export default function MeditationScreen() {
     
     runPhase();
     
-    // Session timer
     timerRef.current = setInterval(() => {
       setSeconds(s => s + 1);
     }, 1000);
@@ -148,10 +140,10 @@ export default function MeditationScreen() {
 
   const getPhaseText = () => {
     switch (currentPhase) {
-      case 'inhale': return t('meditation.inhale');
-      case 'hold': return t('meditation.hold');
-      case 'exhale': return t('meditation.exhale');
-      case 'holdOut': return t('meditation.hold_out');
+      case 'inhale': return 'Inspire';
+      case 'hold': return 'Retiens';
+      case 'exhale': return 'Expire';
+      case 'holdOut': return 'Pause';
     }
   };
 
@@ -167,20 +159,18 @@ export default function MeditationScreen() {
     <View style={[styles.container, ds.container]}>
       <TwinklingStars starCount={40} minSize={1} maxSize={3} />
       
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-down" size={28} color={theme.iconColor} />
         </TouchableOpacity>
         <View style={styles.headerCenter}>
           <CandleFlame size="small" intensity="gentle" />
-          <Text style={[styles.headerTitle, ds.text]}>{t('meditation.title')}</Text>
+          <Text style={[styles.headerTitle, ds.text]}>Méditation</Text>
           <CandleFlame size="small" intensity="gentle" />
         </View>
         <View style={styles.placeholder} />
       </View>
 
-      {/* Main breathing circle */}
       <View style={styles.breathContainer}>
         <Animated.View style={[styles.glowCircle, glowStyle, { backgroundColor: currentPattern.color }]} />
         <Animated.View style={[styles.breathCircle, breathCircleStyle, { borderColor: currentPattern.color }]}>
@@ -194,9 +184,8 @@ export default function MeditationScreen() {
         )}
       </View>
 
-      {/* Pattern selector */}
       <View style={styles.patternContainer}>
-        <Text style={[styles.sectionTitle, ds.textMuted]}>{t('meditation.choose_rhythm')}</Text>
+        <Text style={[styles.sectionTitle, ds.textMuted]}>Choisis ton rythme</Text>
         <View style={styles.patterns}>
           {Object.entries(BREATHING_PATTERNS).map(([key, p]) => (
             <TouchableOpacity
@@ -208,7 +197,7 @@ export default function MeditationScreen() {
               onPress={() => setPattern(key as keyof typeof BREATHING_PATTERNS)}
             >
               <Text style={[styles.patternText, pattern === key ? { color: '#fff' } : ds.text]}>
-                {t(`meditation.patterns.${p.name}`)}
+                {p.name}
               </Text>
               <Text style={[styles.patternTiming, pattern === key ? { color: 'rgba(255,255,255,0.7)' } : ds.textMuted]}>
                 {p.inhale}-{p.hold}-{p.exhale}{p.holdOut > 0 ? `-${p.holdOut}` : ''}
@@ -218,21 +207,19 @@ export default function MeditationScreen() {
         </View>
       </View>
 
-      {/* Stats */}
       {(isActive || seconds > 0) && (
         <View style={styles.statsContainer}>
           <View style={[styles.statCard, ds.card]}>
             <Text style={[styles.statValue, ds.text]}>{formatTime(seconds)}</Text>
-            <Text style={[styles.statLabel, ds.textMuted]}>{t('meditation.duration')}</Text>
+            <Text style={[styles.statLabel, ds.textMuted]}>Durée</Text>
           </View>
           <View style={[styles.statCard, ds.card]}>
             <Text style={[styles.statValue, ds.text]}>{totalBreaths}</Text>
-            <Text style={[styles.statLabel, ds.textMuted]}>{t('common.breaths')}</Text>
+            <Text style={[styles.statLabel, ds.textMuted]}>Respirations</Text>
           </View>
         </View>
       )}
 
-      {/* Control button */}
       <TouchableOpacity
         style={[styles.controlButton, { backgroundColor: isActive ? theme.card : currentPattern.color }]}
         onPress={toggleSession}
@@ -243,14 +230,13 @@ export default function MeditationScreen() {
           color={isActive ? currentPattern.color : '#fff'} 
         />
         <Text style={[styles.controlText, { color: isActive ? currentPattern.color : '#fff' }]}>
-          {isActive ? t('meditation.pause') : t('meditation.start')}
+          {isActive ? 'Pause' : 'Commencer'}
         </Text>
       </TouchableOpacity>
 
-      {/* Instructions */}
       {!isActive && seconds === 0 && (
         <Text style={[styles.instructions, ds.textMuted]}>
-          {t('meditation.instructions')}
+          Trouve un endroit calme, assieds-toi confortablement et laisse ta respiration te guider vers la paix intérieure.
         </Text>
       )}
     </View>
