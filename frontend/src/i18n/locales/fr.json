@@ -504,5 +504,40 @@
     "dream-oracle": "L'Oracle des Rêves",
     "meditation": "La Méditation",
     "rituals": "Les Rituels Lunaires"
+  },
+  "soul_report": {
+    "title": "Rapport de l'Âme",
+    "summary": "Résumé",
+    "emotional_journey": "Voyage émotionnel",
+    "mood_distribution": "Distribution des humeurs",
+    "themes": "Thèmes dominants",
+    "dream_insights": "Révélations oniriques",
+    "growth_areas": "Axes de croissance",
+    "focus": "Focus recommandé",
+    "affirmation": "Affirmation",
+    "generate": "Générer un nouveau rapport",
+    "generate_first": "Générer mon premier rapport",
+    "history": "Rapports précédents",
+    "empty_title": "Ton premier rapport t'attend",
+    "empty_subtitle": "Génère un rapport de l'âme pour découvrir les tendances de ton monde intérieur cette semaine."
+  },
+  "dream_dictionary": {
+    "title": "Dictionnaire Onirique",
+    "search_placeholder": "Rechercher un symbole...",
+    "subtitle": "{{count}} symboles dans ton dictionnaire",
+    "empty_title": "Ton dictionnaire est vide",
+    "empty_subtitle": "Ajoute les symboles récurrents de tes rêves et leur signification personnelle.",
+    "add_first": "Ajouter un symbole",
+    "add_symbol": "Nouveau symbole",
+    "symbol_name": "Nom du symbole",
+    "symbol_placeholder": "ex: eau, lune, maison...",
+    "meaning_label": "Ta signification personnelle",
+    "meaning_placeholder": "Que représente ce symbole pour toi ?",
+    "your_meaning": "Ta signification",
+    "universal_meaning": "Signification universelle",
+    "ai_insight": "Éclairage IA",
+    "occurrences": "Apparitions",
+    "last_seen": "Dernière fois",
+    "emotions": "Émotions associées"
   }
 }
