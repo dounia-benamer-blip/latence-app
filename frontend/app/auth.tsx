@@ -14,13 +14,14 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInUp, FadeInDown } from 'react-native-reanimated';
+import * as AppleAuthentication from 'expo-apple-authentication';
 import { useTheme } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
 
 export default function AuthScreen() {
   const router = useRouter();
   const { theme } = useTheme();
-  const { login, register, loginWithGoogle } = useAuth();
+  const { login, register, loginWithGoogle, loginWithApple } = useAuth();
   
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
@@ -28,6 +29,12 @@ export default function AuthScreen() {
   const [name, setName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isAppleAvailable, setIsAppleAvailable] = useState(false);
+
+  // Check Apple authentication availability
+  React.useEffect(() => {
+    AppleAuthentication.isAvailableAsync().then(setIsAppleAvailable);
+  }, []);
 
   const ds = {
     container: { backgroundColor: theme.background },
