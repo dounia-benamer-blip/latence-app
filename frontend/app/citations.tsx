@@ -164,7 +164,7 @@ export default function CitationsScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-down" size={28} color={theme.iconColor} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, ds.text]}>Sagesse</Text>
+        <Text style={[styles.headerTitle, ds.text]}>{t('wisdom.title')}</Text>
         <TouchableOpacity onPress={() => setShowSaved(!showSaved)} style={styles.savedButton}>
           <Ionicons name={showSaved ? "book" : "book-outline"} size={24} color={theme.iconColor} />
           {savedQuotes.length > 0 && (
