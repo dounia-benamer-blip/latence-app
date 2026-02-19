@@ -149,6 +149,7 @@ export default function CadenceScreen() {
   const router = useRouter();
   const { theme } = useTheme();
   const { t } = useTranslation();
+  const { language } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [cadenceData, setCadenceData] = useState<CadenceData | null>(null);
   const [completedRituals, setCompletedRituals] = useState<string[]>([]);
