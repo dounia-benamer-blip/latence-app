@@ -176,17 +176,19 @@ export default function SubscriptionScreen() {
       astrology: 'Astrologie',
       oracle: 'Oracle des rêves',
       advanced_analysis: 'Analyse approfondie',
-      statistics: 'Statistiques émotionnelles',
+      statistics: 'Statistiques',
       cosmic_tree: 'Arbre cosmique',
       lunar_cycles: 'Cycles lunaires',
-      cadence: 'Cadence (rituels)',
-      sagesse: 'Sagesse (citations)',
-      lettre: 'Lettre à moi-même',
+      cadence: 'Cadence',
+      sagesse: 'Sagesse',
+      lettre: 'Lettre à moi',
+      seal: 'Sceller',
+      dream_interpretation: 'Interprétation des rêves',
       unlimited_archive: 'Archivage illimité',
       seal_permanent: 'Scellés permanents',
       health_sync: 'Sync santé & sommeil',
     };
-    return labels[feature] || feature;
+    return labels[feature] || feature.charAt(0).toUpperCase() + feature.slice(1);
   };
 
   if (isLoading) {
