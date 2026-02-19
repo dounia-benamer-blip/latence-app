@@ -425,6 +425,32 @@ export default function WelcomeScreen() {
   return (
     <SafeAreaView style={[styles.container, dynamicStyles.container]}>
       {renderLanguageModal()}
+      
+      {/* Header with language selector - only on auth step */}
+      {step === 'auth' && (
+        <View style={styles.headerRow}>
+          <TouchableOpacity 
+            style={[styles.languageSelectorInline, dynamicStyles.card]}
+            onPress={() => setShowLanguageModal(true)}
+          >
+            <Text style={styles.languageFlag}>{currentLang.flag}</Text>
+            <Text style={[styles.languageCode, dynamicStyles.text]}>{currentLang.code.toUpperCase()}</Text>
+            <Ionicons name="chevron-down" size={14} color={theme.textMuted} />
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={[styles.themeToggleInline, dynamicStyles.card]}
+            onPress={toggleTheme}
+          >
+            <Ionicons 
+              name={getThemeIcon(themeMode) as any} 
+              size={20} 
+              color={theme.accentWarm} 
+            />
+          </TouchableOpacity>
+        </View>
+      )}
+      
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
