@@ -196,17 +196,8 @@ export default function CadenceScreen() {
   };
 
   const fetchCadence = async () => {
-    try {
-      const response = await fetch(`${API_URL}/api/cadence/daily`);
-      if (response.ok) {
-        const data = await response.json();
-        setCadenceData(data);
-      } else {
-        setCadenceData(generateFallbackCadence());
-      }
-    } catch (error) {
-      setCadenceData(generateFallbackCadence());
-    }
+    // Always use frontend translations for rituals
+    setCadenceData(generateFallbackCadence());
     setLoading(false);
   };
 
