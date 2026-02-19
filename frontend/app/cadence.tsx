@@ -142,6 +142,7 @@ const StreakFlame = ({ streak }: { streak: number }) => {
 export default function CadenceScreen() {
   const router = useRouter();
   const { theme } = useTheme();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [cadenceData, setCadenceData] = useState<CadenceData | null>(null);
   const [completedRituals, setCompletedRituals] = useState<string[]>([]);
@@ -153,6 +154,11 @@ export default function CadenceScreen() {
   const [intention, setIntention] = useState('');
   const [showIntention, setShowIntention] = useState(false);
   const [expandedRitual, setExpandedRitual] = useState<string | null>(null);
+
+  // Get ritual type labels from translations
+  const getRitualLabel = (type: string) => {
+    return t(`cadence.ritual_types.${type}`, type);
+  };
 
   const ds = {
     container: { backgroundColor: theme.background },
