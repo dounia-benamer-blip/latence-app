@@ -17,6 +17,7 @@ import Animated, {
   Easing,
   interpolate,
 } from 'react-native-reanimated';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../src/context/ThemeContext';
 import { CandleFlame } from '../src/components/CandleFlame';
 import { TwinklingStars } from '../src/components/TwinklingStars';
