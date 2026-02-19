@@ -32,7 +32,7 @@ const { width } = Dimensions.get('window');
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
 // Ritual types with icons and colors
-const RITUAL_TYPES = {
+const RITUAL_TYPES: Record<string, { icon: string; color: string; label: string }> = {
   respiration: { icon: 'leaf-outline', color: '#8B9A7D', label: 'Respiration' },
   introspection: { icon: 'eye-outline', color: '#A8B4C4', label: 'Introspection' },
   ecriture: { icon: 'create-outline', color: '#C4A87C', label: 'Écriture' },
@@ -41,11 +41,16 @@ const RITUAL_TYPES = {
   silence: { icon: 'moon-outline', color: '#D4A8D4', label: 'Silence' },
   intention: { icon: 'sunny-outline', color: '#D4C4A8', label: 'Intention' },
   bilan: { icon: 'journal-outline', color: '#A8C4D4', label: 'Bilan' },
+  // Physical activities
+  marche: { icon: 'walk-outline', color: '#7DB38B', label: 'Marche' },
+  nature: { icon: 'leaf-outline', color: '#5D8A66', label: 'Nature' },
+  exercice: { icon: 'fitness-outline', color: '#D49A7C', label: 'Exercice' },
+  etirement: { icon: 'body-outline', color: '#9A7CD4', label: 'Étirement' },
 };
 
 interface DailyRitual {
   id: string;
-  type: keyof typeof RITUAL_TYPES;
+  type: string;
   title: string;
   description: string;
   duration: string;
