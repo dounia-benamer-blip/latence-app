@@ -189,7 +189,11 @@
       "meditation": "Meditation",
       "silence": "Silence",
       "intention": "Intention",
-      "bilan": "Review"
+      "bilan": "Review",
+      "marche": "Walk",
+      "nature": "Nature",
+      "exercice": "Exercise",
+      "etirement": "Stretching"
     },
     "rituals": {
       "intention_title": "Daily intention",
@@ -208,7 +212,15 @@
       "silence_desc": "Close your eyes. Listen to the silence between sounds. Do nothing but be present.",
       "bilan_title": "Evening review",
       "bilan_desc": "What went well? What could you have done differently? What do you need tomorrow?",
-      "bilan_placeholder": "Today, I noticed that..."
+      "bilan_placeholder": "Today, I noticed that...",
+      "walk_title": "Conscious walk",
+      "walk_desc": "Walk slowly, mindfully. Feel each step, listen to the sounds around you, observe without judging.",
+      "nature_title": "Nature outing",
+      "nature_desc": "Step outside for a few minutes. Breathe fresh air, touch a tree, look at the sky. Reconnect with the earth.",
+      "exercise_title": "Energizing exercise",
+      "exercise_desc": "A few dynamic movements to wake up your body: jumps, squats, or simply shake your limbs.",
+      "stretch_title": "Gentle stretches",
+      "stretch_desc": "Gently stretch your neck, shoulders, back. Release the tensions accumulated in your body."
     },
     "gratitude_modal_title": "Your 3 gratitudes",
     "gratitude_modal_subtitle": "Even the little things count",
