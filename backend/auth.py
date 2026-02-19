@@ -17,6 +17,7 @@ import httpx
 import qrcode
 import io
 import base64
+import os
 
 auth_router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 subscription_router = APIRouter(prefix="/api/subscription", tags=["Subscription"])
