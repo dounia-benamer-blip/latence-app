@@ -524,12 +524,12 @@ export default function CadenceScreen() {
                 <View style={styles.ritualContent}>
                   <View style={styles.ritualHeader}>
                     <Text style={[styles.ritualTitle, ds.text, isCompleted && styles.textCompleted]}>
-                      {ritual.title}
+                      {t(`cadence.rituals.${ritual.id}_title`, ritual.title)}
                     </Text>
                     <Text style={[styles.ritualDuration, { color: typeInfo.color }]}>{ritual.duration}</Text>
                   </View>
                   <Text style={[styles.ritualDescription, ds.textSecondary, isCompleted && styles.textCompleted]}>
-                    {ritual.description}
+                    {t(`cadence.rituals.${ritual.id}_desc`, ritual.description)}
                   </Text>
                   
                   {/* Expanded input for bilan type */}
