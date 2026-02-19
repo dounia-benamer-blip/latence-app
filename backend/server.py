@@ -32,6 +32,27 @@ api_router = APIRouter(prefix="/api")
 from auth import register_auth_routes, get_current_user, check_feature_access, check_usage_limit, SUBSCRIPTION_TIERS
 register_auth_routes(app, db)
 
+# Import notification service
+from notifications import check_and_send_capsule_notifications, check_and_send_letter_notifications, send_daily_reminder
+
+# Notification endpoint (can be triggered by cron job or manually)
+@api_router.post("/notifications/check")
+async def check_notifications():
+    """Check and send pending notifications for capsules and letters"""
+    capsules_sent = await check_and_send_capsule_notifications(db)
+    letters_sent = await check_and_send_letter_notifications(db)
+    return {
+        "success": True,
+        "capsules_notified": capsules_sent,
+        "letters_notified": letters_sent
+    }
+
+@api_router.post("/notifications/daily-reminder")
+async def trigger_daily_reminder():
+    """Trigger daily journaling reminder"""
+    sent = await send_daily_reminder(db)
+    return {"success": True, "sent": sent}
+
 # ==================== SACRED TEXTS DATABASE ====================
 # Texts from ALL wisdom traditions - universal and timeless
 
