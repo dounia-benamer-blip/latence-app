@@ -235,28 +235,6 @@ export default function WelcomeScreen() {
 
   const renderAuth = () => (
     <Animated.View entering={FadeIn.duration(800)} style={styles.authContainer}>
-      {/* Language Selector */}
-      <TouchableOpacity 
-        style={[styles.languageSelector, dynamicStyles.card]}
-        onPress={() => setShowLanguageModal(true)}
-      >
-        <Text style={styles.languageFlag}>{currentLang.flag}</Text>
-        <Text style={[styles.languageCode, dynamicStyles.text]}>{currentLang.code.toUpperCase()}</Text>
-        <Ionicons name="chevron-down" size={14} color={theme.textMuted} />
-      </TouchableOpacity>
-
-      {/* Theme Toggle */}
-      <TouchableOpacity 
-        style={[styles.themeToggle, dynamicStyles.card]}
-        onPress={toggleTheme}
-      >
-        <Ionicons 
-          name={getThemeIcon(themeMode) as any} 
-          size={20} 
-          color={theme.accentWarm} 
-        />
-      </TouchableOpacity>
-
       <View style={styles.brandingContainer}>
         <Text style={[styles.appName, dynamicStyles.text]}>Latence</Text>
         <Text style={[styles.byLine, dynamicStyles.textMuted]}>by Atelier Benamer</Text>
