@@ -507,7 +507,6 @@ def register_auth_routes(app, db: AsyncIOMotorDatabase):
     @subscription_router.post("/create-checkout")
     async def create_checkout_session(request: Request):
         """Create Stripe checkout session for subscription"""
-        import os
         from emergentintegrations.payments.stripe.checkout import (
             StripeCheckout, CheckoutSessionRequest
         )
@@ -571,7 +570,6 @@ def register_auth_routes(app, db: AsyncIOMotorDatabase):
     @subscription_router.get("/checkout-status/{session_id}")
     async def get_checkout_status(session_id: str, request: Request):
         """Check payment status and update subscription if successful"""
-        import os
         from emergentintegrations.payments.stripe.checkout import StripeCheckout
         
         api_key = os.environ.get("STRIPE_API_KEY")
