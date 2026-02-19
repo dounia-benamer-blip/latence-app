@@ -24,7 +24,6 @@ import Animated, {
   Easing,
   interpolate,
 } from 'react-native-reanimated';
-import { useTranslation } from 'react-i18next';
 import { useTheme } from '../src/context/ThemeContext';
 import { TwinklingStars } from '../src/components/TwinklingStars';
 
@@ -155,7 +154,6 @@ const AnimatedMoon = ({ phase, size = 100 }: { phase: string; size?: number }) =
 export default function RitualsScreen() {
   const router = useRouter();
   const { theme } = useTheme();
-  const { t, i18n } = useTranslation();
   const [currentPhase, setCurrentPhase] = useState(getMoonPhase());
   const [phaseData, setPhaseData] = useState<PhaseData | null>(null);
   const [generatedRitual, setGeneratedRitual] = useState<GeneratedRitual | null>(null);
@@ -288,7 +286,7 @@ export default function RitualsScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton} data-testid="back-button">
           <Ionicons name="chevron-down" size={28} color={theme.iconColor} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, ds.text]}>{t('rituals.title')}</Text>
+        <Text style={[styles.headerTitle, ds.text]}>Rituels Lunaires</Text>
         <View style={styles.placeholder} />
       </View>
 
@@ -300,7 +298,7 @@ export default function RitualsScreen() {
 
         {/* Phase Info */}
         <Animated.View entering={FadeInUp.duration(600).delay(200)} style={[styles.phaseCard, ds.card]}>
-          <Text style={[styles.phaseName, ds.text]}>{t(`rituals.moon_phases.${getMoonPhaseKey(currentPhase)}`)}</Text>
+          <Text style={[styles.phaseName, ds.text]}>{currentPhase}</Text>
           {phaseData && (
             <>
               <View style={styles.phaseDetails}>
@@ -308,7 +306,7 @@ export default function RitualsScreen() {
                   <Text style={[styles.detailText, { color: theme.accentWarm }]}>{phaseData.element}</Text>
                 </View>
                 <View style={[styles.detailBadge, { backgroundColor: `${theme.accent}20` }]}>
-                  <Text style={[styles.detailText, { color: theme.accent }]}>{t('rituals.day_in_cycle', { day: phaseData.day_in_cycle })}</Text>
+                  <Text style={[styles.detailText, { color: theme.accent }]}>Jour {phaseData.day_in_cycle}</Text>
                 </View>
               </View>
               <Text style={[styles.phaseEnergy, ds.textSecondary]}>{phaseData.energy}</Text>
@@ -319,7 +317,7 @@ export default function RitualsScreen() {
 
         {/* Phase Selector */}
         <Animated.View entering={FadeInUp.duration(600).delay(300)}>
-          <Text style={[styles.sectionTitle, ds.text]}>{t('rituals.phases_title')}</Text>
+          <Text style={[styles.sectionTitle, ds.text]}>Phases lunaires</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.phasesScroll}>
             {MOON_PHASES.map((phase) => (
               <TouchableOpacity
@@ -340,7 +338,7 @@ export default function RitualsScreen() {
                   styles.phaseChipText,
                   { color: phase.name === currentPhase ? '#fff' : theme.textSecondary }
                 ]}>
-                  {t(`rituals.moon_phases_short.${getMoonPhaseKey(phase.name)}`)}
+                  {phase.shortName}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -350,10 +348,10 @@ export default function RitualsScreen() {
         {/* Intention Input */}
         {!showRitual && (
           <Animated.View entering={FadeInUp.duration(600).delay(400)} style={[styles.intentionCard, ds.card]}>
-            <Text style={[styles.intentionLabel, ds.text]}>{t('rituals.intention_label')}</Text>
+            <Text style={[styles.intentionLabel, ds.text]}>Ton intention (optionnel)</Text>
             <TextInput
               style={[styles.intentionInput, ds.text, { borderColor: theme.border, backgroundColor: theme.inputBackground }]}
-              placeholder={t('rituals.intention_placeholder')}
+              placeholder="Que souhaites-tu manifester ?"
               placeholderTextColor={theme.textMuted}
               value={customIntention}
               onChangeText={setCustomIntention}
@@ -372,7 +370,7 @@ export default function RitualsScreen() {
               ) : (
                 <>
                   <Ionicons name="moon" size={20} color="#fff" />
-                  <Text style={styles.generateButtonText}>{t('rituals.generate')}</Text>
+                  <Text style={styles.generateButtonText}>Créer mon rituel</Text>
                 </>
               )}
             </TouchableOpacity>
@@ -399,7 +397,7 @@ export default function RitualsScreen() {
             {/* Preparation */}
             <View style={[styles.ritualCard, ds.card]}>
               <Text style={[styles.ritualSectionTitle, ds.text]}>
-                <Ionicons name="sparkles-outline" size={16} /> {t('rituals.preparation')}
+                <Ionicons name="sparkles-outline" size={16} /> Préparation
               </Text>
               {generatedRitual.preparation.map((item, i) => (
                 <View key={i} style={styles.prepItem}>
@@ -412,7 +410,7 @@ export default function RitualsScreen() {
             {/* Steps */}
             <View style={[styles.ritualCard, ds.card]}>
               <Text style={[styles.ritualSectionTitle, ds.text]}>
-                <Ionicons name="list-outline" size={16} /> {t('rituals.steps')}
+                <Ionicons name="list-outline" size={16} /> Étapes
               </Text>
               {generatedRitual.steps.map((step, i) => (
                 <TouchableOpacity
@@ -467,7 +465,7 @@ export default function RitualsScreen() {
                 {generatedRitual.closing}
               </Text>
               <View style={[styles.affirmationBox, { backgroundColor: `${theme.accentWarm}10` }]}>
-                <Text style={[styles.affirmationLabel, ds.textMuted]}>{t('rituals.affirmation')}</Text>
+                <Text style={[styles.affirmationLabel, ds.textMuted]}>Affirmation</Text>
                 <Text style={[styles.affirmationText, ds.text]}>
                   "{generatedRitual.affirmation}"
                 </Text>
@@ -485,7 +483,7 @@ export default function RitualsScreen() {
               data-testid="new-ritual-btn"
             >
               <Ionicons name="refresh" size={18} color={theme.textMuted} />
-              <Text style={[styles.newRitualText, ds.textMuted]}>{t('rituals.new_ritual')}</Text>
+              <Text style={[styles.newRitualText, ds.textMuted]}>Nouveau rituel</Text>
             </TouchableOpacity>
           </Animated.View>
         )}
