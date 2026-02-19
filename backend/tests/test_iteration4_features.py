@@ -11,7 +11,7 @@ import requests
 import os
 import time
 
-BASE_URL = os.environ.get('EXPO_PUBLIC_BACKEND_URL', 'https://cosy-cosmos.preview.emergentagent.com')
+BASE_URL = os.environ.get('EXPO_PUBLIC_BACKEND_URL', 'https://latence-journal.preview.emergentagent.com')
 
 class TestLunarPhaseAPI:
     """Test /api/lunar-phase/current endpoint"""

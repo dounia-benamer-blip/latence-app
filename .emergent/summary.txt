@@ -2,112 +2,94 @@
 The user wants to build an immersive mobile journal application called Latence, with a strong focus on astrology, emotional well-being, and pervasive AI integration. The app should have a polished, cosy, and magical UI/UX.
 
 PRODUCT REQUIREMENTS:
-The user has requested the implementation of a structured 3-tier payment system.
-1.  **Free Tier / Trial:** A 2-day free trial with full access.
-2.  **Essentiel Subscription (€9.99/month):** Includes all writing features but excludes advanced AI analysis.
-3.  **Premium Subscription (€18.99/month):** Unlocks all features.
-4.  **Lifetime Access:** Granted via unique, single-use codes generated from an in-app admin dashboard.
-5.  **Authentication & Admin:** Requires user authentication (Email/Password, Google, Apple) and an in-app admin dashboard.
-6.  **Internationalization:** The entire application must be available in French, English, and Spanish. (This requirement has been **REMOVED** by the user in favor of a French-only application).
-7.  **New Features Requested:**
-    *   **Cadence Module:** Add physical activities (e.g., conscious walk, nature outing) and make them more intelligent.
-    *   **Rapport de l'Âme (Soul Report):** A new feature to automatically generate a weekly summary of the user's emotional journey.
-    *   **Dictionnaire Onirique (Dream Dictionary):** A new feature for users to build a personal, searchable dictionary of their dream symbols.
-8.  **Deployment:** Prepare the application for submission to the Apple App Store.
+1.  **Monetization:** A 3-tier payment system (Free Trial, Essentiel Subscription, Premium Subscription) and lifetime access via admin-generated codes.
+2.  **Authentication:** User authentication via Email/Password, Google, and Apple.
+3.  **Core Features:**
+    *   **Cadence Module:** A feature for physical/mindful activities. The user has requested this be enhanced with more intelligent rituals.
+    *   **Rapport de l'Âme (Soul Report):** An AI-generated weekly emotional summary.
+    *   **Dictionnaire Onirique (Dream Dictionary):** A personal, searchable dream symbol dictionary.
+4.  **Internationalization (i18n):** Originally requested for French, English, and Spanish, this requirement has been **REMOVED** by the user due to persistent bugs. The application is to be reverted to **French-only**.
+5.  **Deployment:** The user initially requested preparation for Apple App Store submission, but has since **DE-PRIORITIZED** this, asking to focus on a web deployment for now.
 
 **User's preferred language**: French
 
 **what currently exists?**
-The application is a full-stack React Native (Expo) and FastAPI project with a MongoDB database.
--   **Monetization & Auth:** A complete authentication (Email/Password, Google, Apple), 3-tier subscription system with Stripe, and an admin dashboard are fully functional.
--   **Features:** The Rapport de lÂme" (Soul Report) and "Dictionnaire Onirique" (Dream Dictionary) features are now fully implemented and functional.
--   **UI Bugs:** Previously reported UI bugs (Lifetime code visibility, label casing) have been fixed.
--   **Internationalization (i18n):** The app was fully translated, but due to persistent and complex bugs related to dynamic content not updating on language change, the user has requested its complete removal. The process of reverting the app to be French-only has begun.
+The application is in the middle of a significant refactoring process. The previous agent has made substantial progress in removing the internationalization (i18n) system from the React Native (Expo) frontend. This involved deleting i18n-specific files and directories (, ) and overwriting numerous component files () to replace translation hook calls () with hardcoded French strings. The frontend is currently in a transitional and likely non-functional state pending completion of this work. The FastAPI backend and its core features (Soul Report, Dream Dictionary, Stripe Subscriptions) remain intact.
 
 **Last working item**:
--   **Last item agent was working**: Responding to user frustration with translation bugs, the agent began reverting the application to be French-only. The user also requested to enrich the "Cadence" module with more "intelligent" activities. The agent started by modifying `frontend/src/app/(tabs)/cadence.tsx` to remove translation logic and was planning to continue this process across the app.
+-   **Last item agent was working**: The agent was systematically removing all internationalization code from the frontend. It was in the process of overwriting multiple component files (, , , , etc.) with new, simplified, French-only versions using the  tool.
 -   **Status**: IN PROGRESS
 -   **Agent Testing Done**: N
--   **Which testing method agent to use?**: frontend testing agent. The test should confirm that all language selectors and English/Spanish text have been removed from the entire application, ensuring all UI is exclusively in French. It should also verify that the new "intelligent" activities are present in the Cadence module.
+-   **Which testing method agent to use?**: frontend testing agent. The test must confirm that all language selectors, translation hooks, and non-French text have been completely removed. It should also serve as a regression test to ensure the UI is not broken after the extensive file overwrites.
 -   **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
 -   **Issue 1: Complete Reversion to a French-Only Application (P0)**
 -   **Issue 2: Enhance the Cadence Module (P1)**
--   **Issue 3: Prepare for App Store Submission (P2)**
 
 **Issues Detail**:
 -   **Issue 1: Complete Reversion to a French-Only Application**
-    -   **Attempted fixes**: The agent started modifying `cadence.tsx` and the `LanguageContext` to remove translation logic and non-French languages.
+    -   **Attempted fixes**: The agent deleted  and . It also overwrote a large number of component files to remove  and hardcode French text.
     -   **Next debug checklist**:
-        1.  Systematically go through all frontend components (`index.tsx`, `home.tsx`, `cadence.tsx`, etc.) and replace all `useTranslation` hook calls (`t(key)`) with hardcoded French strings.
-        2.  Remove the `<LanguageSelector />` component from `index.tsx` and `home.tsx`.
-        3.  Delete the `frontend/src/contexts/LanguageContext.tsx` file and remove its provider from the layout.
-        4.  Delete the entire `frontend/src/locales` directory.
-        5.  Uninstall `i18next`, `react-i18next`, and `i18next-browser-languagedetector` from `package.json` and run `yarn install`.
-        6.  Review backend endpoints that accepted a `language` parameter (e.g., `/api/mirror_reflect`) and remove it to simplify the code.
-    -   **Why fix this issue and what will be achieved with the fix?**: This is a direct, high-priority user request to eliminate a major source of bugs and simplify the application.
+        1.  Open  and remove the , , and  dependencies.
+        2.  Run yarn install v1.22.22
+[1/4] Resolving packages...
+success Already up-to-date.
+Done in 0.61s. to apply the dependency changes.
+        3.  Review backend API endpoints (e.g., in ) and remove any  parameters to simplify the code.
+        4.  Run a full test of the application to identify and fix any UI breakages or rendering issues caused by the extensive file modifications.
+    -   **Why fix this issue and what will be achieved with the fix?**: This is a direct, high-priority user request to eliminate a major source of bugs, simplify the codebase, and stabilize the application.
     -   **Status**: IN PROGRESS
-    -   **Is recurring issue?**: Y (The underlying i18n bugs were recurring).
+    -   **Is recurring issue?**: Y (The i18n bugs were recurring, leading to this removal).
     -   **Should Test frontend/backend/both after fix?**: Both
     -   **Blocked on other issue**: None
 
 -   **Issue 2: Enhance the Cadence Module**
-    -   **Attempted fixes**: The file `cadence.tsx` was opened for modification.
+    -   **Attempted fixes**: None.
     -   **Next debug checklist**:
-        1.  Brainstorm and add several new, engaging, and "intelligent" rituals to the list of activities in `frontend/src/app/(tabs)/cadence.tsx`.
-        2.  Ensure the new activities are properly displayed with titles and descriptions in the UI.
-    -   **Why fix this issue and what will be achieved with the fix?**: A direct user request to improve and enrich a core feature.
+        1.  After the app is stabilized, modify .
+        2.  Brainstorm and add several new, engaging, and intelligent rituals to the list of activities.
+        3.  Ensure the new activities display correctly with French titles and descriptions.
+    -   **Why fix this issue and what will be achieved with the fix?**: This is a direct user request to improve a core feature.
     -   **Status**: NOT STARTED
     -   **Is recurring issue?**: N
     -   **Should Test frontend/backend/both after fix?**: Frontend
-    -   **Blocked on other issue**: Should be done concurrently with or after Issue 1, as it involves editing the same files.
-
--   **Issue 3: Prepare for App Store Submission**
-    -   **Attempted fixes**: The agent created `eas.json` and a detailed guide `APP_STORE_GUIDE.md`.
-    -   **Next debug checklist**:
-        1.  After the app is stabilized as French-only, review `app.json` and `eas.json` to remove any locale or i18n-related configurations.
-        2.  Confirm with the user that they are ready to proceed with the App Store submission steps.
-    -   **Why fix this issue and what will be achieved with the fix?**: This is a primary, long-term goal for the user.
-    -   **Status**: NOT STARTED (Deferred by user)
-    -   **Is recurring issue?**: N
-    -   **Should Test frontend/backend/both after fix?**: N/A
-    -   **Blocked on other issue**: Issue 1: Complete Reversion to a French-Only Application
+    -   **Blocked on other issue**: Issue 1: Complete Reversion to a French-Only Application.
 
 **In progress Task List**:
--   **Task 1: Simplify and Enhance the App**
-    -   **Where to resume**: Resume work in `frontend/src/app/(tabs)/cadence.tsx`. Complete the removal of all i18n-related code from the entire application and then add the new, enriched activities to the Cadence module.
-    -   **What will be achieved with this?**: The app will be stable, simplified to a single language as requested, and a core feature will be enhanced.
+-   **Task 1: Finalize i18n Removal**
+    -   **Where to resume**: The file modifications are largely complete. The immediate next step is to edit  to uninstall the now-unused i18n libraries.
+    -   **What will be achieved with this?**: The application will be fully purged of the problematic translation system, leading to a more stable and maintainable codebase.
     -   **Status**: IN PROGRESS
     -   **Should Test frontend/backend/both after fix?**: Both
     -   **Blocked on something**: None
 
 **Upcoming and Future Tasks**
 **Upcoming Tasks:**
--   **(P0) Finalize App Store Submission**: Once the French-only version is stable and approved by the user, proceed with guiding them through the App Store submission process using the prepared `APP_STORE_GUIDE.md`.
--   **(P1) Enhance `Cadence` Module further**: Implement streak tracking and astral rituals.
+-   **(P0) Enhance  Module**: Once the i18n removal is complete and verified, implement the new intelligent activities in the Cadence module as requested by the user.
 
 **Future Tasks:**
--   **(P2) Implement Astrological Houses**: Add a new section to the `Cosmos` page.
--   **(P3) Refactor Backend**: Split the monolithic `backend/api/auth.py` into a more maintainable `routes/` directory structure.
--   **(P3) Refactor Frontend**: Delete unused files from previous iterations (`app/tarot.tsx`, `app/compatibility.tsx`).
+-   **(P1) Refactor Backend**: Split the monolithic  into a more maintainable  directory structure.
+-   **(P2) Implement Astrological Houses**: Add a new section to the  page.
+-   **(P3) Cleanup Unused Files**: Delete old, unused files from previous iterations (, ).
+-   **(DEFERRED) App Store Submission**: The user has explicitly asked to forget this for now in favor of a web deployment.
 
 **Completed work in this session**
--   **"Rapport de lÂme Feature (DONE)**: Fully implemented the Soul Report feature on both the frontend and backend.
--   **Dictionnaire Onirique Feature (DONE)**: Fully implemented the Dream Dictionary feature on both the frontend and backend.
--   **Subscription Page UI Fixes (DONE)**: Resolved bugs related to the visibility of the Lifetime Code input field and inconsistent label casing.
--   **App Store Prep (STARTED)**: Created  and  to guide the user.
--   **Internationalization (ATTEMPTED & REVERTED)**: Attempted to fix complex i18n bugs and added a language selector to the welcome screen before the user requested to remove the feature entirely.
+-   Confirmed user's pivot to a French-only application and de-prioritization of the App Store submission.
+-   Provided the user with their admin dashboard URL and credentials.
+-   Deleted i18n-related directories () and context files ().
+-   Removed the  from the main app layout ().
+-   Rewrote and simplified over a dozen frontend component files to remove all translation logic and hardcode French text.
 
 **Earlier issues found/mentioned but not fixed**
 -   **Issue 1: Hardcoded Backend Text**
     -   **Debug checklist**: The  in  are hardcoded in French.
-    -   **Why to solve this issue and what will be achieved with this?**: While no longer a functional bug since the app is French-only, this is technical debt. Fixing it would make future changes easier. This is a low-priority refactor.
+    -   **Why to solve this issue and what will be achieved with this?**: This is no longer a functional bug since the app is now French-only. It remains minor technical debt that could be addressed during a future backend refactor.
     -   **Should Test frontend/backend/both after fix**: Backend
-    -   **Is recurring issue?**: Y
+    -   **Is recurring issue?**: N/A
 
 **Known issue recurrence from previous fork**
-- The core recurring issue was the difficulty with internationalization and state re-rendering in React Native, which proved too complex to fix reliably and has now been addressed by removing the feature.
+-   The core recurring issue with  state management in React Native has been addressed by the decision to completely remove the feature.
 
 **Code Architecture**
 
@@ -121,33 +103,37 @@ The application is a full-stack React Native (Expo) and FastAPI project with a M
 **key DB schema**
 -   ****: 
 -   ****: 
--   ****:  (Implicitly created)
--   ****:  (Implicitly created)
+-   ****: 
+-   ****: 
 
 **changes in tech stack**
--   **REMOVAL**: , , and all related translation libraries are being removed from the project.
+-   **PENDING REMOVAL**: , , and  need to be uninstalled.
 
 **All files of reference**
--   : Currently being modified to remove i18n.
--   : Needs significant modification to remove i18n.
--   : To be deleted.
--   : Entire directory to be deleted.
--   : New document with user instructions for deployment.
--   : New Expo Application Services configuration file.
+-   : Needs to be modified to remove i18n dependencies.
+-   All  files under : The majority have been overwritten and should be checked.
+-   : May require simplification to remove language parameters from endpoints.
 
 **Areas that need refactoring**:
--   **Complete i18n Removal**: The most critical refactoring task is to purge all remnants of the internationalization system from the codebase.
--   **Backend Modularity**: The  file remains monolithic and would benefit from being split into separate route files.
+-   **Dependency Cleanup**:  must be cleaned of i18n libraries, followed by yarn install v1.22.22
+[1/4] Resolving packages...
+success Already up-to-date.
+Done in 0.59s..
+-   **Backend Modularity**: The  file is monolithic and a good candidate for being split into a  directory.
 
 **key api endpoints**
--    (POST): **FUNCTIONAL**
--    (GET): **FUNCTIONAL**
--    (POST): **FUNCTIONAL**
+-    (POST)
+-    (GET)
+-    (POST)
+-    (POST)
 
 **Critical Info for New Agent**
--   **MAJOR PIVOT**: The user has abandoned the multi-language requirement. The highest priority task (P0) is to remove all internationalization code and revert the app to be **French-only**. Do not attempt to fix any translation bugs; remove the feature entirely.
--   **Enrich Cadence**: Concurrently, the user wants the Cadence module to be enhanced with more intelligent and engaging activities.
--   **App Store Goal is Paused**: The goal of preparing for the App Store is secondary to stabilizing the app as a French-only version. Revisit this only after the reversion is complete and tested.
+-   **TOP PRIORITY (P0)**: You must **finish** the removal of the internationalization (i18n) system. The immediate next step is to edit  to remove i18n libraries and then run yarn install v1.22.22
+[1/4] Resolving packages...
+success Already up-to-date.
+Done in 0.42s..
+-   **TESTING IS CRITICAL**: After completing the removal, the application must be thoroughly tested. A frontend testing agent is recommended to check for broken UI and confirm the app renders correctly in French.
+-   **USER PRIORITIES**: The user has explicitly stated to forget the App Store submission goal. The next feature task after stabilizing the app is to enhance the Cadence module. Do not work on anything else until the French-only version is stable and the Cadence module is enhanced.
 
 **documents and test reports created in this job**
 -   
@@ -155,19 +141,12 @@ The application is a full-stack React Native (Expo) and FastAPI project with a M
 -   
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User**: Asks for a full preview/test of the application.
-2.  **User**: Notices translation issues on the welcome screen and asks for a fix: the language should be chosen at the very start and control everything. Asks to remove Spanish.
-3.  **Agent**: Acknowledges and starts working on moving the language selector to the welcome screen.
-4.  (Agent struggles with i18n bugs on the welcome screen).
-5.  **User**: Expresses frustration with translation bugs.
-6.  **User**: Asks to check the Cadence module for translation issues.
-7.  **Agent**: Confirms Cadence also has i18n issues and struggles to fix them.
-8.  **User**: **You know what? Remove everything in English, leave everything in French because this is too complicated.** (CRITICAL PIVOT)
-9.  **User**: **So do that quickly, remove English completely.**
-10. **User**: **And... add stuff to Cadence, add intelligent stuff. What do you think? Like to start.** (PENDING)
+- User confirmed the plan to remove i18n and enhance the Cadence module.
+- User explicitly requested to ignore the App Store submission task for now.
+- User requested the URL for the admin dashboard.
 
 **Project Health Check:**
--   **Broken**: The internationalization system is mid-removal. The app is in an inconsistent state where some parts have been reverted to French-only while others still contain failing translation logic.
+-   **Broken**: The application is in a non-functional, mid-refactoring state. The frontend has undergone massive changes by overwriting files, and the corresponding dependencies have not yet been removed. It will not run correctly until the i18n removal process is fully completed and tested.
 -   **Mocked**: None.
 
 **3rd Party Integrations**
@@ -177,15 +156,17 @@ The application is a full-stack React Native (Expo) and FastAPI project with a M
 -   **Apple Authentication**
 
 **Testing status**
--   **Testing agent used after significant changes**: YES (for the new features, which all passed).
+-   **Testing agent used after significant changes**: NO (Not yet in this session, but it is required after the refactor is complete).
 -   **Troubleshoot agent used after agent stuck in loop**: NO.
 -   **Test files created**: None.
--   **Known regressions**: The entire internationalization feature is considered a regression and is actively being removed. The root cause of i18next state not propagating correctly on navigation was never fixed.
+-   **Known regressions**: The entire app's UI is potentially regressed due to the extensive file overwrites.
 
 **Credentials to test flow:**
 -   **Admin User**:  / 
--   **Regular User**: Register a new user via the app.
+-   **Regular User**: Register a new user via the app (once functional).
 
 **What agent forgot to execute**
--   The previous agent got stuck trying to fix complex i18n state management issues, which led to user frustration and the decision to pivot.
--   The agent had not yet started adding the intelligent activities to the Cadence module as requested in the user's last message.</analysis>
+-   The agent correctly identified the files to change but has not yet completed the final crucial steps of the i18n removal:
+    1.  Uninstalling the dependencies (, , etc.) from .
+    2.  Simplifying the backend API by removing now-redundant  parameters.
+    3.  Initiating any form of testing to validate the massive changes.</analysis>

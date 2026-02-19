@@ -141,7 +141,7 @@ Application mobile de journaling immersive avec focus sur l'astrologie, le bien-
 
 ## Credentials Test
 - **Admin**: admin@latence.app / adminpassword
-- **Preview URL**: https://cosy-cosmos.preview.emergentagent.com
+- **Preview URL**: https://latence-journal.preview.emergentagent.com
 
 ## Notes Techniques
 - MongoDB via MONGO_URL en env
