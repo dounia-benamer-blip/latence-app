@@ -449,27 +449,51 @@ export default function HomeScreen() {
 
         {/* Menu */}
         <View style={styles.menuContainer}>
-          {MENU_ITEMS.map((item, index) => (
-            <Animated.View
-              key={item.id}
-              entering={FadeInUp.duration(500).delay(300 + index * 80)}
-            >
-              <TouchableOpacity
-                style={[styles.menuItem, dynamicStyles.card]}
-                onPress={() => router.push(item.route as any)}
-                activeOpacity={0.7}
+          {MENU_ITEMS.map((item, index) => {
+            // Check if this feature requires Premium
+            const isPremiumFeature = PREMIUM_FEATURES.includes(item.id);
+            const userTier = subscriptionStatus?.tier || 'free';
+            const hasPremiumAccess = userTier === 'premium' || userTier === 'lifetime';
+            const isLocked = isPremiumFeature && !hasPremiumAccess && userTier === 'essentiel';
+            
+            const handlePress = () => {
+              if (isLocked) {
+                setBlockedFeature(item.id);
+                setShowPremiumPopup(true);
+              } else {
+                router.push(item.route as any);
+              }
+            };
+            
+            return (
+              <Animated.View
+                key={item.id}
+                entering={FadeInUp.duration(500).delay(300 + index * 80)}
               >
-                <View style={[styles.menuIcon, { backgroundColor: theme.background }]}>
-                  <Ionicons name={item.icon as any} size={24} color={theme.iconColor} />
-                </View>
-                <View style={styles.menuText}>
-                  <Text style={[styles.menuTitle, dynamicStyles.text]}>{item.title}</Text>
-                  <Text style={[styles.menuSubtitle, dynamicStyles.textMuted]}>{item.subtitle}</Text>
-                </View>
-                <Ionicons name="chevron-forward" size={20} color={theme.textMuted} />
-              </TouchableOpacity>
-            </Animated.View>
-          ))}
+                <TouchableOpacity
+                  style={[styles.menuItem, dynamicStyles.card, isLocked && styles.menuItemLocked]}
+                  onPress={handlePress}
+                  activeOpacity={0.7}
+                >
+                  <View style={[styles.menuIcon, { backgroundColor: theme.background }]}>
+                    <Ionicons name={item.icon as any} size={24} color={isLocked ? theme.textMuted : theme.iconColor} />
+                  </View>
+                  <View style={styles.menuText}>
+                    <Text style={[styles.menuTitle, dynamicStyles.text, isLocked && { color: theme.textMuted }]}>{item.title}</Text>
+                    <Text style={[styles.menuSubtitle, dynamicStyles.textMuted]}>{item.subtitle}</Text>
+                  </View>
+                  {isLocked ? (
+                    <View style={[styles.lockBadge, { backgroundColor: '#9B59B620' }]}>
+                      <Ionicons name="lock-closed" size={14} color="#9B59B6" />
+                      <Text style={styles.lockBadgeText}>Premium</Text>
+                    </View>
+                  ) : (
+                    <Ionicons name="chevron-forward" size={20} color={theme.textMuted} />
+                  )}
+                </TouchableOpacity>
+              </Animated.View>
+            );
+          })}
         </View>
 
         {/* Book Recommendations */}
