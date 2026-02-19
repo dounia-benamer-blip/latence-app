@@ -336,7 +336,7 @@ export default function HomeScreen() {
   };
 
   const moonPhase = getMoonPhase();
-  const today = formatToday();
+  const today = formatToday(t);
 
   // Dynamic styles based on theme
   const dynamicStyles = {
@@ -385,6 +385,8 @@ export default function HomeScreen() {
             <Text style={[styles.byLine, dynamicStyles.textMuted]}>by Atelier Benamer</Text>
           </View>
           <View style={styles.headerButtons}>
+            {/* Language Selector */}
+            <LanguageSelector />
             {/* Theme Toggle Button */}
             <TouchableOpacity 
               style={[styles.themeButton, dynamicStyles.card]}
