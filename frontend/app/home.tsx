@@ -453,14 +453,14 @@ export default function HomeScreen() {
             onPress={() => router.push('/capsule/list')}
           >
             <Text style={[styles.statNumber, dynamicStyles.text]}>{capsuleCount}</Text>
-            <Text style={[styles.statLabel, dynamicStyles.textMuted]}>capsules</Text>
+            <Text style={[styles.statLabel, dynamicStyles.textMuted]}>{t('home.capsules')}</Text>
           </TouchableOpacity>
           <TouchableOpacity 
             style={[styles.statCard, dynamicStyles.card]}
             onPress={() => router.push('/dreams')}
           >
             <Text style={[styles.statNumber, dynamicStyles.text]}>{dreamCount}</Text>
-            <Text style={[styles.statLabel, dynamicStyles.textMuted]}>rêves</Text>
+            <Text style={[styles.statLabel, dynamicStyles.textMuted]}>{t('home.dreams')}</Text>
           </TouchableOpacity>
         </Animated.View>
 
