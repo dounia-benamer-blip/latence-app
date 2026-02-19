@@ -23,11 +23,13 @@ const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
 // Features that require Premium subscription
 // Note: 'dreams' module allows WRITING for Essentiel users, but Oracle is Premium-only
-const PREMIUM_FEATURES = ['mirror', 'astro', 'dream-oracle'];
+const PREMIUM_FEATURES = ['mirror', 'astro', 'dream-oracle', 'meditation', 'rituals'];
 const PREMIUM_FEATURE_NAMES: Record<string, string> = {
   mirror: 'IA Miroir',
   astro: 'Astrologie & Cosmos',
   'dream-oracle': 'Oracle des Rêves',
+  meditation: 'Méditation',
+  rituals: 'Rituels Lunaires',
 };
 
 function formatToday(): string {
