@@ -6,10 +6,8 @@ import {
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
-  useWindowDimensions,
   Platform,
   ActivityIndicator,
-  Modal,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -20,10 +18,7 @@ import Animated, {
 import * as AppleAuthentication from 'expo-apple-authentication';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme, ThemeMode } from '../src/context/ThemeContext';
-import { useTranslation } from 'react-i18next';
-import { useLanguage } from '../src/context/LanguageContext';
 
-// Get icon name for theme toggle
 const getThemeIcon = (mode: ThemeMode): string => {
   switch (mode) {
     case 'light': return 'moon-outline';
@@ -37,18 +32,24 @@ const ENERGY_LEVELS = [1, 2, 3, 4, 5];
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
-// Language options (French and English only)
-const LANGUAGES = [
-  { code: 'fr', name: 'Français', flag: '🇫🇷' },
-  { code: 'en', name: 'English', flag: '🇬🇧' },
+const MOODS = [
+  { id: 'serein', label: 'Serein', icon: 'leaf-outline', color: '#8B9A7D' },
+  { id: 'joyeux', label: 'Joyeux', icon: 'sunny-outline', color: '#D4A574' },
+  { id: 'reveur', label: 'Rêveur', icon: 'cloud-outline', color: '#A8B4C4' },
+  { id: 'melancolique', label: 'Mélancolique', icon: 'rainy-outline', color: '#9B8B7D' },
+  { id: 'fatigue', label: 'Fatigué', icon: 'moon-outline', color: '#7D7D8B' },
+  { id: 'inspire', label: 'Inspiré', icon: 'sparkles-outline', color: '#C4A88B' },
+  { id: 'anxieux', label: 'Anxieux', icon: 'water-outline', color: '#8B9AAA' },
+  { id: 'nostalgique', label: 'Nostalgique', icon: 'time-outline', color: '#B8A090' },
+  { id: 'perdu', label: 'Perdu', icon: 'compass-outline', color: '#A0A0A0' },
+  { id: 'reconnaissant', label: 'Reconnaissant', icon: 'heart-outline', color: '#9AAD8B' },
+  { id: 'contemplatif', label: 'Contemplatif', icon: 'eye-outline', color: '#C4B4D4' },
+  { id: 'eveille', label: 'Éveillé', icon: 'flash-outline', color: '#B4A48B' },
 ];
 
 export default function WelcomeScreen() {
   const router = useRouter();
   const { theme, themeMode, isDark, toggleTheme } = useTheme();
-  const { t } = useTranslation();
-  const { language, setLanguage } = useLanguage();
-  const { width } = useWindowDimensions();
   const [step, setStep] = useState<'auth' | 'mood' | 'energy' | 'wisdom'>('auth');
   const [isAppleAvailable, setIsAppleAvailable] = useState(false);
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
@@ -56,35 +57,17 @@ export default function WelcomeScreen() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [sacredText, setSacredText] = useState<{ text: string; source: string } | null>(null);
   const [isLoadingText, setIsLoadingText] = useState(false);
-  const [showLanguageModal, setShowLanguageModal] = useState(false);
 
-  // Moods with translation keys
-  const MOODS = useMemo(() => [
-    { id: 'serein', labelKey: 'moods.serein', icon: 'leaf-outline', color: '#8B9A7D' },
-    { id: 'joyeux', labelKey: 'moods.joyeux', icon: 'sunny-outline', color: '#D4A574' },
-    { id: 'reveur', labelKey: 'moods.reveur', icon: 'cloud-outline', color: '#A8B4C4' },
-    { id: 'melancolique', labelKey: 'moods.melancolique', icon: 'rainy-outline', color: '#9B8B7D' },
-    { id: 'fatigue', labelKey: 'moods.fatigue', icon: 'moon-outline', color: '#7D7D8B' },
-    { id: 'inspire', labelKey: 'moods.inspire', icon: 'sparkles-outline', color: '#C4A88B' },
-    { id: 'anxieux', labelKey: 'moods.anxieux', icon: 'water-outline', color: '#8B9AAA' },
-    { id: 'nostalgique', labelKey: 'moods.nostalgique', icon: 'time-outline', color: '#B8A090' },
-    { id: 'perdu', labelKey: 'moods.perdu', icon: 'compass-outline', color: '#A0A0A0' },
-    { id: 'reconnaissant', labelKey: 'moods.reconnaissant', icon: 'heart-outline', color: '#9AAD8B' },
-    { id: 'contemplatif', labelKey: 'moods.contemplatif', icon: 'eye-outline', color: '#C4B4D4' },
-    { id: 'eveille', labelKey: 'moods.eveille', icon: 'flash-outline', color: '#B4A48B' },
-  ], []);
-
-  // Poetic greetings based on time of day (translated)
   const getPoeticalGreeting = () => {
     const hour = new Date().getHours();
     if (hour >= 5 && hour < 12) {
-      return { greeting: t('welcome.greeting_morning'), question: t('welcome.question_morning') };
+      return { greeting: 'Douce aurore', question: 'Comment s\'éveille ton âme ce matin ?' };
     } else if (hour >= 12 && hour < 17) {
-      return { greeting: t('welcome.greeting_afternoon'), question: t('welcome.question_afternoon') };
+      return { greeting: 'Lumière du jour', question: 'Quel souffle anime ton après-midi ?' };
     } else if (hour >= 17 && hour < 21) {
-      return { greeting: t('welcome.greeting_evening'), question: t('welcome.question_evening') };
+      return { greeting: 'Crépuscule paisible', question: 'Que murmure ton cœur ce soir ?' };
     } else {
-      return { greeting: t('welcome.greeting_night'), question: t('welcome.question_night') };
+      return { greeting: 'Nuit étoilée', question: 'Quelles pensées habitent ta nuit ?' };
     }
   };
 
@@ -142,7 +125,7 @@ export default function WelcomeScreen() {
   const fetchSacredText = async (mood: string) => {
     setIsLoadingText(true);
     try {
-      const res = await fetch(`${API_URL}/api/sacred-text/${mood}?lang=${language}`);
+      const res = await fetch(`${API_URL}/api/sacred-text/${mood}?lang=fr`);
       if (res.ok) {
         const data = await res.json();
         setSacredText(data);
@@ -181,14 +164,6 @@ export default function WelcomeScreen() {
     router.push('/home');
   };
 
-  const handleLanguageSelect = (langCode: string) => {
-    setLanguage(langCode);
-    setShowLanguageModal(false);
-  };
-
-  const currentLang = LANGUAGES.find(l => l.code === language) || LANGUAGES[0];
-
-  // Dynamic styles based on theme
   const dynamicStyles = {
     container: { backgroundColor: theme.background },
     text: { color: theme.text },
@@ -197,44 +172,6 @@ export default function WelcomeScreen() {
     card: { backgroundColor: theme.card },
     cardSelected: { backgroundColor: theme.cardSelected, borderColor: theme.border },
   };
-
-  const renderLanguageModal = () => (
-    <Modal
-      visible={showLanguageModal}
-      transparent
-      animationType="fade"
-      onRequestClose={() => setShowLanguageModal(false)}
-    >
-      <TouchableOpacity 
-        style={styles.modalOverlay} 
-        activeOpacity={1} 
-        onPress={() => setShowLanguageModal(false)}
-      >
-        <View style={[styles.languageModal, dynamicStyles.card]}>
-          <Text style={[styles.languageModalTitle, dynamicStyles.text]}>{t('common.language')}</Text>
-          {LANGUAGES.map((lang) => (
-            <TouchableOpacity
-              key={lang.code}
-              style={[
-                styles.languageOption,
-                language === lang.code && styles.languageOptionActive,
-              ]}
-              onPress={() => handleLanguageSelect(lang.code)}
-            >
-              <Text style={styles.languageFlag}>{lang.flag}</Text>
-              <Text style={[styles.languageOptionText, dynamicStyles.text]}>{lang.name}</Text>
-              {language === lang.code && (
-                <Ionicons name="checkmark" size={20} color={theme.accent} />
-              )}
-            </TouchableOpacity>
-          ))}
-        </View>
-      </TouchableOpacity>
-    </Modal>
-  );
-
-  // Helper for auth texts - French only
-  const authText = { apple: 'Continuer avec Apple', guest: 'Continuer en invité' };
 
   const renderAuth = () => (
     <Animated.View entering={FadeIn.duration(800)} style={styles.authContainer}>
@@ -252,7 +189,7 @@ export default function WelcomeScreen() {
           >
             <Ionicons name="logo-apple" size={20} color={isDark ? '#000' : '#fff'} />
             <Text style={[styles.appleButtonText, isDark && styles.appleButtonTextDark]}>
-              {authText.apple}
+              Continuer avec Apple
             </Text>
           </TouchableOpacity>
         )}
@@ -261,7 +198,7 @@ export default function WelcomeScreen() {
           style={styles.skipButton}
           onPress={handleSkipAuth}
         >
-          <Text style={[styles.skipText, dynamicStyles.textMuted]}>{authText.guest}</Text>
+          <Text style={[styles.skipText, dynamicStyles.textMuted]}>Continuer en invité</Text>
         </TouchableOpacity>
       </View>
     </Animated.View>
@@ -269,7 +206,6 @@ export default function WelcomeScreen() {
 
   const renderMood = () => (
     <Animated.View entering={FadeIn.duration(600)} style={styles.moodContainer}>
-      {/* Theme Toggle */}
       <TouchableOpacity 
         style={[styles.themeToggleTop, dynamicStyles.card]}
         onPress={toggleTheme}
@@ -323,7 +259,7 @@ export default function WelcomeScreen() {
                     selectedMood === mood.id && { color: theme.text, fontWeight: '500' },
                   ]}
                 >
-                  {t(mood.labelKey)}
+                  {mood.label}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -336,8 +272,8 @@ export default function WelcomeScreen() {
   const renderEnergy = () => (
     <Animated.View entering={FadeIn.duration(600)} style={styles.energyContainer}>
       <View style={styles.header}>
-        <Text style={[styles.greeting, dynamicStyles.text]}>{t('welcome.your_energy')}</Text>
-        <Text style={[styles.subtitle, dynamicStyles.textSecondary]}>{t('welcome.energy_question')}</Text>
+        <Text style={[styles.greeting, dynamicStyles.text]}>Ton énergie</Text>
+        <Text style={[styles.subtitle, dynamicStyles.textSecondary]}>Comment te sens-tu physiquement ?</Text>
       </View>
 
       <View style={styles.energyScale}>
@@ -366,8 +302,8 @@ export default function WelcomeScreen() {
           ))}
         </View>
         <View style={styles.energyLabels}>
-          <Text style={[styles.energyLabelText, dynamicStyles.textMuted]}>{t('welcome.exhausted')}</Text>
-          <Text style={[styles.energyLabelText, dynamicStyles.textMuted]}>{t('welcome.full_energy')}</Text>
+          <Text style={[styles.energyLabelText, dynamicStyles.textMuted]}>Épuisé</Text>
+          <Text style={[styles.energyLabelText, dynamicStyles.textMuted]}>Plein d'énergie</Text>
         </View>
       </View>
 
@@ -376,14 +312,14 @@ export default function WelcomeScreen() {
         onPress={handleEnergyContinue}
         activeOpacity={0.8}
       >
-        <Text style={styles.continueButtonText}>{t('common.continue')}</Text>
+        <Text style={styles.continueButtonText}>Continuer</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.backLink}
         onPress={() => setStep('mood')}
       >
-        <Text style={[styles.backLinkText, dynamicStyles.textMuted]}>{t('common.back')}</Text>
+        <Text style={[styles.backLinkText, dynamicStyles.textMuted]}>Retour</Text>
       </TouchableOpacity>
     </Animated.View>
   );
@@ -391,7 +327,7 @@ export default function WelcomeScreen() {
   const renderWisdom = () => (
     <Animated.View entering={FadeIn.duration(800)} style={styles.wisdomContainer}>
       <View style={styles.wisdomHeader}>
-        <Text style={[styles.wisdomSubtitle, dynamicStyles.textSecondary]}>{t('welcome.light_for_moment')}</Text>
+        <Text style={[styles.wisdomSubtitle, dynamicStyles.textSecondary]}>Une lumière pour ce moment</Text>
       </View>
 
       {isLoadingText ? (
@@ -412,7 +348,7 @@ export default function WelcomeScreen() {
           onPress={handleFinish}
           activeOpacity={0.8}
         >
-          <Text style={styles.beginButtonText}>{t('welcome.begin_journey')}</Text>
+          <Text style={styles.beginButtonText}>Commencer le voyage</Text>
         </TouchableOpacity>
       </Animated.View>
 
@@ -420,14 +356,13 @@ export default function WelcomeScreen() {
         style={styles.backLink}
         onPress={() => setStep('energy')}
       >
-        <Text style={[styles.backLinkText, dynamicStyles.textMuted]}>{t('common.back')}</Text>
+        <Text style={[styles.backLinkText, dynamicStyles.textMuted]}>Retour</Text>
       </TouchableOpacity>
     </Animated.View>
   );
 
   return (
     <SafeAreaView style={[styles.container, dynamicStyles.container]}>
-      {/* Header with theme toggle only */}
       <View style={styles.headerRow}>
         <View style={{ width: 44 }} />
         <TouchableOpacity 
@@ -452,7 +387,6 @@ export default function WelcomeScreen() {
         {step === 'wisdom' && renderWisdom()}
       </ScrollView>
 
-      {/* Sticky bottom button for mood step */}
       {step === 'mood' && (
         <View style={[styles.stickyBottom, dynamicStyles.container]}>
           <TouchableOpacity
@@ -470,9 +404,7 @@ export default function WelcomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: { flex: 1 },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -480,19 +412,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 16,
     paddingBottom: 8,
-  },
-  languageSelectorInline: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-    gap: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
   },
   themeToggleInline: {
     width: 44,
@@ -516,44 +435,6 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
     paddingTop: 8,
   },
-  languageSelector: {
-    position: 'absolute',
-    top: 20,
-    left: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-    gap: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  languageFlag: {
-    fontSize: 16,
-  },
-  languageCode: {
-    fontSize: 13,
-    fontWeight: '500',
-  },
-  themeToggle: {
-    position: 'absolute',
-    top: 20,
-    right: 0,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
-  },
   themeToggleTop: {
     position: 'absolute',
     top: 0,
@@ -569,40 +450,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.06,
     shadowRadius: 8,
     elevation: 2,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  languageModal: {
-    borderRadius: 20,
-    padding: 24,
-    width: '80%',
-    maxWidth: 300,
-  },
-  languageModalTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  languageOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 12,
-    borderRadius: 12,
-    marginBottom: 8,
-    gap: 12,
-  },
-  languageOptionActive: {
-    backgroundColor: 'rgba(139, 154, 125, 0.15)',
-  },
-  languageOptionText: {
-    fontSize: 16,
-    flex: 1,
   },
   authContainer: {
     flex: 1,

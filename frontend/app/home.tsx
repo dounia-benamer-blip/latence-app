@@ -15,152 +15,60 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown, FadeInUp, FadeIn } from 'react-native-reanimated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useTranslation } from 'react-i18next';
 import { useTheme, ThemeMode } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
-import { LanguageSelector } from '../src/components/LanguageSelector';
-import { useLanguage } from '../src/context/LanguageContext';
 import AuraAvatar, { AURA_DATABASE } from './components/AuraAvatar';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
-// Features that require Premium subscription
-// Note: 'dreams' module allows WRITING for Essentiel users, but Oracle is Premium-only
 const PREMIUM_FEATURES = ['mirror', 'astro', 'dream-oracle', 'meditation', 'rituals'];
 
-function formatToday(t: any): string {
-  const d = new Date();
-  const days = [
-    t('home.day_sun', 'Dimanche'), t('home.day_mon', 'Lundi'), t('home.day_tue', 'Mardi'), 
-    t('home.day_wed', 'Mercredi'), t('home.day_thu', 'Jeudi'), t('home.day_fri', 'Vendredi'), 
-    t('home.day_sat', 'Samedi')
-  ];
-  const months = [
-    t('home.month_jan', 'Janvier'), t('home.month_feb', 'Février'), t('home.month_mar', 'Mars'), 
-    t('home.month_apr', 'Avril'), t('home.month_may', 'Mai'), t('home.month_jun', 'Juin'), 
-    t('home.month_jul', 'Juillet'), t('home.month_aug', 'Août'), t('home.month_sep', 'Septembre'), 
-    t('home.month_oct', 'Octobre'), t('home.month_nov', 'Novembre'), t('home.month_dec', 'Décembre')
-  ];
-  return `${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]}`;
-}
+const DAYS = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+const MONTHS = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
 
-// Get icon name for theme toggle
+const MOON_PHASES: Record<string, string> = {
+  'moon_new': 'Nouvelle Lune',
+  'moon_waxing_crescent': 'Premier Croissant',
+  'moon_first_quarter': 'Premier Quartier',
+  'moon_waxing_gibbous': 'Gibbeuse Croissante',
+  'moon_full': 'Pleine Lune',
+  'moon_waning_gibbous': 'Gibbeuse Décroissante',
+  'moon_last_quarter': 'Dernier Quartier',
+  'moon_waning_crescent': 'Dernier Croissant',
+};
+
 const getThemeIcon = (mode: ThemeMode): string => {
   switch (mode) {
-    case 'light': return 'moon-outline';      // Click to go to dark
-    case 'dark': return 'eye-outline';        // Click to go to silence
-    case 'silence': return 'sunny-outline';   // Click to go to light
+    case 'light': return 'moon-outline';
+    case 'dark': return 'eye-outline';
+    case 'silence': return 'sunny-outline';
     default: return 'moon-outline';
   }
 };
 
 interface MenuItem {
   id: string;
-  titleKey: string;
-  subtitleKey: string;
+  title: string;
+  subtitle: string;
   icon: string;
   route: string;
 }
 
 const MENU_ITEMS: MenuItem[] = [
-  {
-    id: 'cadence',
-    titleKey: 'menu.cadence',
-    subtitleKey: 'menu.cadence_sub',
-    icon: 'infinite-outline',
-    route: '/cadence',
-  },
-  {
-    id: 'sagesse',
-    titleKey: 'menu.sagesse',
-    subtitleKey: 'menu.sagesse_sub',
-    icon: 'sparkles-outline',
-    route: '/citations',
-  },
-  {
-    id: 'lettre',
-    titleKey: 'menu.lettre',
-    subtitleKey: 'menu.lettre_sub',
-    icon: 'mail-outline',
-    route: '/lettre',
-  },
-  {
-    id: 'rituals',
-    titleKey: 'menu.rituals',
-    subtitleKey: 'menu.rituals_sub',
-    icon: 'moon-outline',
-    route: '/rituals',
-  },
-  {
-    id: 'meditation',
-    titleKey: 'menu.meditation',
-    subtitleKey: 'menu.meditation_sub',
-    icon: 'flame-outline',
-    route: '/meditation',
-  },
-  {
-    id: 'mirror',
-    titleKey: 'menu.mirror',
-    subtitleKey: 'menu.mirror_sub',
-    icon: 'glasses-outline',
-    route: '/mirror',
-  },
-  {
-    id: 'ecrire',
-    titleKey: 'menu.ecrire',
-    subtitleKey: 'menu.ecrire_sub',
-    icon: 'create-outline',
-    route: '/capsule/write',
-  },
-  {
-    id: 'sceller',
-    titleKey: 'menu.sceller',
-    subtitleKey: 'menu.sceller_sub',
-    icon: 'lock-closed-outline',
-    route: '/capsule/seal',
-  },
-  {
-    id: 'dreams',
-    titleKey: 'menu.dreams',
-    subtitleKey: 'menu.dreams_sub',
-    icon: 'cloudy-night-outline',
-    route: '/dreams',
-  },
-  {
-    id: 'dream-oracle',
-    titleKey: 'menu.dream_oracle',
-    subtitleKey: 'menu.dream_oracle_sub',
-    icon: 'eye-outline',
-    route: '/dream-oracle',
-  },
-  {
-    id: 'dream-dictionary',
-    titleKey: 'menu.dream_dictionary',
-    subtitleKey: 'menu.dream_dictionary_sub',
-    icon: 'book-outline',
-    route: '/dream-dictionary',
-  },
-  {
-    id: 'soul-report',
-    titleKey: 'menu.soul_report',
-    subtitleKey: 'menu.soul_report_sub',
-    icon: 'heart-outline',
-    route: '/soul-report',
-  },
-  {
-    id: 'astro',
-    titleKey: 'menu.cosmos',
-    subtitleKey: 'menu.cosmos_sub',
-    icon: 'planet-outline',
-    route: '/astrology',
-  },
-  {
-    id: 'stats',
-    titleKey: 'menu.stats',
-    subtitleKey: 'menu.stats_sub',
-    icon: 'bar-chart-outline',
-    route: '/stats',
-  },
+  { id: 'cadence', title: 'Cadence', subtitle: 'Ton rythme intérieur', icon: 'infinite-outline', route: '/cadence' },
+  { id: 'sagesse', title: 'Sagesse', subtitle: 'Citations sacrées', icon: 'sparkles-outline', route: '/citations' },
+  { id: 'lettre', title: 'Lettre à soi', subtitle: 'Écris à ton futur toi', icon: 'mail-outline', route: '/lettre' },
+  { id: 'rituals', title: 'Rituels', subtitle: 'Pratiques sacrées', icon: 'moon-outline', route: '/rituals' },
+  { id: 'meditation', title: 'Méditation', subtitle: 'Voyage intérieur', icon: 'flame-outline', route: '/meditation' },
+  { id: 'mirror', title: 'Miroir de l\'âme', subtitle: 'Réflexion profonde', icon: 'glasses-outline', route: '/mirror' },
+  { id: 'ecrire', title: 'Écrire', subtitle: 'Capturer l\'instant', icon: 'create-outline', route: '/capsule/write' },
+  { id: 'sceller', title: 'Sceller', subtitle: 'Créer une capsule', icon: 'lock-closed-outline', route: '/capsule/seal' },
+  { id: 'dreams', title: 'Rêves', subtitle: 'Journal onirique', icon: 'cloudy-night-outline', route: '/dreams' },
+  { id: 'dream-oracle', title: 'Oracle des rêves', subtitle: 'Interprétation IA', icon: 'eye-outline', route: '/dream-oracle' },
+  { id: 'dream-dictionary', title: 'Dictionnaire onirique', subtitle: 'Tes symboles personnels', icon: 'book-outline', route: '/dream-dictionary' },
+  { id: 'soul-report', title: 'Rapport de l\'âme', subtitle: 'Bilan émotionnel', icon: 'heart-outline', route: '/soul-report' },
+  { id: 'astro', title: 'Cosmos', subtitle: 'Ton ciel natal', icon: 'planet-outline', route: '/astrology' },
+  { id: 'stats', title: 'Statistiques', subtitle: 'Ton parcours', icon: 'bar-chart-outline', route: '/stats' },
 ];
 
 interface BookRecommendation {
@@ -171,7 +79,6 @@ interface BookRecommendation {
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { t } = useTranslation();
   const { theme, themeMode, isDark, toggleTheme } = useTheme();
   const { subscriptionStatus, isAuthenticated } = useAuth();
   const [userName, setUserName] = useState('');
@@ -180,24 +87,18 @@ export default function HomeScreen() {
   const [capsuleCount, setCapsuleCount] = useState(0);
   const [dreamCount, setDreamCount] = useState(0);
   
-  // Premium popup
   const [showPremiumPopup, setShowPremiumPopup] = useState(false);
   const [blockedFeature, setBlockedFeature] = useState('');
   
-  // AI Companion
   const [showCompanion, setShowCompanion] = useState(false);
   const [companionMessage, setCompanionMessage] = useState('');
   const [companionResponse, setCompanionResponse] = useState('');
   const [isLoadingCompanion, setIsLoadingCompanion] = useState(false);
   
-  // Book recommendations
   const [bookRecommendations, setBookRecommendations] = useState<BookRecommendation[]>([]);
   const [showBooks, setShowBooks] = useState(false);
   
-  // Daily notification
   const [dailyNotification, setDailyNotification] = useState<{message: string; moon_phase: string} | null>(null);
-  
-  // Astro profile for aura
   const [astroProfile, setAstroProfile] = useState<{name: string} | null>(null);
 
   const fetchData = async () => {
@@ -352,54 +253,28 @@ export default function HomeScreen() {
 
   const moonPhase = getMoonPhase();
   
-  // Use language context to force re-render when language changes
-  const { language } = useLanguage();
-  
-  // Calculate today's date with language dependency
   const today = React.useMemo(() => {
     const d = new Date();
-    const days = [
-      t('home.day_sun'), t('home.day_mon'), t('home.day_tue'), 
-      t('home.day_wed'), t('home.day_thu'), t('home.day_fri'), 
-      t('home.day_sat')
-    ];
-    const months = [
-      t('home.month_jan'), t('home.month_feb'), t('home.month_mar'), 
-      t('home.month_apr'), t('home.month_may'), t('home.month_jun'), 
-      t('home.month_jul'), t('home.month_aug'), t('home.month_sep'), 
-      t('home.month_oct'), t('home.month_nov'), t('home.month_dec')
-    ];
-    return `${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]}`;
-  }, [language, t]);
+    return `${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]}`;
+  }, []);
 
-  // Dynamic styles based on theme
   const dynamicStyles = {
-    container: {
-      flex: 1,
-      backgroundColor: theme.background,
-    },
-    card: {
-      backgroundColor: theme.card,
-    },
-    text: {
-      color: theme.text,
-    },
-    textSecondary: {
-      color: theme.textSecondary,
-    },
-    textMuted: {
-      color: theme.textMuted,
-    },
-    input: {
-      backgroundColor: theme.inputBackground,
-      color: theme.text,
-    },
-    modalBg: {
-      backgroundColor: theme.background,
-    },
-    border: {
-      borderColor: theme.border,
-    },
+    container: { flex: 1, backgroundColor: theme.background },
+    card: { backgroundColor: theme.card },
+    text: { color: theme.text },
+    textSecondary: { color: theme.textSecondary },
+    textMuted: { color: theme.textMuted },
+    input: { backgroundColor: theme.inputBackground, color: theme.text },
+    modalBg: { backgroundColor: theme.background },
+    border: { borderColor: theme.border },
+  };
+
+  const PREMIUM_FEATURE_NAMES: Record<string, string> = {
+    'mirror': 'Miroir de l\'âme',
+    'astro': 'Cosmos',
+    'dream-oracle': 'Oracle des rêves',
+    'meditation': 'Méditation',
+    'rituals': 'Rituels',
   };
 
   return (
@@ -419,9 +294,6 @@ export default function HomeScreen() {
             <Text style={[styles.byLine, dynamicStyles.textMuted]}>by Atelier Benamer</Text>
           </View>
           <View style={styles.headerButtons}>
-            {/* Language Selector */}
-            <LanguageSelector />
-            {/* Theme Toggle Button */}
             <TouchableOpacity 
               style={[styles.themeButton, dynamicStyles.card]}
               onPress={toggleTheme}
@@ -435,7 +307,6 @@ export default function HomeScreen() {
                 color={theme.accentWarm} 
               />
             </TouchableOpacity>
-            {/* Aura Profile Avatar */}
             <TouchableOpacity 
               onPress={() => router.push('/profile')}
               activeOpacity={0.8}
@@ -452,7 +323,7 @@ export default function HomeScreen() {
         {/* Moon Phase Card */}
         <Animated.View entering={FadeInUp.duration(600).delay(100)} style={[styles.moonCard, dynamicStyles.card]}>
           <Ionicons name={moonPhase.icon as any} size={48} color={theme.accentWarm} />
-          <Text style={[styles.moonName, dynamicStyles.textSecondary]}>{t(`home.${moonPhase.key}`)}</Text>
+          <Text style={[styles.moonName, dynamicStyles.textSecondary]}>{MOON_PHASES[moonPhase.key]}</Text>
         </Animated.View>
 
         {/* Daily Poetic Notification */}
@@ -473,8 +344,8 @@ export default function HomeScreen() {
               <Ionicons name="sparkles-outline" size={22} color={theme.accentWarm} />
             </View>
             <View style={styles.companionText}>
-              <Text style={[styles.companionTitle, dynamicStyles.text]}>{t('home.inner_dialogue')}</Text>
-              <Text style={[styles.companionSubtitle, dynamicStyles.textMuted]}>{t('home.inner_dialogue_sub')}</Text>
+              <Text style={[styles.companionTitle, dynamicStyles.text]}>Dialogue intérieur</Text>
+              <Text style={[styles.companionSubtitle, dynamicStyles.textMuted]}>Parle à ton guide</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color={theme.textMuted} />
           </TouchableOpacity>
@@ -487,26 +358,23 @@ export default function HomeScreen() {
             onPress={() => router.push('/capsule/list')}
           >
             <Text style={[styles.statNumber, dynamicStyles.text]}>{capsuleCount}</Text>
-            <Text style={[styles.statLabel, dynamicStyles.textMuted]}>{t('home.capsules')}</Text>
+            <Text style={[styles.statLabel, dynamicStyles.textMuted]}>Capsules</Text>
           </TouchableOpacity>
           <TouchableOpacity 
             style={[styles.statCard, dynamicStyles.card]}
             onPress={() => router.push('/dreams')}
           >
             <Text style={[styles.statNumber, dynamicStyles.text]}>{dreamCount}</Text>
-            <Text style={[styles.statLabel, dynamicStyles.textMuted]}>{t('home.dreams')}</Text>
+            <Text style={[styles.statLabel, dynamicStyles.textMuted]}>Rêves</Text>
           </TouchableOpacity>
         </Animated.View>
 
         {/* Menu */}
         <View style={styles.menuContainer}>
           {MENU_ITEMS.map((item, index) => {
-            // Check if this feature requires Premium
             const isPremiumFeature = PREMIUM_FEATURES.includes(item.id);
             const userTier = subscriptionStatus?.tier || 'free';
-            // Premium and Lifetime users have full access
             const hasPremiumAccess = userTier === 'premium' || userTier === 'lifetime';
-            // Feature is locked if it's premium and user doesn't have premium access
             const isLocked = isPremiumFeature && !hasPremiumAccess;
             
             const handlePress = () => {
@@ -532,13 +400,13 @@ export default function HomeScreen() {
                     <Ionicons name={item.icon as any} size={24} color={isLocked ? theme.textMuted : theme.iconColor} />
                   </View>
                   <View style={styles.menuText}>
-                    <Text style={[styles.menuTitle, dynamicStyles.text, isLocked && { color: theme.textMuted }]}>{t(item.titleKey)}</Text>
-                    <Text style={[styles.menuSubtitle, dynamicStyles.textMuted]}>{t(item.subtitleKey)}</Text>
+                    <Text style={[styles.menuTitle, dynamicStyles.text, isLocked && { color: theme.textMuted }]}>{item.title}</Text>
+                    <Text style={[styles.menuSubtitle, dynamicStyles.textMuted]}>{item.subtitle}</Text>
                   </View>
                   {isLocked ? (
                     <View style={[styles.lockBadge, { backgroundColor: '#9B59B620' }]}>
                       <Ionicons name="lock-closed" size={14} color="#9B59B6" />
-                      <Text style={styles.lockBadgeText}>{t('common.premium')}</Text>
+                      <Text style={styles.lockBadgeText}>Premium</Text>
                     </View>
                   ) : (
                     <Ionicons name="chevron-forward" size={20} color={theme.textMuted} />
@@ -560,8 +428,8 @@ export default function HomeScreen() {
                 <Ionicons name="book-outline" size={20} color={theme.accentWarm} />
               </View>
               <View style={styles.booksHeader}>
-                <Text style={[styles.booksTitle, dynamicStyles.text]}>{t('home.books_title', 'Lectures suggérées')}</Text>
-                <Text style={[styles.booksSubtitle, dynamicStyles.textMuted]}>{t('home.books_subtitle', 'Pour prolonger ce moment')}</Text>
+                <Text style={[styles.booksTitle, dynamicStyles.text]}>Lectures suggérées</Text>
+                <Text style={[styles.booksSubtitle, dynamicStyles.textMuted]}>Pour prolonger ce moment</Text>
               </View>
               <Ionicons name="chevron-forward" size={20} color={theme.textMuted} />
             </TouchableOpacity>
@@ -578,7 +446,7 @@ export default function HomeScreen() {
       >
         <SafeAreaView style={[styles.modalContainer, dynamicStyles.modalBg]}>
           <View style={[styles.modalHeader, { borderBottomColor: theme.border }]}>
-            <Text style={[styles.modalTitle, dynamicStyles.text]}>{t('home.inner_dialogue')}</Text>
+            <Text style={[styles.modalTitle, dynamicStyles.text]}>Dialogue intérieur</Text>
             <TouchableOpacity onPress={() => setShowCompanion(false)}>
               <Ionicons name="close" size={28} color={theme.iconColor} />
             </TouchableOpacity>
@@ -588,7 +456,7 @@ export default function HomeScreen() {
             <View style={styles.companionIntro}>
               <Ionicons name="moon-outline" size={48} color={theme.accentWarm} style={{ marginBottom: 16 }} />
               <Text style={[styles.companionIntroText, dynamicStyles.textSecondary]}>
-                {t('home.companion_intro', 'Un espace pour explorer tes pensées et émotions à travers un dialogue poétique et bienveillant.')}
+                Un espace pour explorer tes pensées et émotions à travers un dialogue poétique et bienveillant.
               </Text>
             </View>
 
@@ -608,7 +476,7 @@ export default function HomeScreen() {
           <View style={[styles.inputContainer, { borderTopColor: theme.border }]}>
             <TextInput
               style={[styles.companionInput, dynamicStyles.input]}
-              placeholder={t('home.companion_placeholder')}
+              placeholder="Que souhaites-tu partager ?"
               placeholderTextColor={theme.textMuted}
               value={companionMessage}
               onChangeText={setCompanionMessage}
@@ -635,7 +503,7 @@ export default function HomeScreen() {
       >
         <SafeAreaView style={[styles.modalContainer, dynamicStyles.modalBg]}>
           <View style={[styles.modalHeader, { borderBottomColor: theme.border }]}>
-            <Text style={[styles.modalTitle, dynamicStyles.text]}>{t('home.books_title')}</Text>
+            <Text style={[styles.modalTitle, dynamicStyles.text]}>Lectures suggérées</Text>
             <TouchableOpacity onPress={() => setShowBooks(false)}>
               <Ionicons name="close" size={28} color={theme.iconColor} />
             </TouchableOpacity>
@@ -643,7 +511,7 @@ export default function HomeScreen() {
 
           <ScrollView style={styles.modalContent} contentContainerStyle={styles.booksContainer}>
             <Text style={[styles.booksIntro, dynamicStyles.textSecondary]}>
-              {t('home.books_intro')}
+              Des lectures choisies pour accompagner ton état d'esprit actuel.
             </Text>
             
             {bookRecommendations.map((book, index) => (
@@ -675,17 +543,17 @@ export default function HomeScreen() {
             </View>
             
             <Text style={[styles.premiumTitle, dynamicStyles.text]}>
-              {t('premium_modal.title')}
+              Fonctionnalité Premium
             </Text>
             
             <Text style={[styles.premiumDescription, dynamicStyles.textSecondary]}>
               {blockedFeature 
-                ? `${t(`premium_features.${blockedFeature}`)} - ${t('premium_modal.description')}`
-                : t('premium_modal.description')}
+                ? `${PREMIUM_FEATURE_NAMES[blockedFeature] || blockedFeature} - Débloque l'accès complet à Latence`
+                : "Débloque l'accès complet à Latence"}
             </Text>
             
             <Text style={[styles.premiumFeatures, dynamicStyles.textMuted]}>
-              {t('premium_modal.features')}
+              Miroir de l'âme, Méditation guidée, Oracle des rêves, Rituels sacrés, et plus encore...
             </Text>
             
             <TouchableOpacity
@@ -697,14 +565,14 @@ export default function HomeScreen() {
               activeOpacity={0.8}
             >
               <Ionicons name="diamond" size={18} color="#fff" />
-              <Text style={styles.premiumButtonText}>{t('premium_modal.button')}</Text>
+              <Text style={styles.premiumButtonText}>Découvrir Premium</Text>
             </TouchableOpacity>
             
             <TouchableOpacity
               style={styles.premiumCloseButton}
               onPress={() => setShowPremiumPopup(false)}
             >
-              <Text style={[styles.premiumCloseText, dynamicStyles.textMuted]}>{t('premium_modal.later')}</Text>
+              <Text style={[styles.premiumCloseText, dynamicStyles.textMuted]}>Plus tard</Text>
             </TouchableOpacity>
           </Animated.View>
         </View>
@@ -714,332 +582,69 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: 24,
-    paddingBottom: 40,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 24,
-  },
-  date: {
-    fontSize: 12,
-    textTransform: 'capitalize',
-    letterSpacing: 0.5,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: '200',
-    letterSpacing: 4,
-  },
-  byLine: {
-    fontSize: 10,
-    letterSpacing: 1,
-    marginTop: 2,
-  },
-  headerButtons: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  themeButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  profileButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  moonCard: {
-    borderRadius: 20,
-    padding: 24,
-    alignItems: 'center',
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  moonEmoji: {
-    fontSize: 48,
-    marginBottom: 8,
-  },
-  moonName: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  notificationCard: {
-    borderRadius: 16,
-    padding: 18,
-    marginBottom: 16,
-    borderLeftWidth: 3,
-  },
-  notificationText: {
-    fontSize: 14,
-    fontStyle: 'italic',
-    lineHeight: 22,
-  },
-  companionButton: {
-    borderRadius: 16,
-    padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 2,
-    borderWidth: 1,
-  },
-  companionIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  companionEmoji: {
-    fontSize: 22,
-  },
-  companionText: {
-    flex: 1,
-    marginLeft: 12,
-  },
-  companionTitle: {
-    fontSize: 15,
-    fontWeight: '500',
-  },
-  companionSubtitle: {
-    fontSize: 12,
-    marginTop: 2,
-  },
-  statsRow: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 24,
-  },
-  statCard: {
-    flex: 1,
-    borderRadius: 16,
-    padding: 20,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  statNumber: {
-    fontSize: 32,
-    fontWeight: '300',
-  },
-  statLabel: {
-    fontSize: 12,
-    marginTop: 4,
-  },
-  menuContainer: {
-    gap: 12,
-  },
-  menuItem: {
-    borderRadius: 16,
-    padding: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  menuItemLocked: {
-    opacity: 0.85,
-  },
-  lockBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 12,
-    gap: 4,
-  },
-  lockBadgeText: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#9B59B6',
-  },
-  menuIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  menuText: {
-    flex: 1,
-    marginLeft: 16,
-  },
-  menuTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  menuSubtitle: {
-    fontSize: 12,
-    marginTop: 2,
-  },
-  booksSection: {
-    borderRadius: 16,
-    padding: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  booksIconContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  booksHeader: {
-    flex: 1,
-  },
-  booksTitle: {
-    fontSize: 15,
-    fontWeight: '500',
-  },
-  booksSubtitle: {
-    fontSize: 12,
-    marginTop: 2,
-  },
-  
-  // Modal Styles
-  modalContainer: {
-    flex: 1,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 20,
-    borderBottomWidth: 1,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '500',
-  },
-  modalContent: {
-    flex: 1,
-  },
-  modalContentContainer: {
-    padding: 24,
-  },
-  companionIntro: {
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  companionIntroEmoji: {
-    fontSize: 48,
-    marginBottom: 16,
-  },
-  companionIntroText: {
-    fontSize: 14,
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  responseCard: {
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
-  },
-  responseText: {
-    fontSize: 16,
-    lineHeight: 26,
-    fontStyle: 'italic',
-  },
-  loadingContainer: {
-    padding: 20,
-    alignItems: 'center',
-  },
-  inputContainer: {
-    padding: 16,
-    borderTopWidth: 1,
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    gap: 12,
-  },
-  companionInput: {
-    flex: 1,
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 15,
-    maxHeight: 100,
-  },
-  sendButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#8B9A7D',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  sendButtonDisabled: {
-    backgroundColor: '#D4D4C4',
-  },
-  
-  // Books Modal
-  booksContainer: {
-    padding: 24,
-  },
-  booksIntro: {
-    fontSize: 14,
-    marginBottom: 20,
-    lineHeight: 22,
-  },
-  bookCard: {
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 12,
-  },
-  bookTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    marginBottom: 4,
-  },
-  bookAuthor: {
-    fontSize: 13,
-    marginBottom: 12,
-  },
-  bookWhy: {
-    fontSize: 13,
-    fontStyle: 'italic',
-  },
+  container: { flex: 1 },
+  scrollContent: { padding: 24, paddingBottom: 40 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 },
+  date: { fontSize: 12, textTransform: 'capitalize', letterSpacing: 0.5 },
+  title: { fontSize: 32, fontWeight: '200', letterSpacing: 4 },
+  byLine: { fontSize: 10, letterSpacing: 1, marginTop: 2 },
+  headerButtons: { flexDirection: 'row', gap: 10 },
+  themeButton: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 8, elevation: 2 },
+  moonCard: { borderRadius: 20, padding: 24, alignItems: 'center', marginBottom: 12, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 8, elevation: 2 },
+  moonName: { fontSize: 14, fontWeight: '500' },
+  notificationCard: { borderRadius: 16, padding: 18, marginBottom: 16, borderLeftWidth: 3 },
+  notificationText: { fontSize: 14, fontStyle: 'italic', lineHeight: 22 },
+  companionButton: { borderRadius: 16, padding: 16, flexDirection: 'row', alignItems: 'center', marginBottom: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 8, elevation: 2, borderWidth: 1 },
+  companionIcon: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
+  companionText: { flex: 1, marginLeft: 12 },
+  companionTitle: { fontSize: 15, fontWeight: '500' },
+  companionSubtitle: { fontSize: 12, marginTop: 2 },
+  statsRow: { flexDirection: 'row', gap: 12, marginBottom: 24 },
+  statCard: { flex: 1, borderRadius: 16, padding: 20, alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 8, elevation: 2 },
+  statNumber: { fontSize: 32, fontWeight: '300' },
+  statLabel: { fontSize: 12, marginTop: 4 },
+  menuContainer: { gap: 12 },
+  menuItem: { borderRadius: 16, padding: 20, flexDirection: 'row', alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 8, elevation: 2 },
+  menuItemLocked: { opacity: 0.85 },
+  lockBadge: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12, gap: 4 },
+  lockBadgeText: { fontSize: 11, fontWeight: '600', color: '#9B59B6' },
+  menuIcon: { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center' },
+  menuText: { flex: 1, marginLeft: 16 },
+  menuTitle: { fontSize: 16, fontWeight: '500' },
+  menuSubtitle: { fontSize: 12, marginTop: 2 },
+  booksSection: { borderRadius: 16, padding: 20, flexDirection: 'row', alignItems: 'center', marginTop: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 8, elevation: 2 },
+  booksIconContainer: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', marginRight: 12 },
+  booksHeader: { flex: 1 },
+  booksTitle: { fontSize: 15, fontWeight: '500' },
+  booksSubtitle: { fontSize: 12, marginTop: 2 },
+  modalContainer: { flex: 1 },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, borderBottomWidth: 1 },
+  modalTitle: { fontSize: 18, fontWeight: '500' },
+  modalContent: { flex: 1 },
+  modalContentContainer: { padding: 24 },
+  companionIntro: { alignItems: 'center', marginBottom: 24 },
+  companionIntroText: { fontSize: 14, textAlign: 'center', lineHeight: 22 },
+  responseCard: { borderRadius: 16, padding: 20, marginBottom: 16 },
+  responseText: { fontSize: 16, lineHeight: 26, fontStyle: 'italic' },
+  loadingContainer: { padding: 20, alignItems: 'center' },
+  inputContainer: { padding: 16, borderTopWidth: 1, flexDirection: 'row', alignItems: 'flex-end', gap: 12 },
+  companionInput: { flex: 1, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 12, fontSize: 15, maxHeight: 100 },
+  sendButton: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#8B9A7D', alignItems: 'center', justifyContent: 'center' },
+  sendButtonDisabled: { backgroundColor: '#D4D4C4' },
+  booksContainer: { padding: 24 },
+  booksIntro: { fontSize: 14, marginBottom: 20, lineHeight: 22 },
+  bookCard: { borderRadius: 16, padding: 20, marginBottom: 12 },
+  bookTitle: { fontSize: 16, fontWeight: '500', marginBottom: 4 },
+  bookAuthor: { fontSize: 13, marginBottom: 12 },
+  bookWhy: { fontSize: 13, fontStyle: 'italic' },
+  premiumOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 24 },
+  premiumPopup: { borderRadius: 24, padding: 32, alignItems: 'center', width: '100%', maxWidth: 360 },
+  premiumIconContainer: { width: 80, height: 80, borderRadius: 40, alignItems: 'center', justifyContent: 'center', marginBottom: 20 },
+  premiumTitle: { fontSize: 20, fontWeight: '600', marginBottom: 12, textAlign: 'center' },
+  premiumDescription: { fontSize: 14, textAlign: 'center', marginBottom: 16, lineHeight: 22 },
+  premiumFeatures: { fontSize: 12, textAlign: 'center', marginBottom: 24, lineHeight: 20 },
+  premiumButton: { backgroundColor: '#9B59B6', paddingVertical: 16, paddingHorizontal: 32, borderRadius: 30, flexDirection: 'row', alignItems: 'center', gap: 8 },
+  premiumButtonText: { color: '#fff', fontSize: 15, fontWeight: '600' },
+  premiumCloseButton: { marginTop: 16, padding: 8 },
+  premiumCloseText: { fontSize: 14 },
 });
