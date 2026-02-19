@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
 import '../i18n';
 
-export type Language = 'fr' | 'en' | 'es';
+export type Language = 'fr' | 'en';
 
 interface LanguageContextType {
   language: Language;
@@ -14,7 +14,6 @@ interface LanguageContextType {
 const LANGUAGES: { code: Language; name: string; flag: string }[] = [
   { code: 'fr', name: 'Français', flag: '🇫🇷' },
   { code: 'en', name: 'English', flag: '🇬🇧' },
-  { code: 'es', name: 'Español', flag: '🇪🇸' },
 ];
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
