@@ -28,7 +28,42 @@
     "yesterday": "Yesterday",
     "days": "days",
     "min": "min",
-    "breaths": "Breaths"
+    "breaths": "Breaths",
+    "language": "Language"
+  },
+  "auth": {
+    "continue_apple": "Continue with Apple",
+    "continue_guest": "Continue as guest"
+  },
+  "welcome": {
+    "greeting_morning": "Dawn rises",
+    "greeting_afternoon": "The sun watches",
+    "greeting_evening": "Twilight approaches",
+    "greeting_night": "The night welcomes you",
+    "question_morning": "How does your soul feel this morning?",
+    "question_afternoon": "What does your heart carry right now?",
+    "question_evening": "What whispers inhabit your mind?",
+    "question_night": "What do you confide to the stars tonight?",
+    "your_energy": "Your energy",
+    "energy_question": "Where is your vitality right now?",
+    "exhausted": "Exhausted",
+    "full_energy": "Full of energy",
+    "light_for_moment": "A light for this moment",
+    "begin_journey": "Begin the journey"
+  },
+  "moods": {
+    "serein": "Serene",
+    "joyeux": "Joyful",
+    "reveur": "Dreamy",
+    "melancolique": "Melancholic",
+    "fatigue": "Tired",
+    "inspire": "Inspired",
+    "anxieux": "Anxious",
+    "nostalgique": "Nostalgic",
+    "perdu": "Lost",
+    "reconnaissant": "Grateful",
+    "contemplatif": "Contemplative",
+    "eveille": "Awake"
   },
   "days_of_week": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
   "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
