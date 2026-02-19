@@ -1236,35 +1236,62 @@ async def mirror_reflect(request: MirrorRequest):
         system_message=system_prompt
     ).with_model("openai", "gpt-4o")
 
+    # Language-specific text templates
+    prompt_templates = {
+        "fr": {
+            "context": "[Contexte de la conversation précédente : {context}]",
+            "mood": "[L'âme qui s'exprime se sent actuellement : {mood}]",
+            "intro": "Voici ce que cette âme te confie :",
+            "outro": "Offre-lui ton miroir, tes questions, ta lumière.",
+            "error": "Le miroir se trouble un instant... Que ressens-tu vraiment en ce moment ? Parfois, les mots ont besoin de temps pour trouver leur chemin vers la surface."
+        },
+        "en": {
+            "context": "[Context from previous conversation: {context}]",
+            "mood": "[The soul speaking currently feels: {mood}]",
+            "intro": "Here is what this soul confides to you:",
+            "outro": "Offer your mirror, your questions, your light.",
+            "error": "The mirror clouds for a moment... What do you really feel right now? Sometimes words need time to find their way to the surface."
+        },
+        "es": {
+            "context": "[Contexto de la conversación anterior: {context}]",
+            "mood": "[El alma que se expresa se siente actualmente: {mood}]",
+            "intro": "Esto es lo que esta alma te confía:",
+            "outro": "Ofrécele tu espejo, tus preguntas, tu luz.",
+            "error": "El espejo se nubla un instante... ¿Qué sientes realmente en este momento? A veces las palabras necesitan tiempo para encontrar su camino a la superficie."
+        }
+    }
+    
+    templates = prompt_templates.get(lang, prompt_templates["fr"])
+    
     context_text = ""
     if request.context:
-        context_text = f"\n\n[Contexte de la conversation précédente : {request.context}]"
+        context_text = f"\n\n{templates['context'].format(context=request.context)}"
     
     mood_text = ""
     if request.mood:
         mood_map = {
-            "serein": "apaisé", "joyeux": "joyeux", "reveur": "rêveur",
-            "melancolique": "mélancolique", "fatigue": "fatigué",
-            "inspire": "inspiré", "anxieux": "anxieux", "nostalgique": "nostalgique",
-            "perdu": "en quête", "reconnaissant": "reconnaissant",
-            "contemplatif": "contemplatif", "eveille": "éveillé"
+            "serein": "apaisé/peaceful/tranquilo", "joyeux": "joyeux/joyful/alegre", "reveur": "rêveur/dreamy/soñador",
+            "melancolique": "mélancolique/melancholic/melancólico", "fatigue": "fatigué/tired/cansado",
+            "inspire": "inspiré/inspired/inspirado", "anxieux": "anxieux/anxious/ansioso", "nostalgique": "nostalgique/nostalgic/nostálgico",
+            "perdu": "en quête/searching/buscando", "reconnaissant": "reconnaissant/grateful/agradecido",
+            "contemplatif": "contemplatif/contemplative/contemplativo", "eveille": "éveillé/awakened/despierto"
         }
-        mood_text = f"\n[L'âme qui s'exprime se sent actuellement : {mood_map.get(request.mood, request.mood)}]"
+        mood_text = f"\n{templates['mood'].format(mood=mood_map.get(request.mood, request.mood))}"
 
     prompt = f"""{mood_text}{context_text}
 
-Voici ce que cette âme te confie :
+{templates['intro']}
 
 "{request.message}"
 
-Offre-lui ton miroir, tes questions, ta lumière."""
+{templates['outro']}"""
 
     try:
         response = await chat.send_message(UserMessage(text=prompt))
         return {"reflection": response}
     except Exception as e:
         logging.error(f"Mirror reflection error: {e}")
-        return {"reflection": "Le miroir se trouble un instant... Que ressens-tu vraiment en ce moment ? Parfois, les mots ont besoin de temps pour trouver leur chemin vers la surface."}
+        return {"reflection": templates['error']}
 
 @api_router.post("/mirror/analyze-writing")
 async def analyze_writing_style(request: MirrorRequest):
