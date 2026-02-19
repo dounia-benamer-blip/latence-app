@@ -819,7 +819,7 @@ async def get_celtic_sign(birth_date: str):
                     return CELTIC_TREE_ZODIAC[index]
         
         return {"error": "Date not found in Celtic zodiac"}
-    except:
+    except Exception:
         raise HTTPException(status_code=400, detail="Invalid date format. Use MM-DD")
 
 @api_router.get("/symbols")
@@ -2671,7 +2671,7 @@ FORMAT DE RÉPONSE (JSON):
                 "Remercie la lune pour sa guidance"
             ],
             "closing": "Que la lumière de la lune guide tes pas.",
-            "affirmation": f"Je suis aligné(e) avec les cycles de la nature."
+            "affirmation": "Je suis aligné(e) avec les cycles de la nature."
         }
 
 # ==================== CADENCE (Daily Routine) ROUTES ====================
