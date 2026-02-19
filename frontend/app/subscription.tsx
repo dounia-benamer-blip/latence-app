@@ -170,14 +170,18 @@ export default function SubscriptionScreen() {
 
   const getFeatureLabel = (feature: string): string => {
     const labels: Record<string, string> = {
-      journal_entries: 'Entrées journal',
-      dreams: 'Journal des rêves',
+      journal_entries: 'Journal illimité',
+      dreams: 'Carnet des rêves',
       mirror_queries: 'IA Miroir',
+      astrology: 'Astrologie',
       oracle: 'Oracle des rêves',
       advanced_analysis: 'Analyse approfondie',
       statistics: 'Statistiques émotionnelles',
       cosmic_tree: 'Arbre cosmique',
       lunar_cycles: 'Cycles lunaires',
+      cadence: 'Cadence (rituels)',
+      sagesse: 'Sagesse (citations)',
+      lettre: 'Lettre à moi-même',
       unlimited_archive: 'Archivage illimité',
       seal_permanent: 'Scellés permanents',
       health_sync: 'Sync santé & sommeil',
