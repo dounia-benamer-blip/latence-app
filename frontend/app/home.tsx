@@ -418,7 +418,7 @@ export default function HomeScreen() {
         {/* Moon Phase Card */}
         <Animated.View entering={FadeInUp.duration(600).delay(100)} style={[styles.moonCard, dynamicStyles.card]}>
           <Ionicons name={moonPhase.icon as any} size={48} color={theme.accentWarm} />
-          <Text style={[styles.moonName, dynamicStyles.textSecondary]}>{moonPhase.name}</Text>
+          <Text style={[styles.moonName, dynamicStyles.textSecondary]}>{t(`home.${moonPhase.key}`)}</Text>
         </Animated.View>
 
         {/* Daily Poetic Notification */}
@@ -439,8 +439,8 @@ export default function HomeScreen() {
               <Ionicons name="sparkles-outline" size={22} color={theme.accentWarm} />
             </View>
             <View style={styles.companionText}>
-              <Text style={[styles.companionTitle, dynamicStyles.text]}>Dialogue intérieur</Text>
-              <Text style={[styles.companionSubtitle, dynamicStyles.textMuted]}>Parler avec ton compagnon poétique</Text>
+              <Text style={[styles.companionTitle, dynamicStyles.text]}>{t('home.inner_dialogue')}</Text>
+              <Text style={[styles.companionSubtitle, dynamicStyles.textMuted]}>{t('home.inner_dialogue_sub')}</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color={theme.textMuted} />
           </TouchableOpacity>
