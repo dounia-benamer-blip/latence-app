@@ -288,7 +288,7 @@ export default function RitualsScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton} data-testid="back-button">
           <Ionicons name="chevron-down" size={28} color={theme.iconColor} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, ds.text]}>Rituels Lunaires</Text>
+        <Text style={[styles.headerTitle, ds.text]}>{t('rituals.title')}</Text>
         <View style={styles.placeholder} />
       </View>
 
