@@ -32,6 +32,8 @@ Application mobile de journaling immersive avec focus sur l'astrologie, le bien-
 - Oracle des Rêves
 - Méditation
 - Rituels Lunaires
+- Rapport de l'Âme
+- Dictionnaire Onirique
 
 ### Lifetime (Code)
 - Accès via codes uniques générés depuis l'admin
@@ -52,13 +54,14 @@ Application mobile de journaling immersive avec focus sur l'astrologie, le bien-
 - [x] Codes Lifetime avec génération QR
 - [x] Badges verrouillés pour features premium
 - [x] Modal d'upgrade Premium
+- [x] Champ code "Accès à Vie" visible et fonctionnel
 
 ### Admin Dashboard ✅
 - [x] Statistiques utilisateurs
 - [x] Génération de codes Lifetime
 - [x] Visualisation des codes
 
-### Internationalization (i18n) ✅ (Février 2026)
+### Internationalization (i18n) ✅ 
 - [x] Framework i18next installé
 - [x] Sélecteur de langue sur l'accueil (FR, EN, ES)
 - [x] Fichiers JSON de traduction complets
@@ -69,7 +72,7 @@ Application mobile de journaling immersive avec focus sur l'astrologie, le bien-
 - [x] Menus et modals traduits
 
 ### Modules Principaux
-- [x] **Cadence**: Rituels quotidiens avec traduction i18n
+- [x] **Cadence**: Rituels quotidiens avec traduction i18n + activités physiques
 - [x] **Sagesse**: Citations sacrées multilingues
 - [x] **Lettre à Moi**: Message futur avec dates localisées
 - [x] **Méditation**: Respiration guidée
@@ -78,6 +81,10 @@ Application mobile de journaling immersive avec focus sur l'astrologie, le bien-
 - [x] **Carnet des Rêves**: Enregistrement des rêves
 - [x] **Oracle des Rêves**: Analyse IA des rêves
 - [x] **Cosmos**: Astrologie (Zodiaque, Lune, Celtique, Arabe)
+
+### Nouvelles Fonctionnalités (Février 2026) ✅
+- [x] **Rapport de l'Âme (Soul Report)**: Résumé hebdomadaire IA du parcours émotionnel
+- [x] **Dictionnaire Onirique (Dream Dictionary)**: Dictionnaire personnel de symboles de rêves
 
 ### Push Notifications (Base) ✅
 - [x] Structure expo-notifications
@@ -95,6 +102,9 @@ Application mobile de journaling immersive avec focus sur l'astrologie, le bien-
 - `/app/frontend/app/cadence.tsx` - Module Cadence
 - `/app/frontend/app/citations.tsx` - Module Sagesse
 - `/app/frontend/app/mirror/index.tsx` - IA Miroir
+- `/app/frontend/app/soul-report.tsx` - Rapport de l'Âme
+- `/app/frontend/app/dream-dictionary.tsx` - Dictionnaire Onirique
+- `/app/frontend/app/subscription.tsx` - Page Abonnement
 
 ### Backend
 - `/app/backend/server.py` - API principale avec endpoints multilingues
@@ -107,22 +117,34 @@ Application mobile de journaling immersive avec focus sur l'astrologie, le bien-
 | `/api/mirror/reflect` | `language` dans body |
 | `/api/mirror/analyze-writing` | `language` dans body |
 | `/api/mirror/deep-question` | `language` dans body |
+| `/api/soul-report/generate` | `?lang=fr\|en\|es` |
+| `/api/dream-dictionary` | `language` dans body (POST) |
+
+## APIs Nouvelles
+
+| Endpoint | Méthode | Description |
+|----------|---------|-------------|
+| `/api/soul-report/latest` | GET | Retourne le dernier rapport |
+| `/api/soul-reports` | GET | Liste tous les rapports |
+| `/api/soul-report/generate` | POST | Génère un nouveau rapport |
+| `/api/dream-dictionary` | GET | Liste les symboles |
+| `/api/dream-dictionary` | POST | Ajoute un symbole |
+| `/api/dream-dictionary/{id}` | DELETE | Supprime un symbole |
 
 ## Prochaines Étapes
 
 ### P0 - Priorité Haute
-- [ ] Configuration pour App Store Connect
-- [ ] Notification quotidienne traduite (backend)
+- [ ] Configuration pour App Store Connect (eas.json)
+- [ ] Instructions de build production iOS
 
 ### P1 - Priorité Moyenne
-- [ ] Améliorer module Cadence (6 fonctionnalités)
-- [ ] Corriger casse labels abonnement
+- [ ] Améliorer module Cadence (streaks, rituels astraux)
+- [ ] Notification quotidienne traduite (backend)
 
 ### P2 - Backlog
-- [ ] Maisons astrologiques
-- [ ] Rapport de l'Âme (Soul Report)
-- [ ] Dictionnaire Onirique
-- [ ] Refactor backend en modules
+- [ ] Maisons astrologiques détaillées
+- [ ] Refactor backend en modules (routes/)
+- [ ] Nettoyage fichiers inutilisés (tarot.tsx, compatibility.tsx)
 
 ## Credentials Test
 
@@ -133,3 +155,11 @@ Application mobile de journaling immersive avec focus sur l'astrologie, le bien-
 - MongoDB via MONGO_URL en env
 - Stripe en mode test
 - Emergent LLM Key pour toutes les intégrations IA
+
+## Historique des mises à jour
+
+### 19 Février 2026
+- ✅ Implémentation complète du Rapport de l'Âme (Soul Report)
+- ✅ Implémentation complète du Dictionnaire Onirique (Dream Dictionary)
+- ✅ Correction visibilité champ "Accès à Vie" sur page abonnement
+- ✅ Tests passés: Backend 100% (13/13), Frontend 100%
