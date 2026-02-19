@@ -215,6 +215,22 @@ export default function ProfileScreen() {
         </Animated.View>
 
         <Animated.View entering={FadeInUp.duration(500).delay(200)} style={styles.section}>
+          <Text style={styles.sectionTitle}>Abonnement</Text>
+          
+          <TouchableOpacity 
+            style={styles.healthCard}
+            onPress={() => router.push('/subscription')}
+          >
+            <Ionicons name="diamond-outline" size={24} color="#9B59B6" />
+            <View style={styles.healthText}>
+              <Text style={styles.healthTitle}>Gérer mon abonnement</Text>
+              <Text style={styles.healthSubtitle}>Plans et facturation</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color="#C4C4B4" />
+          </TouchableOpacity>
+        </Animated.View>
+
+        <Animated.View entering={FadeInUp.duration(500).delay(250)} style={styles.section}>
           <Text style={styles.sectionTitle}>Santé & Sommeil</Text>
           
           <TouchableOpacity style={styles.healthCard}>
