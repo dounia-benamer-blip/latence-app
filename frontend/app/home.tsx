@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme, ThemeMode } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
 import { LanguageSelector } from '../src/components/LanguageSelector';
+import { useLanguage } from '../src/context/LanguageContext';
 import AuraAvatar, { AURA_DATABASE } from './components/AuraAvatar';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
