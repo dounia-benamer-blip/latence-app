@@ -189,7 +189,11 @@
       "meditation": "Méditation",
       "silence": "Silence",
       "intention": "Intention",
-      "bilan": "Bilan"
+      "bilan": "Bilan",
+      "marche": "Marche",
+      "nature": "Nature",
+      "exercice": "Exercice",
+      "etirement": "Étirement"
     },
     "rituals": {
       "intention_title": "Intention du jour",
@@ -208,7 +212,15 @@
       "silence_desc": "Ferme les yeux. Écoute le silence entre les sons. Ne fais rien d'autre que d'être présent(e).",
       "bilan_title": "Bilan du soir",
       "bilan_desc": "Qu'est-ce qui s'est bien passé ? Qu'aurais-tu pu faire différemment ? De quoi as-tu besoin demain ?",
-      "bilan_placeholder": "Aujourd'hui, j'ai remarqué que..."
+      "bilan_placeholder": "Aujourd'hui, j'ai remarqué que...",
+      "walk_title": "Marche consciente",
+      "walk_desc": "Marche lentement, en pleine conscience. Ressens chaque pas, écoute les sons autour de toi, observe sans juger.",
+      "nature_title": "Sortie nature",
+      "nature_desc": "Sors quelques minutes. Respire l'air frais, touche un arbre, regarde le ciel. Reconnecte-toi à la terre.",
+      "exercise_title": "Exercice énergisant",
+      "exercise_desc": "Quelques mouvements dynamiques pour réveiller ton corps : sauts, squats, ou simplement secouer tes membres.",
+      "stretch_title": "Étirements doux",
+      "stretch_desc": "Étire doucement ton cou, tes épaules, ton dos. Libère les tensions accumulées dans ton corps."
     },
     "gratitude_modal_title": "Tes 3 gratitudes",
     "gratitude_modal_subtitle": "Même les petites choses comptent",
