@@ -183,7 +183,7 @@ export default function CadenceScreen() {
     
     fetchCadence();
     fetchStreak();
-  }, []);
+  }, [language]); // Reload when language changes
 
   const fetchStreak = async () => {
     try {
