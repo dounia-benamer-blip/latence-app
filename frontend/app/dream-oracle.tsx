@@ -346,6 +346,14 @@ export default function DreamOracleScreen() {
               Les symboles récurrents dessinent une carte de ton monde intérieur.
             </Text>
             
+            {/* Premium Badge for non-premium users */}
+            {!hasPremiumAccess && (
+              <View style={styles.premiumBadge}>
+                <Ionicons name="diamond" size={16} color="#9B59B6" />
+                <Text style={styles.premiumBadgeText}>Fonctionnalité Premium</Text>
+              </View>
+            )}
+            
             <View style={[styles.statsCard, ds.card]}>
               <View style={styles.statItem}>
                 <Text style={[styles.statValue, ds.text]}>{dreams.length}</Text>
@@ -362,7 +370,10 @@ export default function DreamOracleScreen() {
               </View>
             ) : (
               <TouchableOpacity
-                style={[styles.analyzeButton, { backgroundColor: theme.accentWarm }]}
+                style={[
+                  styles.analyzeButton, 
+                  { backgroundColor: hasPremiumAccess ? theme.accentWarm : '#9B59B6' }
+                ]}
                 onPress={analyzePatterns}
                 disabled={analyzing}
                 data-testid="consult-oracle-btn"
@@ -371,8 +382,10 @@ export default function DreamOracleScreen() {
                   <ActivityIndicator color="#fff" />
                 ) : (
                   <>
-                    <Ionicons name="eye" size={20} color="#fff" />
-                    <Text style={styles.analyzeButtonText}>Consulter l'Oracle</Text>
+                    <Ionicons name={hasPremiumAccess ? "eye" : "diamond"} size={20} color="#fff" />
+                    <Text style={styles.analyzeButtonText}>
+                      {hasPremiumAccess ? 'Consulter l\'Oracle' : 'Passer en Premium'}
+                    </Text>
                   </>
                 )}
               </TouchableOpacity>
