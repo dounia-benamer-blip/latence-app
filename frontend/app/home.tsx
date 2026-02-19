@@ -156,6 +156,7 @@ interface BookRecommendation {
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { theme, themeMode, isDark, toggleTheme } = useTheme();
   const { subscriptionStatus, isAuthenticated } = useAuth();
   const [userName, setUserName] = useState('');
