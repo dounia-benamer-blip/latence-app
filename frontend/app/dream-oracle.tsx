@@ -213,6 +213,12 @@ export default function DreamOracleScreen() {
   };
 
   const analyzePatterns = async () => {
+    // Check premium access first
+    if (!hasPremiumAccess) {
+      setShowPremiumModal(true);
+      return;
+    }
+
     setAnalyzing(true);
 
     // Analyze dream content for symbols
