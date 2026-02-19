@@ -215,8 +215,8 @@ export default function DreamDictionaryScreen() {
             <View style={[styles.emptyIcon, { backgroundColor: `${theme.accentWarm}15` }]}>
               <Text style={styles.emptyEmoji}>📖</Text>
             </View>
-            <Text style={[styles.emptyTitle, ds.text]}>Ton dictionnaire est vide</Text>
-            <Text style={[styles.emptySubtitle, ds.textSecondary]}>Commence à construire ton lexique personnel des symboles de tes rêves</Text>
+            <Text style={[styles.emptyTitle, ds.text]}>Ton Dictionnaire Onirique</Text>
+            <Text style={[styles.emptySubtitle, ds.textSecondary]}>Crée ton propre lexique de symboles de rêves. Ajoute les images, objets ou personnages qui reviennent dans tes songes et note ce qu'ils signifient pour toi.</Text>
             
             <TouchableOpacity
               style={[styles.addFirstButton, { backgroundColor: theme.accentWarm }]}
