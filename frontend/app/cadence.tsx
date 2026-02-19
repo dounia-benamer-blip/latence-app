@@ -31,21 +31,21 @@ import { TwinklingStars } from '../src/components/TwinklingStars';
 const { width } = Dimensions.get('window');
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
-// Ritual types with icons and colors
-const RITUAL_TYPES: Record<string, { icon: string; color: string; label: string }> = {
-  respiration: { icon: 'leaf-outline', color: '#8B9A7D', label: 'Respiration' },
-  introspection: { icon: 'eye-outline', color: '#A8B4C4', label: 'Introspection' },
-  ecriture: { icon: 'create-outline', color: '#C4A87C', label: 'Écriture' },
-  gratitude: { icon: 'heart-outline', color: '#C47C7C', label: 'Gratitude' },
-  meditation: { icon: 'flower-outline', color: '#A8D4A8', label: 'Méditation' },
-  silence: { icon: 'moon-outline', color: '#D4A8D4', label: 'Silence' },
-  intention: { icon: 'sunny-outline', color: '#D4C4A8', label: 'Intention' },
-  bilan: { icon: 'journal-outline', color: '#A8C4D4', label: 'Bilan' },
+// Ritual types with icons and colors (labels use translation keys)
+const RITUAL_TYPES: Record<string, { icon: string; color: string; labelKey: string }> = {
+  respiration: { icon: 'leaf-outline', color: '#8B9A7D', labelKey: 'cadence.ritual_types.respiration' },
+  introspection: { icon: 'eye-outline', color: '#A8B4C4', labelKey: 'cadence.ritual_types.introspection' },
+  ecriture: { icon: 'create-outline', color: '#C4A87C', labelKey: 'cadence.ritual_types.ecriture' },
+  gratitude: { icon: 'heart-outline', color: '#C47C7C', labelKey: 'cadence.ritual_types.gratitude' },
+  meditation: { icon: 'flower-outline', color: '#A8D4A8', labelKey: 'cadence.ritual_types.meditation' },
+  silence: { icon: 'moon-outline', color: '#D4A8D4', labelKey: 'cadence.ritual_types.silence' },
+  intention: { icon: 'sunny-outline', color: '#D4C4A8', labelKey: 'cadence.ritual_types.intention' },
+  bilan: { icon: 'journal-outline', color: '#A8C4D4', labelKey: 'cadence.ritual_types.bilan' },
   // Physical activities
-  marche: { icon: 'walk-outline', color: '#7DB38B', label: 'Marche' },
-  nature: { icon: 'leaf-outline', color: '#5D8A66', label: 'Nature' },
-  exercice: { icon: 'fitness-outline', color: '#D49A7C', label: 'Exercice' },
-  etirement: { icon: 'body-outline', color: '#9A7CD4', label: 'Étirement' },
+  marche: { icon: 'walk-outline', color: '#7DB38B', labelKey: 'cadence.ritual_types.marche' },
+  nature: { icon: 'leaf-outline', color: '#5D8A66', labelKey: 'cadence.ritual_types.nature' },
+  exercice: { icon: 'fitness-outline', color: '#D49A7C', labelKey: 'cadence.ritual_types.exercice' },
+  etirement: { icon: 'body-outline', color: '#9A7CD4', labelKey: 'cadence.ritual_types.etirement' },
 };
 
 interface DailyRitual {
