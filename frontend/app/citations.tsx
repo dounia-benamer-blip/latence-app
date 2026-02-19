@@ -84,11 +84,15 @@ const GlowingOrb = ({ size = 100 }: { size?: number }) => {
 export default function CitationsScreen() {
   const router = useRouter();
   const { theme } = useTheme();
+  const { t, i18n } = useTranslation();
   const [currentQuote, setCurrentQuote] = useState<Quote | null>(null);
   const [savedQuotes, setSavedQuotes] = useState<Quote[]>([]);
   const [showSaved, setShowSaved] = useState(false);
   const [loading, setLoading] = useState(false);
   const [fadeKey, setFadeKey] = useState(0);
+
+  // Get quotes from translations
+  const quotes = t('wisdom.quotes', { returnObjects: true }) as Quote[];
 
   const ds = {
     container: { backgroundColor: theme.background },
@@ -100,14 +104,14 @@ export default function CitationsScreen() {
 
   useEffect(() => {
     getNewQuote();
-  }, []);
+  }, [i18n.language]);
 
   const getNewQuote = async () => {
     setLoading(true);
     
-    // Try to get AI-generated quote based on mood
+    // Try to get AI-generated quote based on mood and language
     try {
-      const response = await fetch(`${API_URL}/api/sacred-quote`);
+      const response = await fetch(`${API_URL}/api/sacred-quote?lang=${i18n.language}`);
       if (response.ok) {
         const data = await response.json();
         setCurrentQuote(data);
@@ -119,9 +123,11 @@ export default function CitationsScreen() {
       // Fallback to local quotes
     }
 
-    // Use local quotes
-    const randomIndex = Math.floor(Math.random() * SACRED_QUOTES.length);
-    setCurrentQuote(SACRED_QUOTES[randomIndex]);
+    // Use local quotes from translations
+    if (quotes && quotes.length > 0) {
+      const randomIndex = Math.floor(Math.random() * quotes.length);
+      setCurrentQuote(quotes[randomIndex]);
+    }
     setFadeKey(prev => prev + 1);
     setLoading(false);
   };
