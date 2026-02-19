@@ -2993,11 +2993,10 @@ async def generate_soul_report(lang: str = "fr"):
     capsules = await db.capsules.find({}, {"_id": 0}).sort("created_at", -1).to_list(10)
     capsule_snippets = [c.get("content", "")[:100] for c in capsules[:5]]
     
-    # Language-specific prompts
-    prompts = {
-        "fr": {
-            "system": """Tu es un guide spirituel bienveillant qui analyse le parcours émotionnel d'une personne.
+    # French-only configuration
+    system_prompt = """Tu es un guide spirituel bienveillant qui analyse le parcours émotionnel d'une personne.
 Tu génères un "Rapport de l'Âme" - un résumé poétique et profond de sa semaine intérieure.
+IMPORTANT: Réponds UNIQUEMENT en français.
 
 Réponds en JSON avec cette structure exacte:
 {
@@ -3008,49 +3007,14 @@ Réponds en JSON avec cette structure exacte:
   "dream_insights": "Analyse des rêves s'il y en a, sinon message encourageant",
   "recommended_focus": "Conseil pour la semaine à venir",
   "affirmation": "Une affirmation personnalisée"
-}""",
-            "period": f"Semaine du {datetime.utcnow().strftime('%d/%m/%Y')}"
-        },
-        "en": {
-            "system": """You are a benevolent spiritual guide analyzing a person's emotional journey.
-You generate a "Soul Report" - a poetic and profound summary of their inner week.
-
-Respond in JSON with this exact structure:
-{
-  "summary": "Poetic 2-3 sentence summary of overall emotional state",
-  "emotional_journey": "Description of the week's emotional journey (3-4 sentences)",
-  "dominant_themes": ["theme1", "theme2", "theme3"],
-  "growth_areas": ["growth area 1", "area 2"],
-  "dream_insights": "Dream analysis if any, otherwise encouraging message",
-  "recommended_focus": "Advice for the coming week",
-  "affirmation": "A personalized affirmation"
-}""",
-            "period": f"Week of {datetime.utcnow().strftime('%m/%d/%Y')}"
-        },
-        "es": {
-            "system": """Eres un guía espiritual benevolente que analiza el viaje emocional de una persona.
-Generas un "Informe del Alma" - un resumen poético y profundo de su semana interior.
-
-Responde en JSON con esta estructura exacta:
-{
-  "summary": "Resumen poético de 2-3 frases sobre el estado emocional general",
-  "emotional_journey": "Descripción del viaje emocional de la semana (3-4 frases)",
-  "dominant_themes": ["tema1", "tema2", "tema3"],
-  "growth_areas": ["área de crecimiento 1", "área 2"],
-  "dream_insights": "Análisis de sueños si los hay, sino mensaje alentador",
-  "recommended_focus": "Consejo para la próxima semana",
-  "affirmation": "Una afirmación personalizada"
-}""",
-            "period": f"Semana del {datetime.utcnow().strftime('%d/%m/%Y')}"
-        }
-    }
+}"""
     
-    lang_config = prompts.get(lang, prompts["fr"])
+    period_label = f"Semaine du {datetime.utcnow().strftime('%d/%m/%Y')}"
     
     chat = LlmChat(
         api_key=EMERGENT_LLM_KEY,
         session_id=f"soul-report-{uuid.uuid4()}",
-        system_message=lang_config["system"]
+        system_message=system_prompt
     ).with_model("openai", "gpt-4o")
     
     user_prompt = f"""Analyse ces données émotionnelles:
@@ -3059,7 +3023,7 @@ Humeurs de la semaine: {json.dumps(mood_counts)}
 Extraits de rêves: {json.dumps(dream_summaries) if dream_summaries else "Aucun rêve enregistré"}
 Extraits d'écriture: {json.dumps(capsule_snippets) if capsule_snippets else "Aucune écriture"}
 
-Génère le rapport de l'âme."""
+Génère le rapport de l'âme en français."""
 
     try:
         response = await chat.send_message(UserMessage(text=user_prompt))
@@ -3076,7 +3040,7 @@ Génère le rapport de l'âme."""
         # Add metadata
         report = {
             "id": str(uuid.uuid4()),
-            "period": lang_config["period"],
+            "period": period_label,
             "generated_at": datetime.utcnow().isoformat(),
             "mood_distribution": mood_counts,
             **report_data
