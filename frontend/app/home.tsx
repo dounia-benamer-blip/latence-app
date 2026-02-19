@@ -133,6 +133,20 @@ const MENU_ITEMS: MenuItem[] = [
     route: '/dream-oracle',
   },
   {
+    id: 'dream-dictionary',
+    titleKey: 'menu.dream_dictionary',
+    subtitleKey: 'menu.dream_dictionary_sub',
+    icon: 'book-outline',
+    route: '/dream-dictionary',
+  },
+  {
+    id: 'soul-report',
+    titleKey: 'menu.soul_report',
+    subtitleKey: 'menu.soul_report_sub',
+    icon: 'heart-outline',
+    route: '/soul-report',
+  },
+  {
     id: 'astro',
     titleKey: 'menu.cosmos',
     subtitleKey: 'menu.cosmos_sub',
