@@ -16,9 +16,18 @@ import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown, FadeInUp, FadeIn } from 'react-native-reanimated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme, ThemeMode } from '../src/context/ThemeContext';
+import { useAuth } from '../src/context/AuthContext';
 import AuraAvatar, { AURA_DATABASE } from './components/AuraAvatar';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
+
+// Features that require Premium subscription
+const PREMIUM_FEATURES = ['mirror', 'astro', 'dreams'];  // dreams includes Oracle
+const PREMIUM_FEATURE_NAMES: Record<string, string> = {
+  mirror: 'IA Miroir',
+  astro: 'Astrologie & Cosmos',
+  dreams: 'Oracle des Rêves',
+};
 
 function formatToday(): string {
   const d = new Date();
