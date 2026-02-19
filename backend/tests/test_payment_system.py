@@ -21,7 +21,7 @@ import uuid
 from datetime import datetime
 
 # Use public URL from environment
-BASE_URL = os.environ.get('EXPO_PUBLIC_BACKEND_URL', 'https://cosy-ai-diary.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('EXPO_PUBLIC_BACKEND_URL', 'https://latence-i18n.preview.emergentagent.com').rstrip('/')
 
 # Test credentials
 ADMIN_PASSWORD = "latence_admin_2024"
