@@ -233,12 +233,8 @@ export default function WelcomeScreen() {
     </Modal>
   );
 
-  // Helper for auth texts based on language
-  const authTexts = {
-    fr: { apple: 'Continuer avec Apple', guest: 'Continuer en invité' },
-    en: { apple: 'Continue with Apple', guest: 'Continue as guest' },
-  };
-  const currentAuthText = authTexts[language] || authTexts.fr;
+  // Helper for auth texts - French only
+  const authText = { apple: 'Continuer avec Apple', guest: 'Continuer en invité' };
 
   const renderAuth = () => (
     <Animated.View entering={FadeIn.duration(800)} style={styles.authContainer}>
@@ -256,7 +252,7 @@ export default function WelcomeScreen() {
           >
             <Ionicons name="logo-apple" size={20} color={isDark ? '#000' : '#fff'} />
             <Text style={[styles.appleButtonText, isDark && styles.appleButtonTextDark]}>
-              {currentAuthText.apple}
+              {authText.apple}
             </Text>
           </TouchableOpacity>
         )}
@@ -265,7 +261,7 @@ export default function WelcomeScreen() {
           style={styles.skipButton}
           onPress={handleSkipAuth}
         >
-          <Text style={[styles.skipText, dynamicStyles.textMuted]}>{currentAuthText.guest}</Text>
+          <Text style={[styles.skipText, dynamicStyles.textMuted]}>{authText.guest}</Text>
         </TouchableOpacity>
       </View>
     </Animated.View>
