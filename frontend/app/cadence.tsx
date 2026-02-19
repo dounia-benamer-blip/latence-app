@@ -15,7 +15,6 @@ import { Ionicons } from '@expo/vector-icons';
 import Animated, {
   FadeIn,
   FadeInUp,
-  FadeInDown,
   useSharedValue,
   useAnimatedStyle,
   withRepeat,
@@ -24,29 +23,25 @@ import Animated, {
   Easing,
   interpolate,
 } from 'react-native-reanimated';
-import { useTranslation } from 'react-i18next';
 import { useTheme } from '../src/context/ThemeContext';
-import { useLanguage } from '../src/context/LanguageContext';
 import { TwinklingStars } from '../src/components/TwinklingStars';
 
 const { width } = Dimensions.get('window');
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
-// Ritual types with icons and colors (labels use translation keys)
-const RITUAL_TYPES: Record<string, { icon: string; color: string; labelKey: string }> = {
-  respiration: { icon: 'leaf-outline', color: '#8B9A7D', labelKey: 'cadence.ritual_types.respiration' },
-  introspection: { icon: 'eye-outline', color: '#A8B4C4', labelKey: 'cadence.ritual_types.introspection' },
-  ecriture: { icon: 'create-outline', color: '#C4A87C', labelKey: 'cadence.ritual_types.ecriture' },
-  gratitude: { icon: 'heart-outline', color: '#C47C7C', labelKey: 'cadence.ritual_types.gratitude' },
-  meditation: { icon: 'flower-outline', color: '#A8D4A8', labelKey: 'cadence.ritual_types.meditation' },
-  silence: { icon: 'moon-outline', color: '#D4A8D4', labelKey: 'cadence.ritual_types.silence' },
-  intention: { icon: 'sunny-outline', color: '#D4C4A8', labelKey: 'cadence.ritual_types.intention' },
-  bilan: { icon: 'journal-outline', color: '#A8C4D4', labelKey: 'cadence.ritual_types.bilan' },
-  // Physical activities
-  marche: { icon: 'walk-outline', color: '#7DB38B', labelKey: 'cadence.ritual_types.marche' },
-  nature: { icon: 'leaf-outline', color: '#5D8A66', labelKey: 'cadence.ritual_types.nature' },
-  exercice: { icon: 'fitness-outline', color: '#D49A7C', labelKey: 'cadence.ritual_types.exercice' },
-  etirement: { icon: 'body-outline', color: '#9A7CD4', labelKey: 'cadence.ritual_types.etirement' },
+const RITUAL_TYPES: Record<string, { icon: string; color: string; label: string }> = {
+  respiration: { icon: 'leaf-outline', color: '#8B9A7D', label: 'Respiration' },
+  introspection: { icon: 'eye-outline', color: '#A8B4C4', label: 'Introspection' },
+  ecriture: { icon: 'create-outline', color: '#C4A87C', label: 'Écriture' },
+  gratitude: { icon: 'heart-outline', color: '#C47C7C', label: 'Gratitude' },
+  meditation: { icon: 'flower-outline', color: '#A8D4A8', label: 'Méditation' },
+  silence: { icon: 'moon-outline', color: '#D4A8D4', label: 'Silence' },
+  intention: { icon: 'sunny-outline', color: '#D4C4A8', label: 'Intention' },
+  bilan: { icon: 'journal-outline', color: '#A8C4D4', label: 'Bilan' },
+  marche: { icon: 'walk-outline', color: '#7DB38B', label: 'Marche consciente' },
+  nature: { icon: 'leaf-outline', color: '#5D8A66', label: 'Nature' },
+  exercice: { icon: 'fitness-outline', color: '#D49A7C', label: 'Exercice' },
+  etirement: { icon: 'body-outline', color: '#9A7CD4', label: 'Étirement' },
 };
 
 interface DailyRitual {
@@ -62,14 +57,22 @@ interface DailyRitual {
 
 interface CadenceData {
   greeting: string;
-  moonInfluence: string;
   rituals: DailyRitual[];
-  eveningReflection: string;
   wisdomQuote?: { text: string; author: string };
-  astralInsight?: string;
 }
 
-// Pulsing infinity animation
+const TIME_LABELS: Record<string, string> = {
+  matin: 'Matin',
+  'apres-midi': 'Après-midi',
+  soir: 'Soir',
+};
+
+const GREETINGS: Record<string, string> = {
+  matin: 'Un nouveau jour s\'éveille avec toi. Prends un moment pour accueillir cette lumière naissante.',
+  'apres-midi': 'Le jour a trouvé son rythme. C\'est l\'heure de faire une pause et de recentrer ton énergie.',
+  soir: 'La journée touche à sa fin. Offre-toi ce temps de douceur pour honorer tout ce que tu as traversé.',
+};
+
 const PulsingInfinity = ({ size = 80 }: { size?: number }) => {
   const pulse = useSharedValue(0);
   const rotate = useSharedValue(0);
@@ -115,7 +118,6 @@ const PulsingInfinity = ({ size = 80 }: { size?: number }) => {
   );
 };
 
-// Streak flame component
 const StreakFlame = ({ streak }: { streak: number }) => {
   const flicker = useSharedValue(0);
 
@@ -148,38 +150,36 @@ const StreakFlame = ({ streak }: { streak: number }) => {
 export default function CadenceScreen() {
   const router = useRouter();
   const { theme } = useTheme();
-  const { t, i18n } = useTranslation();
-  const { language } = useLanguage();
   const [loading, setLoading] = useState(true);
   
-  // Rituels en français uniquement - enrichis et intelligents
-  const RITUELS = {
+  const RITUELS: Record<string, DailyRitual[]> = {
     matin: [
-      { id: 'reveil', type: 'intention', icon: 'sunny-outline', color: '#D4A574', title: 'Réveil en conscience', desc: 'Avant de te lever, prends 30 secondes pour ressentir ton corps. Étire-toi doucement comme un chat.', duration: '1 min' },
-      { id: 'intention', type: 'intention', icon: 'compass-outline', color: '#8B9A7D', title: 'Intention du jour', desc: 'Pose une intention claire pour ta journée. Pas un objectif, mais une manière d\'être.', duration: '2 min', requiresInput: true, inputPlaceholder: 'Aujourd\'hui, je choisis de...' },
-      { id: 'breath', type: 'respiration', icon: 'leaf-outline', color: '#A8D4A8', title: 'Souffle vital', desc: 'Inspire 4 secondes par le nez, retiens 4 secondes, expire 6 secondes par la bouche. Répète 5 fois.', duration: '2 min' },
-      { id: 'hydratation', type: 'meditation', icon: 'water-outline', color: '#7DADD4', title: 'Premier verre d\'eau', desc: 'Bois un grand verre d\'eau tiède en conscience. Visualise cette eau qui réveille chaque cellule.', duration: '1 min' },
-      { id: 'mouvement', type: 'exercice', icon: 'body-outline', color: '#D49A7C', title: 'Éveil du corps', desc: 'Quelques rotations douces : cou, épaules, hanches. Réveille ton corps sans le brusquer.', duration: '3 min' },
-      { id: 'gratitude_matin', type: 'gratitude', icon: 'heart-outline', color: '#C47C7C', title: 'Gratitude matinale', desc: 'Nomme une chose simple pour laquelle tu es reconnaissant ce matin.', duration: '1 min', requiresInput: true, inputPlaceholder: 'Ce matin, je suis reconnaissant pour...' },
+      { id: 'reveil', type: 'intention', title: 'Réveil en conscience', description: 'Avant de te lever, prends 30 secondes pour ressentir ton corps. Étire-toi doucement comme un chat.', duration: '1 min', completed: false },
+      { id: 'intention', type: 'intention', title: 'Intention du jour', description: 'Pose une intention claire pour ta journée. Pas un objectif, mais une manière d\'être.', duration: '2 min', completed: false, requiresInput: true, inputPlaceholder: 'Aujourd\'hui, je choisis de...' },
+      { id: 'breath', type: 'respiration', title: 'Souffle vital', description: 'Inspire 4 secondes par le nez, retiens 4 secondes, expire 6 secondes par la bouche. Répète 5 fois.', duration: '2 min', completed: false },
+      { id: 'hydratation', type: 'meditation', title: 'Premier verre d\'eau', description: 'Bois un grand verre d\'eau tiède en conscience. Visualise cette eau qui réveille chaque cellule.', duration: '1 min', completed: false },
+      { id: 'mouvement', type: 'exercice', title: 'Éveil du corps', description: 'Quelques rotations douces : cou, épaules, hanches. Réveille ton corps sans le brusquer.', duration: '3 min', completed: false },
+      { id: 'gratitude_matin', type: 'gratitude', title: 'Gratitude matinale', description: 'Nomme une chose simple pour laquelle tu es reconnaissant ce matin.', duration: '1 min', completed: false, requiresInput: true, inputPlaceholder: 'Ce matin, je suis reconnaissant pour...' },
     ],
     'apres-midi': [
-      { id: 'pause', type: 'silence', icon: 'pause-outline', color: '#A8B4C4', title: 'Pause sacrée', desc: 'Arrête tout. Ferme les yeux. 3 respirations profondes. C\'est ta pause à toi.', duration: '2 min' },
-      { id: 'scan', type: 'introspection', icon: 'body-outline', color: '#9A7CD4', title: 'Scan corporel rapide', desc: 'Parcours mentalement ton corps de la tête aux pieds. Où sont les tensions ? Relâche-les.', duration: '3 min' },
-      { id: 'marche', type: 'marche', icon: 'walk-outline', color: '#7DB38B', title: 'Marche consciente', desc: 'Marche quelques minutes en sentant chaque pas. Pieds nus si possible.', duration: '5 min' },
-      { id: 'nature', type: 'nature', icon: 'leaf-outline', color: '#5D8A66', title: 'Connexion nature', desc: 'Touche une plante, regarde le ciel, écoute les oiseaux. Reconnecte-toi au vivant.', duration: '3 min' },
-      { id: 'introspection', type: 'introspection', icon: 'eye-outline', color: '#A8B4C4', title: 'Check-in émotionnel', desc: 'Comment te sens-tu vraiment, là maintenant ? Pas de jugement, juste observer.', duration: '2 min', requiresInput: true, inputPlaceholder: 'En ce moment, je ressens...' },
-      { id: 'creativite', type: 'ecriture', icon: 'color-palette-outline', color: '#D4A8D4', title: 'Minute créative', desc: 'Dessine un gribouillis, écris un mot, chante une note. Exprime quelque chose sans réfléchir.', duration: '2 min' },
+      { id: 'pause', type: 'silence', title: 'Pause sacrée', description: 'Arrête tout. Ferme les yeux. 3 respirations profondes. C\'est ta pause à toi.', duration: '2 min', completed: false },
+      { id: 'scan', type: 'introspection', title: 'Scan corporel rapide', description: 'Parcours mentalement ton corps de la tête aux pieds. Où sont les tensions ? Relâche-les.', duration: '3 min', completed: false },
+      { id: 'marche', type: 'marche', title: 'Marche consciente', description: 'Marche quelques minutes en sentant chaque pas. Pieds nus si possible.', duration: '5 min', completed: false },
+      { id: 'nature', type: 'nature', title: 'Connexion nature', description: 'Touche une plante, regarde le ciel, écoute les oiseaux. Reconnecte-toi au vivant.', duration: '3 min', completed: false },
+      { id: 'introspection', type: 'introspection', title: 'Check-in émotionnel', description: 'Comment te sens-tu vraiment, là maintenant ? Pas de jugement, juste observer.', duration: '2 min', completed: false, requiresInput: true, inputPlaceholder: 'En ce moment, je ressens...' },
+      { id: 'creativite', type: 'ecriture', title: 'Minute créative', description: 'Dessine un gribouillis, écris un mot, chante une note. Exprime quelque chose sans réfléchir.', duration: '2 min', completed: false },
     ],
     soir: [
-      { id: 'transition', type: 'silence', icon: 'moon-outline', color: '#D4A8D4', title: 'Transition douce', desc: 'Éteins les écrans. Allume une bougie ou tamise les lumières. C\'est l\'heure de ralentir.', duration: '2 min' },
-      { id: 'detox', type: 'meditation', icon: 'phone-portrait-outline', color: '#7D7D8B', title: 'Détox digitale', desc: 'Pose ton téléphone loin de toi. Tu n\'en as plus besoin ce soir.', duration: '1 min' },
-      { id: 'bilan', type: 'bilan', icon: 'journal-outline', color: '#A8C4D4', title: 'Bilan du jour', desc: '3 choses bien : qu\'est-ce qui s\'est bien passé ? 1 apprentissage : qu\'as-tu appris ?', duration: '5 min', requiresInput: true, inputPlaceholder: 'Aujourd\'hui, j\'ai appris que...' },
-      { id: 'pardon', type: 'gratitude', icon: 'heart-half-outline', color: '#C4A87C', title: 'Pardon du soir', desc: 'Pardonne-toi pour ce que tu n\'as pas fait ou mal fait. Demain est un nouveau jour.', duration: '2 min' },
-      { id: 'gratitude_soir', type: 'gratitude', icon: 'heart-outline', color: '#9AAD8B', title: 'Gratitudes du jour', desc: 'Note 3 moments de ta journée pour lesquels tu ressens de la gratitude.', duration: '3 min', requiresInput: true, inputPlaceholder: '1. ...\n2. ...\n3. ...' },
-      { id: 'silence_soir', type: 'silence', icon: 'volume-mute-outline', color: '#B8A090', title: 'Minute de silence', desc: 'Ferme les yeux. Écoute le silence. Laisse tes pensées passer comme des nuages.', duration: '2 min' },
-      { id: 'visualisation', type: 'meditation', icon: 'sparkles-outline', color: '#C4B4D4', title: 'Visualisation demain', desc: 'Imagine ta journée de demain se dérouler parfaitement. Comment te sens-tu ?', duration: '3 min' },
+      { id: 'transition', type: 'silence', title: 'Transition douce', description: 'Éteins les écrans. Allume une bougie ou tamise les lumières. C\'est l\'heure de ralentir.', duration: '2 min', completed: false },
+      { id: 'detox', type: 'meditation', title: 'Détox digitale', description: 'Pose ton téléphone loin de toi. Tu n\'en as plus besoin ce soir.', duration: '1 min', completed: false },
+      { id: 'bilan', type: 'bilan', title: 'Bilan du jour', description: '3 choses bien : qu\'est-ce qui s\'est bien passé ? 1 apprentissage : qu\'as-tu appris ?', duration: '5 min', completed: false, requiresInput: true, inputPlaceholder: 'Aujourd\'hui, j\'ai appris que...' },
+      { id: 'pardon', type: 'gratitude', title: 'Pardon du soir', description: 'Pardonne-toi pour ce que tu n\'as pas fait ou mal fait. Demain est un nouveau jour.', duration: '2 min', completed: false },
+      { id: 'gratitude_soir', type: 'gratitude', title: 'Gratitudes du jour', description: 'Note 3 moments de ta journée pour lesquels tu ressens de la gratitude.', duration: '3 min', completed: false, requiresInput: true, inputPlaceholder: '1. ...\n2. ...\n3. ...' },
+      { id: 'silence_soir', type: 'silence', title: 'Minute de silence', description: 'Ferme les yeux. Écoute le silence. Laisse tes pensées passer comme des nuages.', duration: '2 min', completed: false },
+      { id: 'visualisation', type: 'meditation', title: 'Visualisation demain', description: 'Imagine ta journée de demain se dérouler parfaitement. Comment te sens-tu ?', duration: '3 min', completed: false },
     ],
   };
+
   const [cadenceData, setCadenceData] = useState<CadenceData | null>(null);
   const [completedRituals, setCompletedRituals] = useState<string[]>([]);
   const [ritualInputs, setRitualInputs] = useState<Record<string, string>>({});
@@ -190,11 +190,6 @@ export default function CadenceScreen() {
   const [intention, setIntention] = useState('');
   const [showIntention, setShowIntention] = useState(false);
   const [expandedRitual, setExpandedRitual] = useState<string | null>(null);
-
-  // Get ritual type labels from translations
-  const getRitualLabel = (type: string) => {
-    return t(`cadence.ritual_types.${type}`, type);
-  };
 
   const ds = {
     container: { backgroundColor: theme.background },
@@ -210,9 +205,18 @@ export default function CadenceScreen() {
     else if (hour < 18) setTimeOfDay('apres-midi');
     else setTimeOfDay('soir');
     
-    fetchCadence();
     fetchStreak();
-  }, [language]); // Reload when language changes
+  }, []);
+
+  useEffect(() => {
+    const data: CadenceData = {
+      greeting: GREETINGS[timeOfDay],
+      rituals: RITUELS[timeOfDay],
+      wisdomQuote: { text: "Ce que tu cherches te cherche aussi.", author: "Rumi" },
+    };
+    setCadenceData(data);
+    setLoading(false);
+  }, [timeOfDay]);
 
   const fetchStreak = async () => {
     try {
@@ -226,160 +230,11 @@ export default function CadenceScreen() {
     }
   };
 
-  const fetchCadence = async () => {
-    // Always use frontend translations for rituals
-    setCadenceData(generateFallbackCadence());
-    setLoading(false);
-  };
-
-  // Recalculate cadence when language changes or component mounts
-  useEffect(() => {
-    setCadenceData(generateFallbackCadence());
-    setLoading(false);
-  }, [language, timeOfDay]);
-
-  const generateFallbackCadence = (): CadenceData => {
-    const timeKey = timeOfDay === 'matin' ? 'morning' : timeOfDay === 'apres-midi' ? 'afternoon' : 'evening';
-    const greetingKey = `cadence.greeting_${timeKey}`;
-    
-    const rituals: DailyRitual[] = [];
-
-    // Morning: Intention
-    if (timeOfDay === 'matin') {
-      rituals.push({
-        id: 'intention',
-        type: 'intention',
-        title: t('cadence.rituals.intention_title'),
-        description: t('cadence.rituals.intention_desc'),
-        duration: '3 min',
-        completed: false,
-        requiresInput: true,
-        inputPlaceholder: t('cadence.rituals.intention_placeholder'),
-      });
-    }
-
-    // Always: Breath
-    rituals.push({
-      id: 'breath',
-      type: 'respiration',
-      title: t('cadence.rituals.breath_title'),
-      description: t('cadence.rituals.breath_desc'),
-      duration: '2 min',
-      completed: false,
-    });
-
-    // Physical: Stretching (morning/afternoon)
-    if (timeOfDay === 'matin' || timeOfDay === 'apres-midi') {
-      rituals.push({
-        id: 'etirement',
-        type: 'etirement',
-        title: t('cadence.rituals.stretch_title'),
-        description: t('cadence.rituals.stretch_desc'),
-        duration: '5 min',
-        completed: false,
-      });
-    }
-
-    // Physical: Conscious Walk (always)
-    rituals.push({
-      id: 'marche',
-      type: 'marche',
-      title: t('cadence.rituals.walk_title'),
-      description: t('cadence.rituals.walk_desc'),
-      duration: '10 min',
-      completed: false,
-    });
-
-    // Introspection
-    const questionKey = `cadence.rituals.introspection_${timeKey}`;
-    rituals.push({
-      id: 'introspection',
-      type: 'introspection',
-      title: t('cadence.rituals.question_title'),
-      description: t(questionKey),
-      duration: '5 min',
-      completed: false,
-    });
-
-    // Physical: Nature (afternoon)
-    if (timeOfDay === 'apres-midi') {
-      rituals.push({
-        id: 'nature',
-        type: 'nature',
-        title: t('cadence.rituals.nature_title'),
-        description: t('cadence.rituals.nature_desc'),
-        duration: '15 min',
-        completed: false,
-      });
-    }
-
-    // Physical: Energizing Exercise (morning)
-    if (timeOfDay === 'matin') {
-      rituals.push({
-        id: 'exercice',
-        type: 'exercice',
-        title: t('cadence.rituals.exercise_title'),
-        description: t('cadence.rituals.exercise_desc'),
-        duration: '10 min',
-        completed: false,
-      });
-    }
-
-    // Gratitude
-    rituals.push({
-      id: 'gratitude',
-      type: 'gratitude',
-      title: t('cadence.rituals.gratitude_title'),
-      description: t('cadence.rituals.gratitude_desc'),
-      duration: '3 min',
-      completed: false,
-      requiresInput: true,
-      inputPlaceholder: t('cadence.rituals.gratitude_placeholder'),
-    });
-
-    // Silence
-    rituals.push({
-      id: 'silence',
-      type: 'silence',
-      title: t('cadence.rituals.silence_title'),
-      description: t('cadence.rituals.silence_desc'),
-      duration: '1 min',
-      completed: false,
-    });
-
-    // Evening: Bilan
-    if (timeOfDay === 'soir') {
-      rituals.push({
-        id: 'bilan',
-        type: 'bilan',
-        title: t('cadence.rituals.bilan_title'),
-        description: t('cadence.rituals.bilan_desc'),
-        duration: '5 min',
-        completed: false,
-        requiresInput: true,
-        inputPlaceholder: t('cadence.rituals.bilan_placeholder'),
-      });
-    }
-
-    return {
-      greeting: t(greetingKey),
-      moonInfluence: "",
-      rituals,
-      eveningReflection: timeOfDay === 'soir' ? t('cadence.evening_reflection') : '',
-      wisdomQuote: {
-        text: t('wisdom.quotes.0.text', "Ce que tu cherches te cherche aussi."),
-        author: t('wisdom.quotes.0.author', "Rumi")
-      },
-      astralInsight: "",
-    };
-  };
-
   const toggleRitual = (id: string) => {
     if (completedRituals.includes(id)) {
       setCompletedRituals(prev => prev.filter(r => r !== id));
     } else {
       setCompletedRituals(prev => [...prev, id]);
-      // Save completion to backend
       saveRitualCompletion(id);
     }
   };
@@ -450,22 +305,19 @@ export default function CadenceScreen() {
     <SafeAreaView style={[styles.container, ds.container]}>
       <TwinklingStars starCount={25} minSize={1} maxSize={2} />
 
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-down" size={28} color={theme.iconColor} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, ds.text]}>{t('cadence.title')}</Text>
+        <Text style={[styles.headerTitle, ds.text]}>Cadence</Text>
         <StreakFlame streak={streak} />
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* Pulsing Icon */}
         <Animated.View entering={FadeIn.duration(800)} style={styles.iconSection}>
           <PulsingInfinity size={70} />
         </Animated.View>
 
-        {/* Time of day badge */}
         <Animated.View entering={FadeInUp.duration(400)} style={styles.timeBadgeContainer}>
           <View style={[styles.timeBadge, { backgroundColor: `${theme.accentWarm}20` }]}>
             <Ionicons 
@@ -474,18 +326,16 @@ export default function CadenceScreen() {
               color={theme.accentWarm} 
             />
             <Text style={[styles.timeBadgeText, { color: theme.accentWarm }]}>
-              {t(`time_of_day.${timeOfDay === 'matin' ? 'morning' : timeOfDay === 'apres-midi' ? 'afternoon' : 'evening'}`)}
+              {TIME_LABELS[timeOfDay]}
             </Text>
           </View>
         </Animated.View>
 
-        {/* Greeting */}
         <Animated.View entering={FadeInUp.duration(600).delay(100)}>
-          <Text style={[styles.subtitle, ds.textMuted]}>{t('cadence.your_inner_rhythm')}</Text>
+          <Text style={[styles.subtitle, ds.textMuted]}>Ton rythme intérieur</Text>
           <Text style={[styles.greeting, ds.text]}>{cadenceData?.greeting}</Text>
         </Animated.View>
 
-        {/* Wisdom Quote */}
         {cadenceData?.wisdomQuote && (
           <Animated.View entering={FadeInUp.duration(600).delay(200)} style={[styles.quoteCard, ds.card]}>
             <Text style={styles.quoteIcon}>✦</Text>
@@ -494,18 +344,9 @@ export default function CadenceScreen() {
           </Animated.View>
         )}
 
-        {/* Moon Influence */}
-        <Animated.View entering={FadeInUp.duration(600).delay(300)} style={[styles.moonCard, ds.card]}>
-          <View style={styles.moonIcon}>
-            <Text style={{ fontSize: 22 }}>🌙</Text>
-          </View>
-          <Text style={[styles.moonText, ds.textSecondary]}>{cadenceData?.moonInfluence}</Text>
-        </Animated.View>
-
-        {/* Progress */}
         <Animated.View entering={FadeInUp.duration(600).delay(400)} style={styles.progressSection}>
           <View style={styles.progressHeader}>
-            <Text style={[styles.progressLabel, ds.textMuted]}>{t('cadence.your_daily_cadence')}</Text>
+            <Text style={[styles.progressLabel, ds.textMuted]}>Ta cadence du jour</Text>
             <Text style={[styles.progressCount, ds.text]}>
               {completedRituals.length}/{cadenceData?.rituals.length}
             </Text>
@@ -520,8 +361,7 @@ export default function CadenceScreen() {
           </View>
         </Animated.View>
 
-        {/* Rituals */}
-        <Text style={[styles.sectionTitle, ds.text]}>{t('cadence.your_micro_rituals')}</Text>
+        <Text style={[styles.sectionTitle, ds.text]}>Tes micro-rituels</Text>
         {cadenceData?.rituals.map((ritual, i) => {
           const typeInfo = RITUAL_TYPES[ritual.type];
           const isCompleted = completedRituals.includes(ritual.id);
@@ -533,7 +373,7 @@ export default function CadenceScreen() {
                 style={[styles.ritualCard, ds.card, isCompleted && styles.ritualCompleted]}
                 onPress={() => {
                   if (ritual.requiresInput && !isCompleted) {
-                    if (ritual.id === 'gratitude') {
+                    if (ritual.id === 'gratitude' || ritual.id === 'gratitude_soir' || ritual.id === 'gratitude_matin') {
                       setShowGratitude(true);
                     } else if (ritual.id === 'intention') {
                       setShowIntention(true);
@@ -552,15 +392,14 @@ export default function CadenceScreen() {
                 <View style={styles.ritualContent}>
                   <View style={styles.ritualHeader}>
                     <Text style={[styles.ritualTitle, ds.text, isCompleted && styles.textCompleted]}>
-                      {getRitualText(ritual.id, 'title') || ritual.title}
+                      {ritual.title}
                     </Text>
                     <Text style={[styles.ritualDuration, { color: typeInfo.color }]}>{ritual.duration}</Text>
                   </View>
                   <Text style={[styles.ritualDescription, ds.textSecondary, isCompleted && styles.textCompleted]}>
-                    {getRitualText(ritual.id, 'desc') || ritual.description}
+                    {ritual.description}
                   </Text>
                   
-                  {/* Expanded input for bilan type */}
                   {isExpanded && ritual.requiresInput && (
                     <Animated.View entering={FadeIn.duration(300)} style={styles.inputSection}>
                       <TextInput
@@ -578,7 +417,7 @@ export default function CadenceScreen() {
                           setExpandedRitual(null);
                         }}
                       >
-                        <Text style={styles.saveInputText}>{t('common.validate')}</Text>
+                        <Text style={styles.saveInputText}>Valider</Text>
                       </TouchableOpacity>
                     </Animated.View>
                   )}
@@ -591,17 +430,16 @@ export default function CadenceScreen() {
           );
         })}
 
-        {/* Gratitude Modal */}
         {showGratitude && (
           <Animated.View entering={FadeIn.duration(300)} style={[styles.inputModal, ds.card]}>
-            <Text style={[styles.inputModalTitle, ds.text]}>{t('cadence.gratitude_modal_title')}</Text>
-            <Text style={[styles.inputModalSubtitle, ds.textMuted]}>{t('cadence.gratitude_modal_subtitle')}</Text>
+            <Text style={[styles.inputModalTitle, ds.text]}>Tes gratitudes</Text>
+            <Text style={[styles.inputModalSubtitle, ds.textMuted]}>Nomme 3 choses pour lesquelles tu es reconnaissant</Text>
             {[0, 1, 2].map((idx) => (
               <View key={idx} style={styles.gratitudeRow}>
                 <Text style={[styles.gratitudeNumber, { color: theme.accentWarm }]}>{idx + 1}.</Text>
                 <TextInput
                   style={[styles.gratitudeInput, ds.text, { backgroundColor: theme.background, borderColor: theme.border }]}
-                  placeholder={`${t('cadence.rituals.gratitude_placeholder')} ${idx + 1}...`}
+                  placeholder={`Gratitude ${idx + 1}...`}
                   placeholderTextColor={theme.textMuted}
                   value={gratitudes[idx]}
                   onChangeText={(text) => handleGratitudeChange(idx, text)}
@@ -610,23 +448,22 @@ export default function CadenceScreen() {
             ))}
             <View style={styles.modalButtons}>
               <TouchableOpacity style={[styles.modalCancelBtn, { borderColor: theme.border }]} onPress={() => setShowGratitude(false)}>
-                <Text style={[styles.modalCancelText, ds.textMuted]}>{t('common.cancel')}</Text>
+                <Text style={[styles.modalCancelText, ds.textMuted]}>Annuler</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.modalSaveBtn, { backgroundColor: theme.accentWarm }]} onPress={saveGratitudes}>
-                <Text style={styles.modalSaveText}>{t('common.save')}</Text>
+                <Text style={styles.modalSaveText}>Enregistrer</Text>
               </TouchableOpacity>
             </View>
           </Animated.View>
         )}
 
-        {/* Intention Modal */}
         {showIntention && (
           <Animated.View entering={FadeIn.duration(300)} style={[styles.inputModal, ds.card]}>
-            <Text style={[styles.inputModalTitle, ds.text]}>{t('cadence.intention_modal_title')}</Text>
-            <Text style={[styles.inputModalSubtitle, ds.textMuted]}>{t('cadence.intention_modal_subtitle')}</Text>
+            <Text style={[styles.inputModalTitle, ds.text]}>Ton intention</Text>
+            <Text style={[styles.inputModalSubtitle, ds.textMuted]}>Quelle énergie veux-tu cultiver aujourd'hui ?</Text>
             <TextInput
               style={[styles.intentionInput, ds.text, { backgroundColor: theme.background, borderColor: theme.border }]}
-              placeholder={t('cadence.rituals.intention_placeholder')}
+              placeholder="Aujourd'hui, je choisis de..."
               placeholderTextColor={theme.textMuted}
               value={intention}
               onChangeText={setIntention}
@@ -634,42 +471,23 @@ export default function CadenceScreen() {
             />
             <View style={styles.modalButtons}>
               <TouchableOpacity style={[styles.modalCancelBtn, { borderColor: theme.border }]} onPress={() => setShowIntention(false)}>
-                <Text style={[styles.modalCancelText, ds.textMuted]}>{t('common.cancel')}</Text>
+                <Text style={[styles.modalCancelText, ds.textMuted]}>Annuler</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.modalSaveBtn, { backgroundColor: theme.accentWarm }]} onPress={saveIntention}>
-                <Text style={styles.modalSaveText}>{t('cadence.set_intention')}</Text>
+                <Text style={styles.modalSaveText}>Poser mon intention</Text>
               </TouchableOpacity>
             </View>
           </Animated.View>
         )}
 
-        {/* Evening Reflection */}
-        {timeOfDay === 'soir' && cadenceData?.eveningReflection && !allCompleted && (
-          <Animated.View entering={FadeInUp.duration(600).delay(800)} style={[styles.reflectionCard, ds.card]}>
-            <Ionicons name="moon-outline" size={20} color={theme.accentWarm} />
-            <Text style={[styles.reflectionTitle, ds.text]}>{t('cadence.evening_thought')}</Text>
-            <Text style={[styles.reflectionText, ds.textSecondary]}>{cadenceData.eveningReflection}</Text>
-          </Animated.View>
-        )}
-
-        {/* Completion Message */}
         {allCompleted && (
           <Animated.View entering={FadeIn.duration(600)} style={[styles.completionCard, { backgroundColor: `${theme.accentWarm}15` }]}>
             <Text style={styles.completionEmoji}>✨</Text>
             <Text style={[styles.completionTitle, { color: theme.accentWarm }]}>
-              {t('cadence.cadence_honored')}
+              Cadence honorée
             </Text>
             <Text style={[styles.completionText, ds.textSecondary]}>
-              {t('cadence.cadence_honored_sub')} {streak > 0 && t('cadence.days_streak', { count: streak + 1 })}
-            </Text>
-          </Animated.View>
-        )}
-
-        {/* Astral Insight */}
-        {cadenceData?.astralInsight && (
-          <Animated.View entering={FadeInUp.duration(600).delay(900)} style={styles.astralInsight}>
-            <Text style={[styles.astralText, ds.textMuted]}>
-              ✧ {cadenceData.astralInsight}
+              Tu as pris soin de toi aujourd'hui. {streak > 0 && `${streak + 1} jours de suite !`}
             </Text>
           </Animated.View>
         )}
@@ -704,10 +522,6 @@ const styles = StyleSheet.create({
   quoteIcon: { fontSize: 20, color: '#D4A574', marginBottom: 10 },
   quoteText: { fontSize: 15, fontStyle: 'italic', textAlign: 'center', lineHeight: 24, marginBottom: 8 },
   quoteAuthor: { fontSize: 12 },
-
-  moonCard: { flexDirection: 'row', alignItems: 'center', padding: 14, borderRadius: 14, marginBottom: 20, gap: 12 },
-  moonIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(212, 165, 116, 0.15)', alignItems: 'center', justifyContent: 'center' },
-  moonText: { flex: 1, fontSize: 13, lineHeight: 19, fontStyle: 'italic' },
 
   progressSection: { marginBottom: 20 },
   progressHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
@@ -747,15 +561,8 @@ const styles = StyleSheet.create({
   modalSaveBtn: { flex: 1, paddingVertical: 12, borderRadius: 20, alignItems: 'center' },
   modalSaveText: { color: '#fff', fontSize: 14, fontWeight: '500' },
 
-  reflectionCard: { padding: 20, borderRadius: 16, alignItems: 'center', marginTop: 8, gap: 10 },
-  reflectionTitle: { fontSize: 14, fontWeight: '500' },
-  reflectionText: { fontSize: 14, textAlign: 'center', lineHeight: 22, fontStyle: 'italic' },
-
   completionCard: { padding: 24, borderRadius: 16, alignItems: 'center', marginTop: 20 },
   completionEmoji: { fontSize: 36, marginBottom: 10 },
   completionTitle: { fontSize: 18, fontWeight: '500', marginBottom: 6 },
   completionText: { fontSize: 14, textAlign: 'center' },
-
-  astralInsight: { marginTop: 20, alignItems: 'center' },
-  astralText: { fontSize: 12, fontStyle: 'italic', textAlign: 'center' },
 });
