@@ -3169,6 +3169,91 @@ async def transcribe_voice(audio: UploadFile = File(...)):
         logging.error(f"Transcription error: {e}")
         return {"text": "", "success": False, "error": str(e)}
 
+# ==================== SLEEP TRACKER ====================
+class SleepEntry(BaseModel):
+    quality: int  # 1-5
+    hours: str
+    notes: Optional[str] = None
+    woke_up_naturally: Optional[bool] = None
+    had_dreams: Optional[bool] = None
+
+@api_router.post("/sleep")
+async def log_sleep(entry: SleepEntry):
+    """Log sleep for today"""
+    today = datetime.utcnow().strftime("%Y-%m-%d")
+    
+    sleep_doc = {
+        "id": str(uuid.uuid4()),
+        "date": today,
+        "quality": entry.quality,
+        "hours": entry.hours,
+        "notes": entry.notes,
+        "woke_up_naturally": entry.woke_up_naturally,
+        "had_dreams": entry.had_dreams,
+        "created_at": datetime.utcnow().isoformat()
+    }
+    
+    # Update or insert for today
+    await db.sleep.update_one(
+        {"date": today},
+        {"$set": sleep_doc},
+        upsert=True
+    )
+    
+    return sleep_doc
+
+@api_router.get("/sleep/today")
+async def get_today_sleep():
+    """Get today's sleep entry"""
+    today = datetime.utcnow().strftime("%Y-%m-%d")
+    entry = await db.sleep.find_one({"date": today}, {"_id": 0})
+    return entry or {}
+
+@api_router.get("/sleep/week")
+async def get_week_sleep():
+    """Get last 7 days of sleep"""
+    entries = await db.sleep.find({}, {"_id": 0}).sort("date", -1).to_list(7)
+    return entries
+
+# ==================== GRATITUDE JOURNAL ====================
+class GratitudeEntry(BaseModel):
+    items: List[str]  # 3 gratitudes
+    reflection: Optional[str] = None
+
+@api_router.post("/gratitude")
+async def log_gratitude(entry: GratitudeEntry):
+    """Log gratitude for today"""
+    today = datetime.utcnow().strftime("%Y-%m-%d")
+    
+    gratitude_doc = {
+        "id": str(uuid.uuid4()),
+        "date": today,
+        "items": entry.items[:5],  # Max 5 items
+        "reflection": entry.reflection,
+        "created_at": datetime.utcnow().isoformat()
+    }
+    
+    await db.gratitude.update_one(
+        {"date": today},
+        {"$set": gratitude_doc},
+        upsert=True
+    )
+    
+    return gratitude_doc
+
+@api_router.get("/gratitude/today")
+async def get_today_gratitude():
+    """Get today's gratitude entry"""
+    today = datetime.utcnow().strftime("%Y-%m-%d")
+    entry = await db.gratitude.find_one({"date": today}, {"_id": 0})
+    return entry or {}
+
+@api_router.get("/gratitude/week")
+async def get_week_gratitude():
+    """Get last 7 days of gratitude"""
+    entries = await db.gratitude.find({}, {"_id": 0}).sort("date", -1).to_list(7)
+    return entries
+
 # Mount static files for fonts
 app.mount("/api/static", StaticFiles(directory=str(ROOT_DIR / "static")), name="static")
 
