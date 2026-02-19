@@ -467,7 +467,7 @@ export default function RitualsScreen() {
                 {generatedRitual.closing}
               </Text>
               <View style={[styles.affirmationBox, { backgroundColor: `${theme.accentWarm}10` }]}>
-                <Text style={[styles.affirmationLabel, ds.textMuted]}>AFFIRMATION</Text>
+                <Text style={[styles.affirmationLabel, ds.textMuted]}>{t('rituals.affirmation')}</Text>
                 <Text style={[styles.affirmationText, ds.text]}>
                   "{generatedRitual.affirmation}"
                 </Text>
@@ -485,7 +485,7 @@ export default function RitualsScreen() {
               data-testid="new-ritual-btn"
             >
               <Ionicons name="refresh" size={18} color={theme.textMuted} />
-              <Text style={[styles.newRitualText, ds.textMuted]}>Nouveau rituel</Text>
+              <Text style={[styles.newRitualText, ds.textMuted]}>{t('rituals.new_ritual')}</Text>
             </TouchableOpacity>
           </Animated.View>
         )}
