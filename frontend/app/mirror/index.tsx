@@ -203,7 +203,7 @@ export default function MirrorScreen() {
           {isLoading && (
             <View style={[styles.loadingBubble, ds.card]}>
               <ActivityIndicator color={theme.accentWarm} size="small" />
-              <Text style={[styles.loadingText, ds.textSecondary]}>Le miroir contemple...</Text>
+              <Text style={[styles.loadingText, ds.textSecondary]}>{t('mirror.thinking')}</Text>
             </View>
           )}
         </ScrollView>
@@ -212,7 +212,7 @@ export default function MirrorScreen() {
         <View style={[styles.inputContainer, ds.card]}>
           <TextInput
             style={[styles.textInput, ds.input]}
-            placeholder="Confie ce qui traverse ton esprit..."
+            placeholder={t('mirror.placeholder')}
             placeholderTextColor={theme.textMuted}
             value={inputText}
             onChangeText={setInputText}
