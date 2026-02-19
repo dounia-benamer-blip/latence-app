@@ -26,10 +26,10 @@ const { width, height } = Dimensions.get('window');
 
 // Breathing patterns
 const BREATHING_PATTERNS = {
-  calm: { name: 'Calme', inhale: 4, hold: 4, exhale: 6, holdOut: 2, color: '#8B9A7D' },
-  energize: { name: 'Énergisant', inhale: 4, hold: 0, exhale: 4, holdOut: 0, color: '#D4A574' },
-  sleep: { name: 'Sommeil', inhale: 4, hold: 7, exhale: 8, holdOut: 0, color: '#6B7A9D' },
-  focus: { name: 'Focus', inhale: 4, hold: 4, exhale: 4, holdOut: 4, color: '#9D8B7A' },
+  calm: { name: 'calm', inhale: 4, hold: 4, exhale: 6, holdOut: 2, color: '#8B9A7D' },
+  energize: { name: 'energize', inhale: 4, hold: 0, exhale: 4, holdOut: 0, color: '#D4A574' },
+  sleep: { name: 'sleep', inhale: 4, hold: 7, exhale: 8, holdOut: 0, color: '#6B7A9D' },
+  focus: { name: 'focus', inhale: 4, hold: 4, exhale: 4, holdOut: 4, color: '#9D8B7A' },
 };
 
 export default function MeditationScreen() {
