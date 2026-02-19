@@ -351,11 +351,9 @@ export default function HomeScreen() {
 
   const moonPhase = getMoonPhase();
   
-  // Dynamically format today's date based on current language
-  const { i18n } = useTranslation();
-  const today = React.useMemo(() => {
-    return formatToday(t);
-  }, [t, i18n.language]);
+  // Get current language from i18next
+  const currentLanguage = t('home.day_wed'); // This will force re-render on language change
+  const today = formatToday(t);
 
   // Dynamic styles based on theme
   const dynamicStyles = {
