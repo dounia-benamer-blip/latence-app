@@ -73,44 +73,54 @@ class PaymentTransaction(BaseModel):
 
 SUBSCRIPTION_TIERS = {
     "free": {
-        "name": "Gratuit",
+        "name": "Essai Gratuit",
         "price": 0,
+        "trial_days": 2,  # 2 jours d'essai
         "limits": {
-            "journal_entries": 3,  # per month
-            "dreams": 3,
-            "mirror_queries": 3,
-            "oracle": False,
-            "advanced_analysis": False,
-            "statistics": False,
-            "cosmic_tree": False,
-            "lunar_cycles": False,
-            "unlimited_archive": False,
-            "seal_permanent": False,
+            "journal_entries": -1,  # unlimited during trial
+            "dreams": -1,
+            "mirror_queries": -1,
+            "astrology": True,
+            "oracle": True,
+            "advanced_analysis": True,
+            "statistics": True,
+            "cosmic_tree": True,
+            "lunar_cycles": True,
+            "unlimited_archive": True,
+            "seal_permanent": True,
+            "cadence": True,
+            "sagesse": True,
+            "lettre": True,
         }
     },
     "essentiel": {
         "name": "Essentiel",
-        "price": 4.99,
+        "price": 9.99,
         "limits": {
             "journal_entries": -1,  # unlimited
-            "dreams": -1,
-            "mirror_queries": 20,
-            "oracle": True,
-            "advanced_analysis": True,
+            "dreams": False,  # PAS de rêves
+            "mirror_queries": False,  # PAS d'IA Miroir
+            "astrology": False,  # PAS d'astro
+            "oracle": False,
+            "advanced_analysis": False,
             "statistics": True,
             "cosmic_tree": False,
             "lunar_cycles": True,
             "unlimited_archive": True,
             "seal_permanent": True,
+            "cadence": True,
+            "sagesse": True,
+            "lettre": True,
         }
     },
     "premium": {
         "name": "Premium",
-        "price": 14.99,
+        "price": 18.99,
         "limits": {
             "journal_entries": -1,
-            "dreams": -1,
-            "mirror_queries": -1,
+            "dreams": -1,  # Rêves illimités
+            "mirror_queries": -1,  # IA Miroir illimitée
+            "astrology": True,  # Astro inclus
             "oracle": True,
             "advanced_analysis": True,
             "statistics": True,
@@ -119,6 +129,9 @@ SUBSCRIPTION_TIERS = {
             "unlimited_archive": True,
             "seal_permanent": True,
             "health_sync": True,
+            "cadence": True,
+            "sagesse": True,
+            "lettre": True,
         }
     },
     "lifetime": {
