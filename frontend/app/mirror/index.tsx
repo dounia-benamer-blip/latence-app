@@ -14,6 +14,7 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../src/context/ThemeContext';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
@@ -28,6 +29,7 @@ interface Message {
 export default function MirrorScreen() {
   const router = useRouter();
   const { theme } = useTheme();
+  const { t, i18n } = useTranslation();
   const scrollRef = useRef<ScrollView>(null);
   
   const [messages, setMessages] = useState<Message[]>([]);
@@ -62,6 +64,7 @@ export default function MirrorScreen() {
         body: JSON.stringify({
           message: userMessage.content,
           context: messages.slice(-4).map(m => m.content).join(' | '),
+          language: i18n.language,
         }),
       });
 
@@ -72,7 +75,7 @@ export default function MirrorScreen() {
         const mirrorMessage: Message = {
           id: (Date.now() + 1).toString(),
           type: 'mirror',
-          content: data[responseKey] || 'Le miroir se trouble...',
+          content: data[responseKey] || t('mirror.thinking'),
           timestamp: new Date(),
         };
         setMessages(prev => [...prev, mirrorMessage]);
@@ -82,7 +85,7 @@ export default function MirrorScreen() {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'mirror',
-        content: 'Le miroir se trouble un instant... Que ressens-tu vraiment en ce moment ?',
+        content: t('mirror.empty_reflect'),
         timestamp: new Date(),
       };
       setMessages(prev => [...prev, errorMessage]);
