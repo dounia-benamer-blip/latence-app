@@ -11,7 +11,15 @@
     "or": "or",
     "premium": "Premium",
     "free": "Free",
-    "close": "Close"
+    "close": "Close",
+    "share": "Share",
+    "new": "New",
+    "refresh": "Refresh",
+    "next": "Next",
+    "previous": "Previous",
+    "complete": "Complete",
+    "start": "Start",
+    "stop": "Stop"
   },
   "home": {
     "greeting_morning": "Good morning",
@@ -31,7 +39,10 @@
     "capsules": "capsules",
     "dreams": "dreams",
     "stats_capsules": "capsules",
-    "stats_dreams": "dreams"
+    "stats_dreams": "dreams",
+    "books_title": "Suggested Readings",
+    "books_subtitle": "To extend this moment",
+    "companion_intro": "A space to explore your thoughts and emotions through a poetic and caring dialogue."
   },
   "menu": {
     "cadence": "Cadence",
@@ -110,6 +121,49 @@
     "button": "Discover Premium",
     "later": "Later"
   },
+  "wisdom": {
+    "title": "Wisdom",
+    "subtitle": "Sacred universal quotes",
+    "new_quote": "New quote",
+    "save": "Save",
+    "share": "Share",
+    "saved": "Saved",
+    "quotes": [
+      {"text": "What you seek is seeking you.", "author": "Rumi"},
+      {"text": "The wound is the place where the Light enters you.", "author": "Rumi"},
+      {"text": "Be the change you wish to see in the world.", "author": "Gandhi"},
+      {"text": "Don't grieve. Anything you lose comes round in another form.", "author": "Rumi"},
+      {"text": "Silence is the language of God, all else is poor translation.", "author": "Rumi"},
+      {"text": "It is not the length of life, but depth of life.", "author": "Ralph Waldo Emerson"},
+      {"text": "Know thyself.", "author": "Temple of Delphi"},
+      {"text": "Peace comes from within. Do not seek it without.", "author": "Buddha"},
+      {"text": "What is essential is invisible to the eye.", "author": "Saint-Exupéry"},
+      {"text": "The heart has its reasons which reason knows nothing of.", "author": "Pascal"},
+      {"text": "A journey of a thousand miles begins with a single step.", "author": "Lao Tzu"},
+      {"text": "Who looks outside, dreams; who looks inside, awakes.", "author": "Carl Jung"}
+    ]
+  },
+  "cadence": {
+    "title": "Cadence",
+    "subtitle": "Your inner rhythm",
+    "daily_rituals": "Daily rituals",
+    "evening_reflection": "Evening reflection",
+    "complete_ritual": "Mark as done",
+    "completed": "Completed",
+    "ritual_types": {
+      "respiration": "Breathing",
+      "introspection": "Introspection",
+      "ecriture": "Writing",
+      "gratitude": "Gratitude",
+      "meditation": "Meditation",
+      "silence": "Silence",
+      "intention": "Intention",
+      "bilan": "Review"
+    },
+    "duration": "{{minutes}} min",
+    "streak": "Current streak",
+    "days": "days"
+  },
   "capsule": {
     "write_title": "Write",
     "write_subtitle": "Drop your thoughts",
@@ -132,7 +186,11 @@
       "gold_duration": "1 year"
     },
     "seal_button": "Seal the capsule",
-    "sealed_message": "Your capsule is sealed. It will open on {{date}}."
+    "sealed_message": "Your capsule is sealed. It will open on {{date}}.",
+    "my_capsules": "My capsules",
+    "sealed": "Sealed",
+    "opens_in": "Opens in",
+    "ready_to_open": "Ready to open"
   },
   "dreams": {
     "title": "Dream Journal",
@@ -145,7 +203,11 @@
     "type_recurring": "Recurring",
     "describe": "Describe your dream...",
     "emotions": "Emotions felt",
-    "save": "Save dream"
+    "save": "Save dream",
+    "delete_confirm": "Delete this dream?",
+    "last_night": "Last night",
+    "intensity": "Intensity",
+    "tags": "Tags"
   },
   "oracle": {
     "title": "Dream Oracle",
@@ -160,18 +222,28 @@
     "symbols": "Recurring symbols & their meaning",
     "patterns": "Hidden emotional patterns",
     "messages": "Messages from the unconscious",
-    "guidance": "Personalized guidance"
+    "guidance": "Personalized guidance",
+    "new_reading": "New consultation",
+    "synthesis": "Synthesis",
+    "symbols_revealed": "Symbols revealed"
   },
   "mirror": {
     "title": "Mirror",
     "subtitle": "AI that reflects your soul",
     "placeholder": "Confide in the Mirror...",
     "send": "Send",
+    "thinking": "The Mirror is reflecting...",
     "modes": {
       "reflect": "Reflect",
       "explore": "Explore",
       "guide": "Guide"
-    }
+    },
+    "welcome": "I am your inner Mirror. What would you like to explore today?",
+    "suggestions": [
+      "How are you feeling right now?",
+      "What's on your mind?",
+      "What do you need today?"
+    ]
   },
   "cosmos": {
     "title": "Cosmos",
@@ -183,15 +255,30 @@
       "arab": "Arab"
     },
     "enter_birthdate": "Enter your birth date",
-    "discover": "Discover my profile"
+    "discover": "Discover my profile",
+    "your_sign": "Your sign",
+    "element": "Element",
+    "planet": "Planet",
+    "characteristics": "Characteristics",
+    "compatibility": "Compatibility",
+    "daily_horoscope": "Daily horoscope",
+    "moon_sign": "Moon sign",
+    "celtic_sign": "Celtic sign",
+    "arab_sign": "Arab sign"
   },
   "rituals": {
     "title": "Lunar Rituals",
     "subtitle": "Guided by the moon",
     "current_phase": "Current phase",
     "generate": "Generate a ritual",
+    "generating": "Creating ritual...",
     "steps": "Steps",
-    "affirmation": "Affirmation"
+    "affirmation": "Affirmation",
+    "preparation": "Preparation",
+    "ritual_for": "Ritual for the {{phase}}",
+    "complete_step": "Mark as done",
+    "all_completed": "Ritual completed",
+    "new_ritual": "New ritual"
   },
   "meditation": {
     "title": "Meditation",
@@ -201,7 +288,20 @@
     "exhale": "Exhale",
     "start": "Start",
     "pause": "Pause",
-    "resume": "Resume"
+    "resume": "Resume",
+    "stop": "Stop",
+    "cycles": "cycles",
+    "duration": "Duration",
+    "minutes": "minutes",
+    "choose_exercise": "Choose an exercise",
+    "exercises": {
+      "calm": "Calm",
+      "calm_desc": "Soothing breathing 4-4-4",
+      "focus": "Focus",
+      "focus_desc": "Concentration 4-7-8",
+      "energy": "Energy",
+      "energy_desc": "Energizing breathing"
+    }
   },
   "letter": {
     "title": "Letter to Self",
@@ -209,7 +309,12 @@
     "placeholder": "Dear future me...",
     "choose_date": "Choose delivery date",
     "send": "Send the letter",
-    "sent_message": "Your letter will be delivered on {{date}}"
+    "sent_message": "Your letter will be delivered on {{date}}",
+    "my_letters": "My letters",
+    "pending": "Pending",
+    "delivered": "Delivered",
+    "no_letters": "No letters yet",
+    "write_first": "Write your first letter to your future self"
   },
   "settings": {
     "title": "Settings",
@@ -247,5 +352,16 @@
     "number_of_codes": "Number of codes",
     "batch_name": "Batch name (optional)",
     "generate_button": "Generate codes"
+  },
+  "stats": {
+    "title": "Statistics",
+    "subtitle": "Your emotional evolution",
+    "this_month": "This month",
+    "capsules_written": "Capsules written",
+    "dreams_recorded": "Dreams recorded",
+    "rituals_completed": "Rituals completed",
+    "mood_evolution": "Mood evolution",
+    "most_used": "Most used",
+    "streak": "Current streak"
   }
 }
