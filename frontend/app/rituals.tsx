@@ -399,7 +399,7 @@ export default function RitualsScreen() {
             {/* Preparation */}
             <View style={[styles.ritualCard, ds.card]}>
               <Text style={[styles.ritualSectionTitle, ds.text]}>
-                <Ionicons name="sparkles-outline" size={16} /> Préparation
+                <Ionicons name="sparkles-outline" size={16} /> {t('rituals.preparation')}
               </Text>
               {generatedRitual.preparation.map((item, i) => (
                 <View key={i} style={styles.prepItem}>
@@ -412,7 +412,7 @@ export default function RitualsScreen() {
             {/* Steps */}
             <View style={[styles.ritualCard, ds.card]}>
               <Text style={[styles.ritualSectionTitle, ds.text]}>
-                <Ionicons name="list-outline" size={16} /> Étapes du rituel
+                <Ionicons name="list-outline" size={16} /> {t('rituals.steps')}
               </Text>
               {generatedRitual.steps.map((step, i) => (
                 <TouchableOpacity
