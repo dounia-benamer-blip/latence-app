@@ -335,9 +335,9 @@ export default function SubscriptionScreen() {
 
         {/* Free Tier Info */}
         <Animated.View entering={FadeInDown.duration(500).delay(700)} style={styles.freeInfo}>
-          <Ionicons name="information-circle-outline" size={18} color={theme.textMuted} />
+          <Ionicons name="gift-outline" size={18} color={theme.accent} />
           <Text style={[styles.freeInfoText, ds.textMuted]}>
-            Le niveau gratuit inclut 3 entrées journal et 3 rêves par mois.
+            2 jours d'essai gratuit avec accès complet à toutes les fonctionnalités.
           </Text>
         </Animated.View>
       </ScrollView>
