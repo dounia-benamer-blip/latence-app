@@ -211,18 +211,26 @@ export default function AuthScreen() {
               style={[styles.socialButton, ds.card]}
               onPress={handleGoogleLogin}
               activeOpacity={0.7}
+              disabled={isLoading}
+              data-testid="google-login-btn"
             >
               <Ionicons name="logo-google" size={20} color={theme.text} />
               <Text style={[styles.socialButtonText, ds.text]}>Continuer avec Google</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[styles.socialButton, { backgroundColor: '#000' }]}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="logo-apple" size={20} color="#fff" />
-              <Text style={[styles.socialButtonText, { color: '#fff' }]}>Continuer avec Apple</Text>
-            </TouchableOpacity>
+            {/* Apple Sign-In - only show on iOS or if available */}
+            {(Platform.OS === 'ios' || isAppleAvailable) && (
+              <TouchableOpacity
+                style={[styles.socialButton, { backgroundColor: '#000' }]}
+                onPress={handleAppleLogin}
+                activeOpacity={0.7}
+                disabled={isLoading}
+                data-testid="apple-login-btn"
+              >
+                <Ionicons name="logo-apple" size={20} color="#fff" />
+                <Text style={[styles.socialButtonText, { color: '#fff' }]}>Continuer avec Apple</Text>
+              </TouchableOpacity>
+            )}
           </Animated.View>
 
           {/* Toggle Mode */}
