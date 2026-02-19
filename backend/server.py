@@ -2950,6 +2950,222 @@ async def get_delivered_letters():
     ).to_list(100)
     return letters
 
+
+# =============================================================================
+# SOUL REPORT - Weekly emotional summary
+# =============================================================================
+
+class SoulReportRequest(BaseModel):
+    language: Optional[str] = "fr"
+
+@api_router.get("/soul-report/latest")
+async def get_latest_soul_report():
+    """Get the most recent soul report"""
+    report = await db.soul_reports.find_one(sort=[("generated_at", -1)], projection={"_id": 0})
+    return report
+
+@api_router.get("/soul-reports")
+async def get_all_soul_reports():
+    """Get all soul reports"""
+    reports = await db.soul_reports.find({}, {"_id": 0}).sort("generated_at", -1).to_list(20)
+    return reports
+
+@api_router.post("/soul-report/generate")
+async def generate_soul_report(lang: str = "fr"):
+    """Generate a new soul report analyzing recent emotional data"""
+    
+    # Gather data from last 7 days
+    week_ago = (datetime.utcnow() - timedelta(days=7)).isoformat()
+    
+    # Get moods
+    moods = await db.moods.find({"date": {"$gte": week_ago}}, {"_id": 0}).to_list(100)
+    mood_counts = {}
+    for m in moods:
+        mood = m.get("mood", "neutre")
+        mood_counts[mood] = mood_counts.get(mood, 0) + 1
+    
+    # Get dreams
+    dreams = await db.dreams.find({}, {"_id": 0}).sort("created_at", -1).to_list(10)
+    dream_summaries = [d.get("description", "")[:100] for d in dreams[:5]]
+    
+    # Get capsules
+    capsules = await db.capsules.find({}, {"_id": 0}).sort("created_at", -1).to_list(10)
+    capsule_snippets = [c.get("content", "")[:100] for c in capsules[:5]]
+    
+    # Language-specific prompts
+    prompts = {
+        "fr": {
+            "system": """Tu es un guide spirituel bienveillant qui analyse le parcours émotionnel d'une personne.
+Tu génères un "Rapport de l'Âme" - un résumé poétique et profond de sa semaine intérieure.
+
+Réponds en JSON avec cette structure exacte:
+{
+  "summary": "Résumé poétique de 2-3 phrases sur l'état émotionnel général",
+  "emotional_journey": "Description du voyage émotionnel de la semaine (3-4 phrases)",
+  "dominant_themes": ["thème1", "thème2", "thème3"],
+  "growth_areas": ["axe de croissance 1", "axe 2"],
+  "dream_insights": "Analyse des rêves s'il y en a, sinon message encourageant",
+  "recommended_focus": "Conseil pour la semaine à venir",
+  "affirmation": "Une affirmation personnalisée"
+}""",
+            "period": f"Semaine du {datetime.utcnow().strftime('%d/%m/%Y')}"
+        },
+        "en": {
+            "system": """You are a benevolent spiritual guide analyzing a person's emotional journey.
+You generate a "Soul Report" - a poetic and profound summary of their inner week.
+
+Respond in JSON with this exact structure:
+{
+  "summary": "Poetic 2-3 sentence summary of overall emotional state",
+  "emotional_journey": "Description of the week's emotional journey (3-4 sentences)",
+  "dominant_themes": ["theme1", "theme2", "theme3"],
+  "growth_areas": ["growth area 1", "area 2"],
+  "dream_insights": "Dream analysis if any, otherwise encouraging message",
+  "recommended_focus": "Advice for the coming week",
+  "affirmation": "A personalized affirmation"
+}""",
+            "period": f"Week of {datetime.utcnow().strftime('%m/%d/%Y')}"
+        },
+        "es": {
+            "system": """Eres un guía espiritual benevolente que analiza el viaje emocional de una persona.
+Generas un "Informe del Alma" - un resumen poético y profundo de su semana interior.
+
+Responde en JSON con esta estructura exacta:
+{
+  "summary": "Resumen poético de 2-3 frases sobre el estado emocional general",
+  "emotional_journey": "Descripción del viaje emocional de la semana (3-4 frases)",
+  "dominant_themes": ["tema1", "tema2", "tema3"],
+  "growth_areas": ["área de crecimiento 1", "área 2"],
+  "dream_insights": "Análisis de sueños si los hay, sino mensaje alentador",
+  "recommended_focus": "Consejo para la próxima semana",
+  "affirmation": "Una afirmación personalizada"
+}""",
+            "period": f"Semana del {datetime.utcnow().strftime('%d/%m/%Y')}"
+        }
+    }
+    
+    lang_config = prompts.get(lang, prompts["fr"])
+    
+    chat = LlmChat(
+        api_key=EMERGENT_LLM_KEY,
+        session_id=f"soul-report-{uuid.uuid4()}",
+        system_message=lang_config["system"]
+    ).with_model("openai", "gpt-4o")
+    
+    user_prompt = f"""Analyse ces données émotionnelles:
+
+Humeurs de la semaine: {json.dumps(mood_counts)}
+Extraits de rêves: {json.dumps(dream_summaries) if dream_summaries else "Aucun rêve enregistré"}
+Extraits d'écriture: {json.dumps(capsule_snippets) if capsule_snippets else "Aucune écriture"}
+
+Génère le rapport de l'âme."""
+
+    try:
+        response = await chat.send_message(UserMessage(text=user_prompt))
+        clean_response = response.strip()
+        if clean_response.startswith("```json"):
+            clean_response = clean_response[7:]
+        if clean_response.startswith("```"):
+            clean_response = clean_response[3:]
+        if clean_response.endswith("```"):
+            clean_response = clean_response[:-3]
+        
+        report_data = json.loads(clean_response.strip())
+        
+        # Add metadata
+        report = {
+            "id": str(uuid.uuid4()),
+            "period": lang_config["period"],
+            "generated_at": datetime.utcnow().isoformat(),
+            "mood_distribution": mood_counts,
+            **report_data
+        }
+        
+        # Save to database
+        await db.soul_reports.insert_one(report)
+        del report["_id"]  # Remove MongoDB _id if added
+        
+        return report
+    except Exception as e:
+        logging.error(f"Soul report generation error: {e}")
+        return {"error": str(e)}
+
+
+# =============================================================================
+# DREAM DICTIONARY - Personal dream symbol dictionary
+# =============================================================================
+
+class DreamSymbolCreate(BaseModel):
+    symbol: str
+    personal_meaning: str
+    language: Optional[str] = "fr"
+
+@api_router.get("/dream-dictionary")
+async def get_dream_dictionary():
+    """Get all dream symbols"""
+    symbols = await db.dream_dictionary.find({}, {"_id": 0}).sort("last_seen", -1).to_list(200)
+    return symbols
+
+@api_router.post("/dream-dictionary")
+async def add_dream_symbol(data: DreamSymbolCreate):
+    """Add a new dream symbol to the dictionary"""
+    
+    # Check if symbol already exists
+    existing = await db.dream_dictionary.find_one({"symbol": {"$regex": f"^{data.symbol}$", "$options": "i"}})
+    
+    if existing:
+        # Update existing symbol
+        await db.dream_dictionary.update_one(
+            {"symbol": {"$regex": f"^{data.symbol}$", "$options": "i"}},
+            {
+                "$set": {"personal_meaning": data.personal_meaning, "last_seen": datetime.utcnow().isoformat()},
+                "$inc": {"occurrences": 1}
+            }
+        )
+        updated = await db.dream_dictionary.find_one({"symbol": {"$regex": f"^{data.symbol}$", "$options": "i"}}, {"_id": 0})
+        return updated
+    
+    # Generate universal meaning via AI
+    lang_prompts = {
+        "fr": f"Donne une brève signification universelle (1-2 phrases) du symbole de rêve '{data.symbol}' selon la psychologie jungienne et les traditions oniriques. Réponds directement sans introduction.",
+        "en": f"Give a brief universal meaning (1-2 sentences) of the dream symbol '{data.symbol}' according to Jungian psychology and dream traditions. Respond directly without introduction.",
+        "es": f"Da un breve significado universal (1-2 frases) del símbolo onírico '{data.symbol}' según la psicología junguiana y las tradiciones oníricas. Responde directamente sin introducción."
+    }
+    
+    universal_meaning = ""
+    try:
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"dream-symbol-{uuid.uuid4()}",
+            system_message="Tu es un expert en interprétation des rêves, spécialisé dans les archétypes jungiens."
+        ).with_model("openai", "gpt-4o")
+        
+        universal_meaning = await chat.send_message(UserMessage(text=lang_prompts.get(data.language, lang_prompts["fr"])))
+    except Exception as e:
+        logging.error(f"Dream symbol AI error: {e}")
+    
+    symbol_doc = {
+        "id": str(uuid.uuid4()),
+        "symbol": data.symbol.capitalize(),
+        "personal_meaning": data.personal_meaning,
+        "universal_meaning": universal_meaning,
+        "occurrences": 1,
+        "last_seen": datetime.utcnow().isoformat(),
+        "emotions": [],
+        "ai_insight": ""
+    }
+    
+    await db.dream_dictionary.insert_one(symbol_doc)
+    del symbol_doc["_id"]
+    return symbol_doc
+
+@api_router.delete("/dream-dictionary/{symbol_id}")
+async def delete_dream_symbol(symbol_id: str):
+    """Delete a dream symbol"""
+    await db.dream_dictionary.delete_one({"id": symbol_id})
+    return {"status": "deleted"}
+
+
 app.include_router(api_router)
 
 # Mount static files for fonts
