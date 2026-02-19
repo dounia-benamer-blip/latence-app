@@ -607,6 +607,55 @@ export default function HomeScreen() {
           </ScrollView>
         </SafeAreaView>
       </Modal>
+
+      {/* Premium Upgrade Popup */}
+      <Modal
+        visible={showPremiumPopup}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowPremiumPopup(false)}
+      >
+        <View style={styles.premiumOverlay}>
+          <Animated.View entering={FadeIn.duration(300)} style={[styles.premiumPopup, dynamicStyles.card]}>
+            <View style={[styles.premiumIconContainer, { backgroundColor: '#9B59B620' }]}>
+              <Ionicons name="diamond" size={40} color="#9B59B6" />
+            </View>
+            
+            <Text style={[styles.premiumTitle, dynamicStyles.text]}>
+              Fonctionnalité Premium
+            </Text>
+            
+            <Text style={[styles.premiumDescription, dynamicStyles.textSecondary]}>
+              {blockedFeature && PREMIUM_FEATURE_NAMES[blockedFeature] 
+                ? `${PREMIUM_FEATURE_NAMES[blockedFeature]} fait partie de l'offre Premium.`
+                : 'Cette fonctionnalité fait partie de l\'offre Premium.'}
+            </Text>
+            
+            <Text style={[styles.premiumFeatures, dynamicStyles.textMuted]}>
+              Accède à l'IA Miroir, l'Oracle des Rêves, l'Astrologie complète et bien plus.
+            </Text>
+            
+            <TouchableOpacity
+              style={styles.premiumButton}
+              onPress={() => {
+                setShowPremiumPopup(false);
+                router.push('/subscription');
+              }}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="diamond" size={18} color="#fff" />
+              <Text style={styles.premiumButtonText}>Découvrir Premium</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              style={styles.premiumCloseButton}
+              onPress={() => setShowPremiumPopup(false)}
+            >
+              <Text style={[styles.premiumCloseText, dynamicStyles.textMuted]}>Plus tard</Text>
+            </TouchableOpacity>
+          </Animated.View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
