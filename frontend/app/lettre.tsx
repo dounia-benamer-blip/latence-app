@@ -84,6 +84,7 @@ const FloatingEnvelope = ({ size = 80 }: { size?: number }) => {
 export default function LettreScreen() {
   const router = useRouter();
   const { theme } = useTheme();
+  const { t, i18n } = useTranslation();
   const [step, setStep] = useState<'write' | 'schedule' | 'sent'>('write');
   const [content, setContent] = useState('');
   const [deliveryMonths, setDeliveryMonths] = useState<number | null>(null);
@@ -101,8 +102,9 @@ export default function LettreScreen() {
     if (!deliveryMonths) return '';
     const date = new Date();
     date.setMonth(date.getMonth() + deliveryMonths);
+    const locale = i18n.language === 'es' ? 'es-ES' : i18n.language === 'en' ? 'en-US' : 'fr-FR';
     const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric' };
-    return date.toLocaleDateString('fr-FR', options);
+    return date.toLocaleDateString(locale, options);
   };
 
   const saveLetter = async () => {
