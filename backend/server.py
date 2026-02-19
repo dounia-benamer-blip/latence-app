@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi import FastAPI, APIRouter, HTTPException, Request
 from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
@@ -27,6 +27,10 @@ EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY')
 
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
+
+# Import and register auth routes
+from auth import register_auth_routes, get_current_user, check_feature_access, check_usage_limit, SUBSCRIPTION_TIERS
+register_auth_routes(app, db)
 
 # ==================== SACRED TEXTS DATABASE ====================
 # Texts from ALL wisdom traditions - universal and timeless
