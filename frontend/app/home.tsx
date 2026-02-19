@@ -354,7 +354,23 @@ export default function HomeScreen() {
   
   // Use language context to force re-render when language changes
   const { language } = useLanguage();
-  const today = formatToday(t);
+  
+  // Calculate today's date with language dependency
+  const today = React.useMemo(() => {
+    const d = new Date();
+    const days = [
+      t('home.day_sun'), t('home.day_mon'), t('home.day_tue'), 
+      t('home.day_wed'), t('home.day_thu'), t('home.day_fri'), 
+      t('home.day_sat')
+    ];
+    const months = [
+      t('home.month_jan'), t('home.month_feb'), t('home.month_mar'), 
+      t('home.month_apr'), t('home.month_may'), t('home.month_jun'), 
+      t('home.month_jul'), t('home.month_aug'), t('home.month_sep'), 
+      t('home.month_oct'), t('home.month_nov'), t('home.month_dec')
+    ];
+    return `${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]}`;
+  }, [language, t]);
 
   // Dynamic styles based on theme
   const dynamicStyles = {
