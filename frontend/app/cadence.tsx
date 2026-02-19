@@ -187,7 +187,8 @@ export default function CadenceScreen() {
       'marche': 'walk', 'nature': 'nature', 'exercice': 'exercise', 'etirement': 'stretch',
     };
     const key = keyMap[ritualId] || ritualId;
-    const lang = language || 'fr';
+    // Use i18n.language directly for most current value
+    const lang = i18n.language || language || 'fr';
     return ritualTranslations[lang]?.[key]?.[field] || '';
   };
   const [cadenceData, setCadenceData] = useState<CadenceData | null>(null);
