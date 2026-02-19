@@ -196,7 +196,7 @@ export default function MeditationScreen() {
 
       {/* Pattern selector */}
       <View style={styles.patternContainer}>
-        <Text style={[styles.sectionTitle, ds.textMuted]}>Choisis ton rythme</Text>
+        <Text style={[styles.sectionTitle, ds.textMuted]}>{t('meditation.choose_rhythm')}</Text>
         <View style={styles.patterns}>
           {Object.entries(BREATHING_PATTERNS).map(([key, p]) => (
             <TouchableOpacity
@@ -208,7 +208,7 @@ export default function MeditationScreen() {
               onPress={() => setPattern(key as keyof typeof BREATHING_PATTERNS)}
             >
               <Text style={[styles.patternText, pattern === key ? { color: '#fff' } : ds.text]}>
-                {p.name}
+                {t(`meditation.patterns.${p.name}`)}
               </Text>
               <Text style={[styles.patternTiming, pattern === key ? { color: 'rgba(255,255,255,0.7)' } : ds.textMuted]}>
                 {p.inhale}-{p.hold}-{p.exhale}{p.holdOut > 0 ? `-${p.holdOut}` : ''}
