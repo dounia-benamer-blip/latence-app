@@ -830,6 +830,22 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
   },
+  menuItemLocked: {
+    opacity: 0.85,
+  },
+  lockBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 12,
+    gap: 4,
+  },
+  lockBadgeText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#9B59B6',
+  },
   menuIcon: {
     width: 48,
     height: 48,
