@@ -96,26 +96,31 @@ SUBSCRIPTION_TIERS = {
     "essentiel": {
         "name": "Essentiel",
         "price": 9.99,
+        "description": "Écriture complète, sans approfondissement",
         "limits": {
-            "journal_entries": -1,  # unlimited
-            "dreams": False,  # PAS de rêves
-            "mirror_queries": False,  # PAS d'IA Miroir
-            "astrology": False,  # PAS d'astro
-            "oracle": False,
-            "advanced_analysis": False,
-            "statistics": True,
-            "cosmic_tree": False,
-            "lunar_cycles": True,
-            "unlimited_archive": True,
-            "seal_permanent": True,
+            "journal_entries": -1,  # Écriture illimitée
+            "dreams": -1,  # Carnet des rêves (ÉCRITURE)
+            "seal": True,  # Sceller
             "cadence": True,
             "sagesse": True,
             "lettre": True,
+            "lunar_cycles": True,
+            "unlimited_archive": True,
+            "seal_permanent": True,
+            "statistics": True,
+            # PAS D'APPROFONDISSEMENT:
+            "mirror_queries": False,  # PAS d'IA Miroir
+            "oracle": False,  # PAS d'Oracle des rêves
+            "advanced_analysis": False,  # PAS d'analyse approfondie
+            "astrology": False,  # PAS d'Astrologie
+            "cosmic_tree": False,  # PAS d'Arbre cosmique
+            "dream_interpretation": False,  # PAS d'interprétation IA des rêves
         }
     },
     "premium": {
         "name": "Premium",
         "price": 18.99,
+        "description": "Accès complet avec approfondissement IA",
         "limits": {
             "journal_entries": -1,
             "dreams": -1,  # Rêves illimités
