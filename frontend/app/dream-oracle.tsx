@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   ActivityIndicator,
   Dimensions,
+  Modal,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -24,6 +25,7 @@ import Animated, {
   interpolate,
 } from 'react-native-reanimated';
 import { useTheme } from '../src/context/ThemeContext';
+import { useAuth } from '../src/context/AuthContext';
 import { TwinklingStars } from '../src/components/TwinklingStars';
 
 const { width } = Dimensions.get('window');
