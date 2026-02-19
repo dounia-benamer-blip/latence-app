@@ -15,8 +15,10 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown, FadeInUp, FadeIn } from 'react-native-reanimated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTranslation } from 'react-i18next';
 import { useTheme, ThemeMode } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
+import { LanguageSelector } from '../src/components/LanguageSelector';
 import AuraAvatar, { AURA_DATABASE } from './components/AuraAvatar';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
@@ -24,18 +26,20 @@ const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 // Features that require Premium subscription
 // Note: 'dreams' module allows WRITING for Essentiel users, but Oracle is Premium-only
 const PREMIUM_FEATURES = ['mirror', 'astro', 'dream-oracle', 'meditation', 'rituals'];
-const PREMIUM_FEATURE_NAMES: Record<string, string> = {
-  mirror: 'IA Miroir',
-  astro: 'Astrologie & Cosmos',
-  'dream-oracle': 'Oracle des Rêves',
-  meditation: 'Méditation',
-  rituals: 'Rituels Lunaires',
-};
 
-function formatToday(): string {
+function formatToday(t: any): string {
   const d = new Date();
-  const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-  const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+  const days = [
+    t('home.day_sun', 'Dimanche'), t('home.day_mon', 'Lundi'), t('home.day_tue', 'Mardi'), 
+    t('home.day_wed', 'Mercredi'), t('home.day_thu', 'Jeudi'), t('home.day_fri', 'Vendredi'), 
+    t('home.day_sat', 'Samedi')
+  ];
+  const months = [
+    t('home.month_jan', 'Janvier'), t('home.month_feb', 'Février'), t('home.month_mar', 'Mars'), 
+    t('home.month_apr', 'Avril'), t('home.month_may', 'Mai'), t('home.month_jun', 'Juin'), 
+    t('home.month_jul', 'Juillet'), t('home.month_aug', 'Août'), t('home.month_sep', 'Septembre'), 
+    t('home.month_oct', 'Octobre'), t('home.month_nov', 'Novembre'), t('home.month_dec', 'Décembre')
+  ];
   return `${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]}`;
 }
 
@@ -51,8 +55,8 @@ const getThemeIcon = (mode: ThemeMode): string => {
 
 interface MenuItem {
   id: string;
-  title: string;
-  subtitle: string;
+  titleKey: string;
+  subtitleKey: string;
   icon: string;
   route: string;
 }
