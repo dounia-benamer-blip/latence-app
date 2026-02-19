@@ -223,11 +223,11 @@ export default function MeditationScreen() {
         <View style={styles.statsContainer}>
           <View style={[styles.statCard, ds.card]}>
             <Text style={[styles.statValue, ds.text]}>{formatTime(seconds)}</Text>
-            <Text style={[styles.statLabel, ds.textMuted]}>Durée</Text>
+            <Text style={[styles.statLabel, ds.textMuted]}>{t('meditation.duration')}</Text>
           </View>
           <View style={[styles.statCard, ds.card]}>
             <Text style={[styles.statValue, ds.text]}>{totalBreaths}</Text>
-            <Text style={[styles.statLabel, ds.textMuted]}>Respirations</Text>
+            <Text style={[styles.statLabel, ds.textMuted]}>{t('common.breaths')}</Text>
           </View>
         </View>
       )}
@@ -243,14 +243,14 @@ export default function MeditationScreen() {
           color={isActive ? currentPattern.color : '#fff'} 
         />
         <Text style={[styles.controlText, { color: isActive ? currentPattern.color : '#fff' }]}>
-          {isActive ? 'Pause' : 'Commencer'}
+          {isActive ? t('meditation.pause') : t('meditation.start')}
         </Text>
       </TouchableOpacity>
 
       {/* Instructions */}
       {!isActive && seconds === 0 && (
         <Text style={[styles.instructions, ds.textMuted]}>
-          Trouve un endroit calme, ferme les yeux, et laisse-toi guider par le rythme de la flamme.
+          {t('meditation.instructions')}
         </Text>
       )}
     </View>
