@@ -148,9 +148,48 @@ const StreakFlame = ({ streak }: { streak: number }) => {
 export default function CadenceScreen() {
   const router = useRouter();
   const { theme } = useTheme();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { language } = useLanguage();
   const [loading, setLoading] = useState(true);
+  
+  // Local translations for rituals to ensure they update with language
+  const ritualTranslations: Record<string, Record<string, { title: string; desc: string }>> = {
+    fr: {
+      breath: { title: 'Trois respirations conscientes', desc: 'Inspire profondément par le nez, retiens un instant, expire lentement par la bouche. Répète trois fois.' },
+      question: { title: 'Question du jour', desc: 'De quoi as-tu besoin de te libérer ?' },
+      gratitude: { title: 'Un moment de gratitude', desc: 'Pense à une chose, même infime, pour laquelle tu ressens de la reconnaissance.' },
+      silence: { title: 'Une minute de silence', desc: 'Ferme les yeux. Écoute le silence entre les sons. Ne fais rien, sois juste présent.' },
+      intention: { title: 'Intention du jour', desc: 'Pose une intention pour aujourdhui. Quest-ce qui compte vraiment pour toi maintenant ?' },
+      bilan: { title: 'Bilan du soir', desc: 'Quest-ce qui sest bien passé ? Quaurais-tu pu faire différemment ? De quoi as-tu besoin demain ?' },
+      walk: { title: 'Marche consciente', desc: 'Marche lentement, en pleine conscience. Ressens chaque pas, écoute les sons autour de toi.' },
+      nature: { title: 'Sortie nature', desc: 'Sors quelques minutes. Respire lair frais, touche un arbre, regarde le ciel. Reconnecte-toi à la terre.' },
+      exercise: { title: 'Exercice énergisant', desc: 'Quelques mouvements dynamiques pour réveiller ton corps: sauts, squats, ou simplement secoue tes membres.' },
+      stretch: { title: 'Étirements doux', desc: 'Étire doucement ta nuque, tes épaules, ton dos. Relâche les tensions accumulées dans ton corps.' },
+    },
+    en: {
+      breath: { title: 'Three conscious breaths', desc: 'Breathe deeply through your nose (4s), hold (4s), exhale slowly through your mouth (6s). Repeat three times.' },
+      question: { title: 'Question of the moment', desc: 'How do you really feel right now? Listen to your body.' },
+      gratitude: { title: 'Three gratitudes', desc: 'Note three things, however small, for which you feel grateful.' },
+      silence: { title: 'One minute of silence', desc: 'Close your eyes. Listen to the silence between sounds. Do nothing but be present.' },
+      intention: { title: 'Daily intention', desc: 'Set an intention for today. What truly matters to you right now?' },
+      bilan: { title: 'Evening review', desc: 'What went well? What could you have done differently? What do you need tomorrow?' },
+      walk: { title: 'Conscious walk', desc: 'Walk slowly, mindfully. Feel each step, listen to the sounds around you, observe without judging.' },
+      nature: { title: 'Nature outing', desc: 'Step outside for a few minutes. Breathe fresh air, touch a tree, look at the sky. Reconnect with the earth.' },
+      exercise: { title: 'Energizing exercise', desc: 'A few dynamic movements to wake up your body: jumps, squats, or simply shake your limbs.' },
+      stretch: { title: 'Gentle stretches', desc: 'Gently stretch your neck, shoulders, back. Release the tensions accumulated in your body.' },
+    },
+  };
+  
+  const getRitualText = (ritualId: string, field: 'title' | 'desc'): string => {
+    const keyMap: Record<string, string> = {
+      'breath': 'breath', 'intention': 'intention', 'introspection': 'question',
+      'gratitude': 'gratitude', 'silence': 'silence', 'bilan': 'bilan',
+      'marche': 'walk', 'nature': 'nature', 'exercice': 'exercise', 'etirement': 'stretch',
+    };
+    const key = keyMap[ritualId] || ritualId;
+    const lang = language || 'fr';
+    return ritualTranslations[lang]?.[key]?.[field] || '';
+  };
   const [cadenceData, setCadenceData] = useState<CadenceData | null>(null);
   const [completedRituals, setCompletedRituals] = useState<string[]>([]);
   const [ritualInputs, setRitualInputs] = useState<Record<string, string>>({});
