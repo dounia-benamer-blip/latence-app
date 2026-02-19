@@ -696,4 +696,84 @@ const styles = StyleSheet.create({
   symbolIcon: { fontSize: 28, marginBottom: 8 },
   symbolName: { fontSize: 13, fontWeight: '600', marginBottom: 4, textTransform: 'capitalize' },
   symbolMeaning: { fontSize: 10, textAlign: 'center' },
+
+  // Premium Badge & Modal
+  premiumBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: '#9B59B620',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    marginBottom: 20,
+  },
+  premiumBadgeText: { 
+    fontSize: 14, 
+    fontWeight: '600', 
+    color: '#9B59B6' 
+  },
+  premiumOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  premiumPopup: {
+    width: '100%',
+    maxWidth: 340,
+    borderRadius: 24,
+    padding: 28,
+    alignItems: 'center',
+  },
+  premiumIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#9B59B620',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  premiumTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  premiumDescription: {
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 12,
+  },
+  premiumFeatures: {
+    fontSize: 12,
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  premiumButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    backgroundColor: '#9B59B6',
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 24,
+    width: '100%',
+    marginBottom: 12,
+  },
+  premiumButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  premiumCloseButton: {
+    paddingVertical: 12,
+  },
+  premiumCloseText: {
+    fontSize: 14,
+  },
 });
