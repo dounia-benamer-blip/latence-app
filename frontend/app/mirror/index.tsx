@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -15,6 +15,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
 import { useTheme } from '../../src/context/ThemeContext';
+import VoiceRecorder from '../../src/components/VoiceRecorder';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
@@ -22,27 +23,54 @@ interface Message {
   id: string;
   type: 'user' | 'mirror';
   content: string;
-  timestamp: Date;
 }
+
+// Questions concrètes mais profondes
+const STARTER_QUESTIONS = [
+  "Qu'est-ce qui t'a fait sourire aujourd'hui, même brièvement ?",
+  "Y a-t-il quelque chose que tu évites de regarder en face ?",
+  "Si tu pouvais changer une seule chose dans ta vie demain, ce serait quoi ?",
+  "Qu'est-ce qui te pèse en ce moment ?",
+  "De quoi as-tu vraiment besoin là, maintenant ?",
+  "Quelle émotion revient souvent ces derniers jours ?",
+  "Qu'est-ce que tu n'oses pas dire à voix haute ?",
+  "Qu'est-ce qui te manque ?",
+  "Qu'est-ce que tu repousses depuis trop longtemps ?",
+  "Comment te sens-tu vraiment, sans filtre ?",
+];
 
 export default function MirrorScreen() {
   const router = useRouter();
-  const { theme } = useTheme();
+  const { theme, isDark } = useTheme();
   const scrollRef = useRef<ScrollView>(null);
   
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [mode, setMode] = useState<'reflect' | 'analyze' | 'question'>('reflect');
+  const [showTextInput, setShowTextInput] = useState(false);
+  const [currentQuestion, setCurrentQuestion] = useState('');
 
-  const sendMessage = async () => {
-    if (!inputText.trim() || isLoading) return;
+  useEffect(() => {
+    // Poser une question au démarrage
+    const randomQ = STARTER_QUESTIONS[Math.floor(Math.random() * STARTER_QUESTIONS.length)];
+    setCurrentQuestion(randomQ);
+  }, []);
+
+  const handleVoiceTranscription = (text: string) => {
+    if (text.trim()) {
+      setInputText(text);
+      // Envoyer automatiquement après transcription
+      sendMessageWithText(text);
+    }
+  };
+
+  const sendMessageWithText = async (text: string) => {
+    if (!text.trim() || isLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
       type: 'user',
-      content: inputText.trim(),
-      timestamp: new Date(),
+      content: text.trim(),
     };
 
     setMessages(prev => [...prev, userMessage]);
@@ -50,43 +78,78 @@ export default function MirrorScreen() {
     setIsLoading(true);
 
     try {
-      const endpoints = {
-        reflect: '/api/mirror/reflect',
-        analyze: '/api/mirror/analyze-writing',
-        question: '/api/mirror/deep-question',
-      };
-
-      const res = await fetch(`${API_URL}${endpoints[mode]}`, {
+      const res = await fetch(`${API_URL}/api/mirror/reflect`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: userMessage.content,
+          message: text,
           context: messages.slice(-4).map(m => m.content).join(' | '),
-          language: 'fr',
+          question: currentQuestion,
         }),
       });
 
       if (res.ok) {
         const data = await res.json();
-        const responseKey = mode === 'analyze' ? 'analysis' : mode === 'question' ? 'question' : 'reflection';
         
         const mirrorMessage: Message = {
           id: (Date.now() + 1).toString(),
           type: 'mirror',
-          content: data[responseKey] || 'Le miroir réfléchit...',
-          timestamp: new Date(),
+          content: data.reflection || "Continue, je t'écoute...",
         };
         setMessages(prev => [...prev, mirrorMessage]);
+        
+        // Nouvelle question pour la suite
+        const newQ = STARTER_QUESTIONS[Math.floor(Math.random() * STARTER_QUESTIONS.length)];
+        setCurrentQuestion(newQ);
       }
     } catch (e) {
       console.log('Mirror error:', e);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'mirror',
-        content: 'Partage tes pensées, tes émotions, ou ce qui te traverse en ce moment.',
-        timestamp: new Date(),
+        content: "Je t'écoute. Prends ton temps.",
       };
       setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+      setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
+    }
+  };
+
+  const sendMessage = () => sendMessageWithText(inputText);
+
+  const askNewQuestion = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/api/mirror/deep-question`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          context: messages.slice(-4).map(m => m.content).join(' | '),
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const question = data.question || STARTER_QUESTIONS[Math.floor(Math.random() * STARTER_QUESTIONS.length)];
+        
+        const mirrorMessage: Message = {
+          id: Date.now().toString(),
+          type: 'mirror',
+          content: question,
+        };
+        setMessages(prev => [...prev, mirrorMessage]);
+        setCurrentQuestion(question);
+      }
+    } catch (e) {
+      const fallbackQ = STARTER_QUESTIONS[Math.floor(Math.random() * STARTER_QUESTIONS.length)];
+      const mirrorMessage: Message = {
+        id: Date.now().toString(),
+        type: 'mirror',
+        content: fallbackQ,
+      };
+      setMessages(prev => [...prev, mirrorMessage]);
+      setCurrentQuestion(fallbackQ);
     } finally {
       setIsLoading(false);
       setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
@@ -98,14 +161,7 @@ export default function MirrorScreen() {
     card: { backgroundColor: theme.card },
     text: { color: theme.text },
     textSecondary: { color: theme.textSecondary },
-    input: { backgroundColor: theme.inputBackground, color: theme.text },
   };
-
-  const MODES = [
-    { id: 'reflect', icon: 'eye-outline', label: 'Réflexion' },
-    { id: 'analyze', icon: 'document-text-outline', label: 'Analyse' },
-    { id: 'question', icon: 'help-circle-outline', label: 'Question' },
-  ];
 
   return (
     <SafeAreaView style={[styles.container, ds.container]}>
@@ -115,39 +171,13 @@ export default function MirrorScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}>
+          <TouchableOpacity onPress={() => router.back()}>
             <Ionicons name="chevron-down" size={28} color={theme.iconColor} />
           </TouchableOpacity>
-          <Text style={[styles.headerTitle, ds.text]}>Miroir de l'Âme</Text>
-          <View style={styles.placeholder} />
-        </View>
-
-        {/* Mode Selector */}
-        <View style={styles.modeContainer}>
-          {MODES.map((m) => (
-            <TouchableOpacity
-              key={m.id}
-              style={[
-                styles.modeBtn,
-                mode === m.id && { backgroundColor: theme.accentWarm },
-              ]}
-              onPress={() => setMode(m.id as any)}
-            >
-              <Ionicons
-                name={m.icon as any}
-                size={18}
-                color={mode === m.id ? '#fff' : theme.textMuted}
-              />
-              <Text
-                style={[
-                  styles.modeBtnText,
-                  { color: mode === m.id ? '#fff' : theme.textMuted },
-                ]}
-              >
-                {m.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
+          <Text style={[styles.headerTitle, ds.text]}>Miroir</Text>
+          <TouchableOpacity onPress={askNewQuestion} disabled={isLoading}>
+            <Ionicons name="refresh-outline" size={24} color={theme.iconColor} />
+          </TouchableOpacity>
         </View>
 
         {/* Messages */}
@@ -157,82 +187,104 @@ export default function MirrorScreen() {
           contentContainerStyle={styles.messagesContent}
           showsVerticalScrollIndicator={false}
         >
-          {messages.length === 0 && (
+          {messages.length === 0 ? (
             <Animated.View entering={FadeIn.duration(500)} style={styles.emptyState}>
               <View style={[styles.mirrorIcon, { backgroundColor: `${theme.accentWarm}15` }]}>
-                <Ionicons name="eye" size={48} color={theme.accentWarm} />
+                <Ionicons name="eye" size={56} color={theme.accentWarm} />
               </View>
-              <Text style={[styles.emptyTitle, ds.text]}>Miroir de l'Âme</Text>
-              <Text style={[styles.emptySubtitle, ds.textSecondary]}>
-                {mode === 'reflect' && 'Partage tes pensées, tes émotions, ou ce qui te traverse en ce moment.'}
-                {mode === 'analyze' && 'Partage un texte que tu as écrit et je t\'en ferai une analyse profonde.'}
-                {mode === 'question' && 'Je vais te poser une question profonde pour stimuler ta réflexion.'}
+              
+              <Text style={[styles.questionText, ds.text]}>{currentQuestion}</Text>
+              
+              <Text style={[styles.hint, ds.textSecondary]}>
+                Appuie sur le micro et réponds à voix haute
               </Text>
             </Animated.View>
-          )}
+          ) : (
+            <>
+              {messages.map((msg, index) => (
+                <Animated.View
+                  key={msg.id}
+                  entering={FadeInUp.duration(300).delay(index * 30)}
+                  style={[
+                    styles.messageBubble,
+                    msg.type === 'user' ? styles.userBubble : styles.mirrorBubble,
+                    msg.type === 'user'
+                      ? { backgroundColor: theme.accentWarm }
+                      : { backgroundColor: theme.card },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.messageText,
+                      msg.type === 'user' ? styles.userText : ds.text,
+                    ]}
+                  >
+                    {msg.content}
+                  </Text>
+                </Animated.View>
+              ))}
 
-          {messages.map((msg, index) => (
-            <Animated.View
-              key={msg.id}
-              entering={FadeInUp.duration(400).delay(index * 50)}
-              style={[
-                styles.messageBubble,
-                msg.type === 'user' ? styles.userBubble : styles.mirrorBubble,
-                msg.type === 'user'
-                  ? { backgroundColor: theme.accentWarm }
-                  : { backgroundColor: theme.card, borderLeftColor: theme.accentWarm },
-              ]}
-            >
-              {msg.type === 'mirror' && (
-                <View style={styles.mirrorHeader}>
-                  <Ionicons name="eye" size={16} color={theme.accentWarm} />
-                  <Text style={[styles.mirrorLabel, { color: theme.accentWarm }]}>Miroir</Text>
+              {isLoading && (
+                <View style={[styles.loadingBubble, ds.card]}>
+                  <ActivityIndicator color={theme.accentWarm} size="small" />
                 </View>
               )}
-              <Text
-                style={[
-                  styles.messageText,
-                  msg.type === 'user' ? styles.userText : { color: theme.text },
-                ]}
-              >
-                {msg.content}
-              </Text>
-            </Animated.View>
-          ))}
-
-          {isLoading && (
-            <View style={[styles.loadingBubble, ds.card]}>
-              <ActivityIndicator color={theme.accentWarm} size="small" />
-              <Text style={[styles.loadingText, ds.textSecondary]}>Le miroir réfléchit...</Text>
-            </View>
+            </>
           )}
         </ScrollView>
 
-        {/* Input */}
-        <View style={[styles.inputContainer, ds.card]}>
-          <TextInput
-            style={[styles.textInput, ds.input]}
-            placeholder="Écris ce qui te traverse..."
-            placeholderTextColor={theme.textMuted}
-            value={inputText}
-            onChangeText={setInputText}
-            multiline
-            maxLength={2000}
+        {/* Input Area - Voice First */}
+        <View style={[styles.inputArea, ds.card]}>
+          {/* Voice Recorder - Principal */}
+          <VoiceRecorder
+            onTranscription={handleVoiceTranscription}
+            theme={theme}
+            placeholder="Appuie et parle..."
           />
-          <TouchableOpacity
-            style={[
-              styles.sendBtn,
-              { backgroundColor: inputText.trim() ? theme.accentWarm : theme.inputBackground },
-            ]}
-            onPress={sendMessage}
-            disabled={!inputText.trim() || isLoading}
+          
+          {/* Text Input Toggle */}
+          <TouchableOpacity 
+            style={styles.textToggle}
+            onPress={() => setShowTextInput(!showTextInput)}
           >
-            <Ionicons
-              name="arrow-up"
-              size={22}
-              color={inputText.trim() ? '#fff' : theme.textMuted}
+            <Ionicons 
+              name={showTextInput ? "chevron-down" : "create-outline"} 
+              size={20} 
+              color={theme.textMuted} 
             />
+            <Text style={[styles.textToggleLabel, { color: theme.textMuted }]}>
+              {showTextInput ? "Masquer" : "Écrire à la place"}
+            </Text>
           </TouchableOpacity>
+
+          {/* Text Input (optionnel) */}
+          {showTextInput && (
+            <View style={styles.textInputRow}>
+              <TextInput
+                style={[styles.textInput, { backgroundColor: theme.inputBackground, color: theme.text }]}
+                placeholder="Ou écris ici..."
+                placeholderTextColor={theme.textMuted}
+                value={inputText}
+                onChangeText={setInputText}
+                multiline
+                maxLength={1000}
+              />
+              <TouchableOpacity
+                style={[
+                  styles.sendBtn,
+                  { backgroundColor: inputText.trim() ? theme.accentWarm : theme.inputBackground },
+                ]}
+                onPress={sendMessage}
+                disabled={!inputText.trim() || isLoading}
+              >
+                <Ionicons
+                  name="arrow-up"
+                  size={20}
+                  color={inputText.trim() ? '#fff' : theme.textMuted}
+                />
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -249,67 +301,73 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
   },
-  headerTitle: { fontSize: 16, fontWeight: '500' },
-  placeholder: { width: 28 },
-  
-  modeContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 16,
-    gap: 8,
-    marginBottom: 8,
-  },
-  modeBtn: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    paddingVertical: 10,
-    borderRadius: 20,
-    backgroundColor: 'transparent',
-  },
-  modeBtnText: { fontSize: 12, fontWeight: '500' },
+  headerTitle: { fontSize: 18, fontWeight: '600' },
   
   messagesContainer: { flex: 1 },
-  messagesContent: { padding: 16, paddingBottom: 20 },
+  messagesContent: { padding: 20, paddingBottom: 20 },
   
-  emptyState: { alignItems: 'center', paddingTop: 60, paddingHorizontal: 32 },
+  emptyState: { alignItems: 'center', paddingTop: 40 },
   mirrorIcon: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: 32,
+  },
+  questionText: { 
+    fontSize: 22, 
+    fontWeight: '500', 
+    textAlign: 'center', 
+    lineHeight: 32,
+    paddingHorizontal: 20,
     marginBottom: 24,
   },
-  emptyTitle: { fontSize: 22, fontWeight: '300', marginBottom: 12, letterSpacing: 1 },
-  emptySubtitle: { fontSize: 14, textAlign: 'center', lineHeight: 22 },
+  hint: { 
+    fontSize: 14, 
+    textAlign: 'center',
+    opacity: 0.7,
+  },
   
-  messageBubble: { marginBottom: 12, padding: 16, borderRadius: 16, maxWidth: '90%' },
-  userBubble: { alignSelf: 'flex-end', borderBottomRightRadius: 4 },
-  mirrorBubble: { alignSelf: 'flex-start', borderBottomLeftRadius: 4, borderLeftWidth: 3 },
-  mirrorHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 },
-  mirrorLabel: { fontSize: 11, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1 },
-  messageText: { fontSize: 15, lineHeight: 24 },
+  messageBubble: { 
+    marginBottom: 12, 
+    padding: 16, 
+    borderRadius: 20, 
+    maxWidth: '85%' 
+  },
+  userBubble: { alignSelf: 'flex-end' },
+  mirrorBubble: { alignSelf: 'flex-start' },
+  messageText: { fontSize: 16, lineHeight: 24 },
   userText: { color: '#fff' },
   
   loadingBubble: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    padding: 14,
-    borderRadius: 16,
+    padding: 16,
+    borderRadius: 20,
     alignSelf: 'flex-start',
+    width: 60,
+    alignItems: 'center',
   },
-  loadingText: { fontSize: 13, fontStyle: 'italic' },
   
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    padding: 12,
+  inputArea: {
+    padding: 16,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
+  },
+  
+  textToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    gap: 6,
+  },
+  textToggleLabel: { fontSize: 13 },
+  
+  textInputRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
     gap: 10,
+    marginTop: 8,
   },
   textInput: {
     flex: 1,
@@ -317,7 +375,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     fontSize: 15,
-    maxHeight: 120,
+    maxHeight: 100,
   },
   sendBtn: {
     width: 44,
