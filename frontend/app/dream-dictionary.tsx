@@ -14,7 +14,6 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
-import { useTranslation } from 'react-i18next';
 import { useTheme } from '../src/context/ThemeContext';
 import { TwinklingStars } from '../src/components/TwinklingStars';
 
@@ -35,7 +34,6 @@ interface DreamSymbol {
 export default function DreamDictionaryScreen() {
   const router = useRouter();
   const { theme, isDark } = useTheme();
-  const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [symbols, setSymbols] = useState<DreamSymbol[]>([]);
   const [filteredSymbols, setFilteredSymbols] = useState<DreamSymbol[]>([]);
@@ -96,7 +94,7 @@ export default function DreamDictionaryScreen() {
         body: JSON.stringify({
           symbol: newSymbol.trim(),
           personal_meaning: newMeaning.trim(),
-          language: i18n.language,
+          language: 'fr',
         }),
       });
       if (response.ok) {
@@ -136,8 +134,7 @@ export default function DreamDictionaryScreen() {
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
-    const locale = i18n.language === 'es' ? 'es-ES' : i18n.language === 'en' ? 'en-US' : 'fr-FR';
-    return date.toLocaleDateString(locale, { day: 'numeric', month: 'short' });
+    return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
   };
 
   return (
@@ -149,7 +146,7 @@ export default function DreamDictionaryScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-down" size={28} color={theme.iconColor} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, ds.text]}>{t('dream_dictionary.title')}</Text>
+        <Text style={[styles.headerTitle, ds.text]}>Dictionnaire Onirique</Text>
         <TouchableOpacity onPress={() => setShowAddModal(true)} style={styles.addButton}>
           <Ionicons name="add-circle-outline" size={26} color={theme.accentWarm} />
         </TouchableOpacity>
@@ -160,7 +157,7 @@ export default function DreamDictionaryScreen() {
         <Ionicons name="search-outline" size={20} color={theme.textMuted} />
         <TextInput
           style={[styles.searchInput, ds.input]}
-          placeholder={t('dream_dictionary.search_placeholder')}
+          placeholder="Rechercher un symbole..."
           placeholderTextColor={theme.textMuted}
           value={searchQuery}
           onChangeText={setSearchQuery}
@@ -176,12 +173,12 @@ export default function DreamDictionaryScreen() {
         {loading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={theme.accentWarm} />
-            <Text style={[styles.loadingText, ds.textMuted]}>{t('common.loading')}</Text>
+            <Text style={[styles.loadingText, ds.textMuted]}>Chargement...</Text>
           </View>
         ) : filteredSymbols.length > 0 ? (
           <>
             <Text style={[styles.subtitle, ds.textMuted]}>
-              {t('dream_dictionary.subtitle', { count: filteredSymbols.length })}
+              {filteredSymbols.length} symbole{filteredSymbols.length > 1 ? 's' : ''} dans ton dictionnaire
             </Text>
             
             {filteredSymbols.map((symbol, idx) => (
@@ -218,15 +215,15 @@ export default function DreamDictionaryScreen() {
             <View style={[styles.emptyIcon, { backgroundColor: `${theme.accentWarm}15` }]}>
               <Text style={styles.emptyEmoji}>📖</Text>
             </View>
-            <Text style={[styles.emptyTitle, ds.text]}>{t('dream_dictionary.empty_title')}</Text>
-            <Text style={[styles.emptySubtitle, ds.textSecondary]}>{t('dream_dictionary.empty_subtitle')}</Text>
+            <Text style={[styles.emptyTitle, ds.text]}>Ton dictionnaire est vide</Text>
+            <Text style={[styles.emptySubtitle, ds.textSecondary]}>Commence à construire ton lexique personnel des symboles de tes rêves</Text>
             
             <TouchableOpacity
               style={[styles.addFirstButton, { backgroundColor: theme.accentWarm }]}
               onPress={() => setShowAddModal(true)}
             >
               <Ionicons name="add" size={20} color="#fff" />
-              <Text style={styles.addFirstText}>{t('dream_dictionary.add_first')}</Text>
+              <Text style={styles.addFirstText}>Ajouter mon premier symbole</Text>
             </TouchableOpacity>
           </Animated.View>
         )}
@@ -254,20 +251,20 @@ export default function DreamDictionaryScreen() {
               </View>
 
               <View style={[styles.detailSection, ds.card]}>
-                <Text style={[styles.detailLabel, ds.textMuted]}>{t('dream_dictionary.your_meaning')}</Text>
+                <Text style={[styles.detailLabel, ds.textMuted]}>Ta signification</Text>
                 <Text style={[styles.detailText, ds.text]}>{selectedSymbol.personal_meaning}</Text>
               </View>
 
               {selectedSymbol.universal_meaning && (
                 <View style={[styles.detailSection, ds.card]}>
-                  <Text style={[styles.detailLabel, ds.textMuted]}>{t('dream_dictionary.universal_meaning')}</Text>
+                  <Text style={[styles.detailLabel, ds.textMuted]}>Signification universelle</Text>
                   <Text style={[styles.detailText, ds.textSecondary]}>{selectedSymbol.universal_meaning}</Text>
                 </View>
               )}
 
               {selectedSymbol.ai_insight && (
                 <View style={[styles.detailSection, ds.card, { borderLeftWidth: 3, borderLeftColor: theme.accentWarm }]}>
-                  <Text style={[styles.detailLabel, ds.textMuted]}>{t('dream_dictionary.ai_insight')}</Text>
+                  <Text style={[styles.detailLabel, ds.textMuted]}>Analyse IA</Text>
                   <Text style={[styles.detailText, ds.textSecondary]}>{selectedSymbol.ai_insight}</Text>
                 </View>
               )}
@@ -275,17 +272,17 @@ export default function DreamDictionaryScreen() {
               <View style={styles.statsRow}>
                 <View style={[styles.statBox, ds.card]}>
                   <Text style={[styles.statNumber, { color: theme.accentWarm }]}>{selectedSymbol.occurrences}</Text>
-                  <Text style={[styles.statLabel, ds.textMuted]}>{t('dream_dictionary.occurrences')}</Text>
+                  <Text style={[styles.statLabel, ds.textMuted]}>Apparitions</Text>
                 </View>
                 <View style={[styles.statBox, ds.card]}>
                   <Text style={[styles.statNumber, { color: theme.accent }]}>{formatDate(selectedSymbol.last_seen)}</Text>
-                  <Text style={[styles.statLabel, ds.textMuted]}>{t('dream_dictionary.last_seen')}</Text>
+                  <Text style={[styles.statLabel, ds.textMuted]}>Dernière fois</Text>
                 </View>
               </View>
 
               {selectedSymbol.emotions && selectedSymbol.emotions.length > 0 && (
                 <View style={styles.emotionsSection}>
-                  <Text style={[styles.detailLabel, ds.textMuted]}>{t('dream_dictionary.emotions')}</Text>
+                  <Text style={[styles.detailLabel, ds.textMuted]}>Émotions associées</Text>
                   <View style={styles.emotionsTags}>
                     {selectedSymbol.emotions.map((emotion, idx) => (
                       <View key={idx} style={[styles.emotionTag, { backgroundColor: `${theme.accent}15` }]}>
@@ -309,26 +306,26 @@ export default function DreamDictionaryScreen() {
       >
         <SafeAreaView style={[styles.modalContainer, ds.container]}>
           <View style={[styles.modalHeader, { borderBottomColor: theme.border }]}>
-            <Text style={[styles.modalTitle, ds.text]}>{t('dream_dictionary.add_symbol')}</Text>
+            <Text style={[styles.modalTitle, ds.text]}>Nouveau symbole</Text>
             <TouchableOpacity onPress={() => setShowAddModal(false)}>
               <Ionicons name="close" size={28} color={theme.iconColor} />
             </TouchableOpacity>
           </View>
 
           <View style={styles.addFormContainer}>
-            <Text style={[styles.formLabel, ds.text]}>{t('dream_dictionary.symbol_name')}</Text>
+            <Text style={[styles.formLabel, ds.text]}>Nom du symbole</Text>
             <TextInput
               style={[styles.formInput, ds.card, ds.text]}
-              placeholder={t('dream_dictionary.symbol_placeholder')}
+              placeholder="Ex: Eau, Lune, Maison..."
               placeholderTextColor={theme.textMuted}
               value={newSymbol}
               onChangeText={setNewSymbol}
             />
 
-            <Text style={[styles.formLabel, ds.text]}>{t('dream_dictionary.meaning_label')}</Text>
+            <Text style={[styles.formLabel, ds.text]}>Ta signification personnelle</Text>
             <TextInput
               style={[styles.formInput, styles.formTextarea, ds.card, ds.text]}
-              placeholder={t('dream_dictionary.meaning_placeholder')}
+              placeholder="Que représente ce symbole pour toi ?"
               placeholderTextColor={theme.textMuted}
               value={newMeaning}
               onChangeText={setNewMeaning}
@@ -346,7 +343,7 @@ export default function DreamDictionaryScreen() {
               ) : (
                 <>
                   <Ionicons name="checkmark" size={20} color="#fff" />
-                  <Text style={styles.saveButtonText}>{t('common.save')}</Text>
+                  <Text style={styles.saveButtonText}>Enregistrer</Text>
                 </>
               )}
             </TouchableOpacity>

@@ -12,7 +12,6 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
-import { useTranslation } from 'react-i18next';
 import { useTheme } from '../src/context/ThemeContext';
 import { TwinklingStars } from '../src/components/TwinklingStars';
 
@@ -36,7 +35,6 @@ interface SoulReport {
 export default function SoulReportScreen() {
   const router = useRouter();
   const { theme, isDark } = useTheme();
-  const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [report, setReport] = useState<SoulReport | null>(null);
@@ -84,7 +82,7 @@ export default function SoulReportScreen() {
   const generateNewReport = async () => {
     setGenerating(true);
     try {
-      const response = await fetch(`${API_URL}/api/soul-report/generate?lang=${i18n.language}`, {
+      const response = await fetch(`${API_URL}/api/soul-report/generate?lang=fr`, {
         method: 'POST',
       });
       if (response.ok) {
@@ -101,8 +99,7 @@ export default function SoulReportScreen() {
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
-    const locale = i18n.language === 'es' ? 'es-ES' : i18n.language === 'en' ? 'en-US' : 'fr-FR';
-    return date.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
+    return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
   };
 
   const getMoodEmoji = (mood: string) => {
@@ -123,7 +120,7 @@ export default function SoulReportScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-down" size={28} color={theme.iconColor} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, ds.text]}>{t('soul_report.title')}</Text>
+        <Text style={[styles.headerTitle, ds.text]}>Rapport de l'Âme</Text>
         <View style={styles.placeholder} />
       </View>
 
@@ -131,7 +128,7 @@ export default function SoulReportScreen() {
         {loading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={theme.accentWarm} />
-            <Text style={[styles.loadingText, ds.textMuted]}>{t('common.loading')}</Text>
+            <Text style={[styles.loadingText, ds.textMuted]}>Chargement...</Text>
           </View>
         ) : report ? (
           <>
@@ -150,7 +147,7 @@ export default function SoulReportScreen() {
               {/* Summary */}
               <View style={styles.section}>
                 <Text style={[styles.sectionTitle, ds.text]}>
-                  <Ionicons name="heart-outline" size={16} /> {t('soul_report.summary')}
+                  <Ionicons name="heart-outline" size={16} /> Résumé
                 </Text>
                 <Text style={[styles.sectionContent, ds.textSecondary]}>{report.summary}</Text>
               </View>
@@ -158,7 +155,7 @@ export default function SoulReportScreen() {
               {/* Emotional Journey */}
               <View style={styles.section}>
                 <Text style={[styles.sectionTitle, ds.text]}>
-                  <Ionicons name="analytics-outline" size={16} /> {t('soul_report.emotional_journey')}
+                  <Ionicons name="analytics-outline" size={16} /> Parcours émotionnel
                 </Text>
                 <Text style={[styles.sectionContent, ds.textSecondary]}>{report.emotional_journey}</Text>
               </View>
@@ -167,7 +164,7 @@ export default function SoulReportScreen() {
               {report.mood_distribution && Object.keys(report.mood_distribution).length > 0 && (
                 <View style={styles.section}>
                   <Text style={[styles.sectionTitle, ds.text]}>
-                    <Ionicons name="pie-chart-outline" size={16} /> {t('soul_report.mood_distribution')}
+                    <Ionicons name="pie-chart-outline" size={16} /> Distribution des humeurs
                   </Text>
                   <View style={styles.moodGrid}>
                     {Object.entries(report.mood_distribution).slice(0, 6).map(([mood, count]) => (
@@ -185,7 +182,7 @@ export default function SoulReportScreen() {
               {report.dominant_themes && report.dominant_themes.length > 0 && (
                 <View style={styles.section}>
                   <Text style={[styles.sectionTitle, ds.text]}>
-                    <Ionicons name="bulb-outline" size={16} /> {t('soul_report.themes')}
+                    <Ionicons name="bulb-outline" size={16} /> Thèmes dominants
                   </Text>
                   <View style={styles.tagsContainer}>
                     {report.dominant_themes.map((theme_item, idx) => (
@@ -201,7 +198,7 @@ export default function SoulReportScreen() {
               {report.dream_insights && (
                 <View style={styles.section}>
                   <Text style={[styles.sectionTitle, ds.text]}>
-                    <Ionicons name="moon-outline" size={16} /> {t('soul_report.dream_insights')}
+                    <Ionicons name="moon-outline" size={16} /> Éclairages oniriques
                   </Text>
                   <Text style={[styles.sectionContent, ds.textSecondary]}>{report.dream_insights}</Text>
                 </View>
@@ -211,7 +208,7 @@ export default function SoulReportScreen() {
               {report.growth_areas && report.growth_areas.length > 0 && (
                 <View style={styles.section}>
                   <Text style={[styles.sectionTitle, ds.text]}>
-                    <Ionicons name="trending-up-outline" size={16} /> {t('soul_report.growth_areas')}
+                    <Ionicons name="trending-up-outline" size={16} /> Pistes de croissance
                   </Text>
                   {report.growth_areas.map((area, idx) => (
                     <View key={idx} style={styles.growthItem}>
@@ -227,7 +224,7 @@ export default function SoulReportScreen() {
                 <View style={[styles.focusCard, { backgroundColor: `${theme.accent}10` }]}>
                   <Ionicons name="compass-outline" size={20} color={theme.accent} />
                   <View style={styles.focusContent}>
-                    <Text style={[styles.focusLabel, ds.textMuted]}>{t('soul_report.focus')}</Text>
+                    <Text style={[styles.focusLabel, ds.textMuted]}>Focus recommandé</Text>
                     <Text style={[styles.focusText, ds.text]}>{report.recommended_focus}</Text>
                   </View>
                 </View>
@@ -236,7 +233,7 @@ export default function SoulReportScreen() {
               {/* Affirmation */}
               {report.affirmation && (
                 <View style={[styles.affirmationCard, { borderLeftColor: theme.accentWarm }]}>
-                  <Text style={[styles.affirmationLabel, ds.textMuted]}>{t('soul_report.affirmation')}</Text>
+                  <Text style={[styles.affirmationLabel, ds.textMuted]}>Affirmation</Text>
                   <Text style={[styles.affirmationText, ds.text]}>"{report.affirmation}"</Text>
                 </View>
               )}
@@ -254,7 +251,7 @@ export default function SoulReportScreen() {
                 ) : (
                   <>
                     <Ionicons name="sparkles" size={20} color="#fff" />
-                    <Text style={styles.generateButtonText}>{t('soul_report.generate')}</Text>
+                    <Text style={styles.generateButtonText}>Générer un nouveau rapport</Text>
                   </>
                 )}
               </TouchableOpacity>
@@ -263,7 +260,7 @@ export default function SoulReportScreen() {
             {/* Previous Reports */}
             {reports.length > 1 && (
               <Animated.View entering={FadeInUp.duration(600).delay(300)}>
-                <Text style={[styles.historyTitle, ds.text]}>{t('soul_report.history')}</Text>
+                <Text style={[styles.historyTitle, ds.text]}>Rapports précédents</Text>
                 {reports.slice(1, 5).map((r, idx) => (
                   <TouchableOpacity
                     key={r.id}
@@ -283,8 +280,8 @@ export default function SoulReportScreen() {
             <View style={[styles.emptyIcon, { backgroundColor: `${theme.accentWarm}15` }]}>
               <Text style={styles.emptyEmoji}>🌱</Text>
             </View>
-            <Text style={[styles.emptyTitle, ds.text]}>{t('soul_report.empty_title')}</Text>
-            <Text style={[styles.emptySubtitle, ds.textSecondary]}>{t('soul_report.empty_subtitle')}</Text>
+            <Text style={[styles.emptyTitle, ds.text]}>Aucun rapport encore</Text>
+            <Text style={[styles.emptySubtitle, ds.textSecondary]}>Génère ton premier rapport de l'âme pour obtenir un aperçu de ton parcours émotionnel</Text>
             
             <TouchableOpacity
               style={[styles.generateButton, { backgroundColor: theme.accentWarm }]}
@@ -296,7 +293,7 @@ export default function SoulReportScreen() {
               ) : (
                 <>
                   <Ionicons name="sparkles" size={20} color="#fff" />
-                  <Text style={styles.generateButtonText}>{t('soul_report.generate_first')}</Text>
+                  <Text style={styles.generateButtonText}>Générer mon premier rapport</Text>
                 </>
               )}
             </TouchableOpacity>

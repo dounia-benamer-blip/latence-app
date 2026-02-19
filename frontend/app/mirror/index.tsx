@@ -14,7 +14,6 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
-import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../src/context/ThemeContext';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
@@ -29,7 +28,6 @@ interface Message {
 export default function MirrorScreen() {
   const router = useRouter();
   const { theme } = useTheme();
-  const { t, i18n } = useTranslation();
   const scrollRef = useRef<ScrollView>(null);
   
   const [messages, setMessages] = useState<Message[]>([]);
@@ -64,7 +62,7 @@ export default function MirrorScreen() {
         body: JSON.stringify({
           message: userMessage.content,
           context: messages.slice(-4).map(m => m.content).join(' | '),
-          language: i18n.language,
+          language: 'fr',
         }),
       });
 
@@ -75,7 +73,7 @@ export default function MirrorScreen() {
         const mirrorMessage: Message = {
           id: (Date.now() + 1).toString(),
           type: 'mirror',
-          content: data[responseKey] || t('mirror.thinking'),
+          content: data[responseKey] || 'Le miroir réfléchit...',
           timestamp: new Date(),
         };
         setMessages(prev => [...prev, mirrorMessage]);
@@ -85,7 +83,7 @@ export default function MirrorScreen() {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'mirror',
-        content: t('mirror.empty_reflect'),
+        content: 'Partage tes pensées, tes émotions, ou ce qui te traverse en ce moment.',
         timestamp: new Date(),
       };
       setMessages(prev => [...prev, errorMessage]);
@@ -103,6 +101,12 @@ export default function MirrorScreen() {
     input: { backgroundColor: theme.inputBackground, color: theme.text },
   };
 
+  const MODES = [
+    { id: 'reflect', icon: 'eye-outline', label: 'Réflexion' },
+    { id: 'analyze', icon: 'document-text-outline', label: 'Analyse' },
+    { id: 'question', icon: 'help-circle-outline', label: 'Question' },
+  ];
+
   return (
     <SafeAreaView style={[styles.container, ds.container]}>
       <KeyboardAvoidingView
@@ -114,17 +118,13 @@ export default function MirrorScreen() {
           <TouchableOpacity onPress={() => router.back()} hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}>
             <Ionicons name="chevron-down" size={28} color={theme.iconColor} />
           </TouchableOpacity>
-          <Text style={[styles.headerTitle, ds.text]}>{t('mirror.title')}</Text>
+          <Text style={[styles.headerTitle, ds.text]}>Miroir de l'Âme</Text>
           <View style={styles.placeholder} />
         </View>
 
         {/* Mode Selector */}
         <View style={styles.modeContainer}>
-          {[
-            { id: 'reflect', icon: 'eye-outline', labelKey: 'reflect' },
-            { id: 'analyze', icon: 'document-text-outline', labelKey: 'analyze' },
-            { id: 'question', icon: 'help-circle-outline', labelKey: 'question' },
-          ].map((m) => (
+          {MODES.map((m) => (
             <TouchableOpacity
               key={m.id}
               style={[
@@ -144,7 +144,7 @@ export default function MirrorScreen() {
                   { color: mode === m.id ? '#fff' : theme.textMuted },
                 ]}
               >
-                {t(`mirror.modes.${m.labelKey}`)}
+                {m.label}
               </Text>
             </TouchableOpacity>
           ))}
@@ -162,11 +162,11 @@ export default function MirrorScreen() {
               <View style={[styles.mirrorIcon, { backgroundColor: `${theme.accentWarm}15` }]}>
                 <Ionicons name="eye" size={48} color={theme.accentWarm} />
               </View>
-              <Text style={[styles.emptyTitle, ds.text]}>{t('mirror.empty_title')}</Text>
+              <Text style={[styles.emptyTitle, ds.text]}>Miroir de l'Âme</Text>
               <Text style={[styles.emptySubtitle, ds.textSecondary]}>
-                {mode === 'reflect' && t('mirror.empty_reflect')}
-                {mode === 'analyze' && t('mirror.empty_analyze')}
-                {mode === 'question' && t('mirror.empty_question')}
+                {mode === 'reflect' && 'Partage tes pensées, tes émotions, ou ce qui te traverse en ce moment.'}
+                {mode === 'analyze' && 'Partage un texte que tu as écrit et je t\'en ferai une analyse profonde.'}
+                {mode === 'question' && 'Je vais te poser une question profonde pour stimuler ta réflexion.'}
               </Text>
             </Animated.View>
           )}
@@ -203,7 +203,7 @@ export default function MirrorScreen() {
           {isLoading && (
             <View style={[styles.loadingBubble, ds.card]}>
               <ActivityIndicator color={theme.accentWarm} size="small" />
-              <Text style={[styles.loadingText, ds.textSecondary]}>{t('mirror.thinking')}</Text>
+              <Text style={[styles.loadingText, ds.textSecondary]}>Le miroir réfléchit...</Text>
             </View>
           )}
         </ScrollView>
@@ -212,7 +212,7 @@ export default function MirrorScreen() {
         <View style={[styles.inputContainer, ds.card]}>
           <TextInput
             style={[styles.textInput, ds.input]}
-            placeholder={t('mirror.placeholder')}
+            placeholder="Écris ce qui te traverse..."
             placeholderTextColor={theme.textMuted}
             value={inputText}
             onChangeText={setInputText}
