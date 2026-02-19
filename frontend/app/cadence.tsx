@@ -376,7 +376,7 @@ export default function CadenceScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-down" size={28} color={theme.iconColor} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, ds.text]}>Cadence</Text>
+        <Text style={[styles.headerTitle, ds.text]}>{t('cadence.title')}</Text>
         <StreakFlame streak={streak} />
       </View>
 
@@ -395,14 +395,14 @@ export default function CadenceScreen() {
               color={theme.accentWarm} 
             />
             <Text style={[styles.timeBadgeText, { color: theme.accentWarm }]}>
-              {timeOfDay === 'matin' ? 'Matin' : timeOfDay === 'apres-midi' ? 'Après-midi' : 'Soir'}
+              {t(`time_of_day.${timeOfDay === 'matin' ? 'morning' : timeOfDay === 'apres-midi' ? 'afternoon' : 'evening'}`)}
             </Text>
           </View>
         </Animated.View>
 
         {/* Greeting */}
         <Animated.View entering={FadeInUp.duration(600).delay(100)}>
-          <Text style={[styles.subtitle, ds.textMuted]}>TON RYTHME INTÉRIEUR</Text>
+          <Text style={[styles.subtitle, ds.textMuted]}>{t('cadence.your_inner_rhythm')}</Text>
           <Text style={[styles.greeting, ds.text]}>{cadenceData?.greeting}</Text>
         </Animated.View>
 
