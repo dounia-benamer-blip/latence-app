@@ -56,6 +56,8 @@ interface MenuItem {
 
 const MENU_ITEMS: MenuItem[] = [
   { id: 'cadence', title: 'Cadence', subtitle: 'Ton rythme intérieur', icon: 'infinite-outline', route: '/cadence' },
+  { id: 'gratitude', title: 'Gratitudes', subtitle: '3 mercis du jour', icon: 'heart-circle-outline', route: '/gratitude' },
+  { id: 'sleep', title: 'Sommeil', subtitle: 'Comment était ta nuit ?', icon: 'bed-outline', route: '/sleep' },
   { id: 'sagesse', title: 'Sagesse', subtitle: 'Citations sacrées', icon: 'sparkles-outline', route: '/citations' },
   { id: 'lettre', title: 'Lettre à soi', subtitle: 'Écris à ton futur toi', icon: 'mail-outline', route: '/lettre' },
   { id: 'rituals', title: 'Rituels', subtitle: 'Pratiques sacrées', icon: 'moon-outline', route: '/rituals' },
