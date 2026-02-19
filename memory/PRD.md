@@ -104,26 +104,31 @@ Journal intime immersif centré sur la lune, l'introspection et la sagesse unive
 
 ## Système d'Abonnement
 
-### 🆓 Niveau Gratuit
-- 3 entrées journal/mois
-- 3 rêves/mois
-- IA Miroir basique (3 queries)
-- Pas d'Oracle, pas d'analyse avancée
+### 🎁 Essai Gratuit - 2 jours
+- Accès complet à toutes les fonctionnalités
+- Journal, Rêves, IA Miroir, Astrologie, tout !
+- Automatiquement converti en mode limité après 2 jours
 
-### ⭐ Essentiel - 4.99€/mois
+### ⭐ Essentiel - 9.99€/mois
 - Journal illimité
-- Rêves illimités
-- IA Miroir (20 queries)
+- Cadence (rituels)
+- Sagesse (citations)
+- Lettre à moi-même
+- Scellés permanents
+- Archivage illimité
+- Cycles lunaires
+- Statistiques
+- **❌ PAS de Rêves**
+- **❌ PAS d'IA Miroir**
+- **❌ PAS d'Astrologie**
+
+### 💎 Premium - 18.99€/mois
+- **TOUT Essentiel +**
+- Carnet des rêves illimité
+- IA Miroir illimitée
+- Astrologie complète
 - Oracle des rêves
 - Analyse approfondie
-- Statistiques émotionnelles
-- Cycles lunaires
-- Archivage illimité
-- Scellés permanents
-
-### 💎 Premium - 14.99€/mois
-- Tout Essentiel +
-- IA Miroir illimitée
 - Arbre cosmique
 - Sync santé & sommeil
 
