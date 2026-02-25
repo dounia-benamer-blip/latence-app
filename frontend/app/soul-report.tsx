@@ -102,13 +102,13 @@ export default function SoulReportScreen() {
     return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
   };
 
-  const getMoodEmoji = (mood: string) => {
-    const emojis: Record<string, string> = {
-      serein: '😌', joyeux: '😊', reveur: '🌙', melancolique: '😔',
-      fatigue: '😴', inspire: '✨', anxieux: '😰', nostalgique: '💭',
-      perdu: '🌀', reconnaissant: '🙏', contemplatif: '🧘', eveille: '🌟'
+  const getMoodIcon = (mood: string) => {
+    const icons: Record<string, string> = {
+      serein: 'leaf-outline', joyeux: 'sunny-outline', reveur: 'moon-outline', melancolique: 'rainy-outline',
+      fatigue: 'bed-outline', inspire: 'sparkles-outline', anxieux: 'pulse-outline', nostalgique: 'time-outline',
+      perdu: 'compass-outline', reconnaissant: 'heart-outline', contemplatif: 'eye-outline', eveille: 'flash-outline'
     };
-    return emojis[mood] || '💫';
+    return icons[mood] || 'sparkles-outline';
   };
 
   return (
@@ -136,7 +136,7 @@ export default function SoulReportScreen() {
             <Animated.View entering={FadeInUp.duration(600)} style={[styles.reportCard, ds.card]}>
               <View style={styles.reportHeader}>
                 <View style={[styles.reportIcon, { backgroundColor: `${theme.accentWarm}20` }]}>
-                  <Text style={styles.reportEmoji}>🌟</Text>
+                  <Ionicons name="sparkles-outline" size={28} color={theme.accentWarm} />
                 </View>
                 <View style={styles.reportMeta}>
                   <Text style={[styles.reportPeriod, ds.text]}>{report.period}</Text>
@@ -169,7 +169,7 @@ export default function SoulReportScreen() {
                   <View style={styles.moodGrid}>
                     {Object.entries(report.mood_distribution).slice(0, 6).map(([mood, count]) => (
                       <View key={mood} style={[styles.moodBadge, { backgroundColor: `${theme.accent}15` }]}>
-                        <Text style={styles.moodEmoji}>{getMoodEmoji(mood)}</Text>
+                        <Ionicons name={getMoodIcon(mood) as any} size={16} color={theme.accent} />
                         <Text style={[styles.moodLabel, ds.textSecondary]}>{mood}</Text>
                         <Text style={[styles.moodCount, { color: theme.accentWarm }]}>{count}</Text>
                       </View>
@@ -278,7 +278,7 @@ export default function SoulReportScreen() {
           /* No Report Yet */
           <Animated.View entering={FadeIn.duration(600)} style={styles.emptyState}>
             <View style={[styles.emptyIcon, { backgroundColor: `${theme.accentWarm}15` }]}>
-              <Text style={styles.emptyEmoji}>🌱</Text>
+              <Ionicons name="leaf-outline" size={48} color={theme.accentWarm} />
             </View>
             <Text style={[styles.emptyTitle, ds.text]}>Aucun rapport encore</Text>
             <Text style={[styles.emptySubtitle, ds.textSecondary]}>Génère ton premier rapport de l'âme pour obtenir un aperçu de ton parcours émotionnel</Text>
@@ -317,7 +317,6 @@ const styles = StyleSheet.create({
   reportCard: { borderRadius: 20, padding: 24, marginBottom: 20 },
   reportHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 24 },
   reportIcon: { width: 56, height: 56, borderRadius: 28, justifyContent: 'center', alignItems: 'center' },
-  reportEmoji: { fontSize: 28 },
   reportMeta: { marginLeft: 16, flex: 1 },
   reportPeriod: { fontSize: 18, fontWeight: '600' },
   reportDate: { fontSize: 13, marginTop: 2 },
@@ -327,8 +326,7 @@ const styles = StyleSheet.create({
   sectionContent: { fontSize: 15, lineHeight: 24 },
   
   moodGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-  moodBadge: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 20 },
-  moodEmoji: { fontSize: 16, marginRight: 6 },
+  moodBadge: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 20, gap: 6 },
   moodLabel: { fontSize: 13, marginRight: 6 },
   moodCount: { fontSize: 13, fontWeight: '600' },
   
@@ -358,7 +356,6 @@ const styles = StyleSheet.create({
   
   emptyState: { alignItems: 'center', paddingTop: 60 },
   emptyIcon: { width: 100, height: 100, borderRadius: 50, justifyContent: 'center', alignItems: 'center', marginBottom: 24 },
-  emptyEmoji: { fontSize: 48 },
   emptyTitle: { fontSize: 20, fontWeight: '600', marginBottom: 10 },
   emptySubtitle: { fontSize: 15, textAlign: 'center', lineHeight: 22, paddingHorizontal: 40, marginBottom: 30 },
 });
