@@ -166,7 +166,7 @@ export default function WriteScreen() {
               <VoiceRecorder
                 onTranscription={(text) => setContent(prev => prev ? `${prev}\n${text}` : text)}
                 theme={theme}
-                placeholder="🎙️ Dicte tes pensées..."
+                placeholder="Dicte tes pensées..."
               />
               
               <TextInput

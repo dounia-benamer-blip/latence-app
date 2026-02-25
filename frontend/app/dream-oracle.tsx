@@ -31,20 +31,20 @@ import { TwinklingStars } from '../src/components/TwinklingStars';
 const { width } = Dimensions.get('window');
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
-// Dream symbols and their meanings
+// Dream symbols and their meanings with icons
 const DREAM_SYMBOLS = {
-  'eau': { icon: '💧', meaning: 'Émotions, inconscient, purification' },
-  'vol': { icon: '🦅', meaning: 'Liberté, ambition, évasion' },
-  'chute': { icon: '🌀', meaning: 'Perte de contrôle, lâcher-prise' },
-  'mort': { icon: '🦋', meaning: 'Transformation, renaissance' },
-  'poursuite': { icon: '🏃', meaning: 'Fuite, conflit intérieur' },
-  'maison': { icon: '🏠', meaning: 'Soi, psyché, sécurité' },
-  'animaux': { icon: '🐺', meaning: 'Instincts, nature sauvage' },
-  'serpent': { icon: '🐍', meaning: 'Transformation, sagesse' },
-  'feu': { icon: '🔥', meaning: 'Passion, purification' },
-  'forêt': { icon: '🌲', meaning: 'Inconscient, mystère' },
-  'lune': { icon: '🌙', meaning: 'Féminin, intuition, cycles' },
-  'miroir': { icon: '🪞', meaning: 'Réflexion, identité, vérité' },
+  'eau': { icon: 'water-outline', meaning: 'Émotions, inconscient, purification' },
+  'vol': { icon: 'airplane-outline', meaning: 'Liberté, ambition, évasion' },
+  'chute': { icon: 'arrow-down-circle-outline', meaning: 'Perte de contrôle, lâcher-prise' },
+  'mort': { icon: 'flower-outline', meaning: 'Transformation, renaissance' },
+  'poursuite': { icon: 'footsteps-outline', meaning: 'Fuite, conflit intérieur' },
+  'maison': { icon: 'home-outline', meaning: 'Soi, psyché, sécurité' },
+  'animaux': { icon: 'paw-outline', meaning: 'Instincts, nature sauvage' },
+  'serpent': { icon: 'git-branch-outline', meaning: 'Transformation, sagesse' },
+  'feu': { icon: 'flame-outline', meaning: 'Passion, purification' },
+  'forêt': { icon: 'leaf-outline', meaning: 'Inconscient, mystère' },
+  'lune': { icon: 'moon-outline', meaning: 'Féminin, intuition, cycles' },
+  'miroir': { icon: 'scan-outline', meaning: 'Réflexion, identité, vérité' },
 };
 
 interface Dream {
@@ -122,7 +122,7 @@ const OracleEye = ({ size = 80 }: { size?: number }) => {
         ]}
       />
       <Animated.View style={eyeStyle}>
-        <Text style={{ fontSize: size }}>👁️</Text>
+        <Ionicons name="eye" size={size} color="#D4A574" />
       </Animated.View>
     </View>
   );
@@ -407,7 +407,7 @@ export default function DreamOracleScreen() {
           <Animated.View entering={FadeInUp.duration(600)}>
             {/* Reading Header */}
             <View style={[styles.readingHeader, ds.card]}>
-              <Text style={styles.readingIcon}>🌙</Text>
+              <Ionicons name="moon-outline" size={40} color={theme.accentWarm} />
               <Text style={[styles.readingTitle, ds.text]}>Révélation de l'Oracle</Text>
               <View style={[styles.emotionBadge, { backgroundColor: `${theme.accentWarm}20` }]}>
                 <Text style={[styles.emotionText, { color: theme.accentWarm }]}>
@@ -427,7 +427,7 @@ export default function DreamOracleScreen() {
                     // Handle both AI response format and local format
                     const symbolName = pattern.symbol || pattern.pattern || 'symbole';
                     const symbolData = DREAM_SYMBOLS[symbolName.toLowerCase() as keyof typeof DREAM_SYMBOLS];
-                    const icon = pattern.icon || symbolData?.icon || '✨';
+                    const iconName = pattern.icon || symbolData?.icon || 'sparkles-outline';
                     const meaning = pattern.meaning || pattern.significance || symbolData?.meaning || '';
                     const count = pattern.count || 1;
                     
@@ -437,7 +437,7 @@ export default function DreamOracleScreen() {
                         entering={FadeInUp.delay(i * 100)}
                         style={[styles.patternCard, { backgroundColor: theme.background }]}
                       >
-                        <Text style={styles.patternIcon}>{icon}</Text>
+                        <Ionicons name={iconName as any} size={28} color={theme.accentWarm} style={{ marginBottom: 6 }} />
                         <Text style={[styles.patternSymbol, ds.text]}>{symbolName}</Text>
                         {pattern.count && <Text style={[styles.patternCount, { color: theme.accentWarm }]}>×{count}</Text>}
                         <Text style={[styles.patternMeaning, ds.textMuted]} numberOfLines={3}>{meaning}</Text>

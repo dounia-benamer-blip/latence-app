@@ -296,7 +296,7 @@ export default function SleepTrackerScreen() {
                     const q = SLEEP_QUALITIES.find(sq => sq.id === entry.quality);
                     return (
                       <View key={i} style={styles.miniDay}>
-                        <Text style={styles.miniEmoji}>{q?.emoji || '😐'}</Text>
+                        <Ionicons name={q?.icon as any || 'ellipse-outline'} size={20} color={q?.color || theme.textMuted} />
                         <Text style={[styles.miniHours, ds.textMuted]}>{entry.hours}</Text>
                       </View>
                     );
@@ -350,6 +350,5 @@ const styles = StyleSheet.create({
   
   miniCalendar: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 },
   miniDay: { alignItems: 'center' },
-  miniEmoji: { fontSize: 20 },
   miniHours: { fontSize: 11, marginTop: 4 },
 });
