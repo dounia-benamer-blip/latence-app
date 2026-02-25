@@ -3,6 +3,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ThemeProvider, useTheme } from '../src/context/ThemeContext';
 import { AuthProvider } from '../src/context/AuthContext';
+import { FontProvider } from '../src/context/FontContext';
 
 function RootLayoutNav() {
   const { theme, isDark } = useTheme();
@@ -23,10 +24,12 @@ function RootLayoutNav() {
 
 export default function RootLayout() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <RootLayoutNav />
-      </AuthProvider>
-    </ThemeProvider>
+    <FontProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <RootLayoutNav />
+        </AuthProvider>
+      </ThemeProvider>
+    </FontProvider>
   );
 }
