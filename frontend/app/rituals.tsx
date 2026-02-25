@@ -30,16 +30,16 @@ import { TwinklingStars } from '../src/components/TwinklingStars';
 const { width } = Dimensions.get('window');
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
-// Moon phases icons and data
+// Moon phases icons and data - using Ionicons
 const MOON_PHASES = [
-  { name: 'Nouvelle Lune', icon: '🌑', shortName: 'Nouvelle' },
-  { name: 'Premier Croissant', icon: '🌒', shortName: 'Croissant' },
-  { name: 'Premier Quartier', icon: '🌓', shortName: 'Quartier' },
-  { name: 'Gibbeuse Croissante', icon: '🌔', shortName: 'Gibbeuse+' },
-  { name: 'Pleine Lune', icon: '🌕', shortName: 'Pleine' },
-  { name: 'Gibbeuse Décroissante', icon: '🌖', shortName: 'Gibbeuse-' },
-  { name: 'Dernier Quartier', icon: '🌗', shortName: 'Quartier' },
-  { name: 'Dernier Croissant', icon: '🌘', shortName: 'Croissant' },
+  { name: 'Nouvelle Lune', icon: 'moon-outline', shortName: 'Nouvelle' },
+  { name: 'Premier Croissant', icon: 'moon-outline', shortName: 'Croissant' },
+  { name: 'Premier Quartier', icon: 'moon-outline', shortName: 'Quartier' },
+  { name: 'Gibbeuse Croissante', icon: 'moon-outline', shortName: 'Gibbeuse+' },
+  { name: 'Pleine Lune', icon: 'moon', shortName: 'Pleine' },
+  { name: 'Gibbeuse Décroissante', icon: 'moon', shortName: 'Gibbeuse-' },
+  { name: 'Dernier Quartier', icon: 'moon', shortName: 'Quartier' },
+  { name: 'Dernier Croissant', icon: 'moon-outline', shortName: 'Croissant' },
 ];
 
 interface PhaseData {
@@ -145,7 +145,7 @@ const AnimatedMoon = ({ phase, size = 100 }: { phase: string; size?: number }) =
       />
       {/* Moon */}
       <Animated.View style={moonStyle}>
-        <Text style={{ fontSize: size }}>{phaseData.icon}</Text>
+        <Ionicons name={phaseData.icon as any} size={size} color="#F5E6D3" />
       </Animated.View>
     </View>
   );
@@ -163,16 +163,16 @@ export default function RitualsScreen() {
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [showRitual, setShowRitual] = useState(false);
 
-  // Moon phases for UI (using translation keys)
+  // Moon phases for UI
   const MOON_PHASES_DATA = [
-    { key: 'new', icon: '🌑' },
-    { key: 'waxing_crescent', icon: '🌒' },
-    { key: 'first_quarter', icon: '🌓' },
-    { key: 'waxing_gibbous', icon: '🌔' },
-    { key: 'full', icon: '🌕' },
-    { key: 'waning_gibbous', icon: '🌖' },
-    { key: 'last_quarter', icon: '🌗' },
-    { key: 'waning_crescent', icon: '🌘' },
+    { key: 'new', icon: 'moon-outline' },
+    { key: 'waxing_crescent', icon: 'moon-outline' },
+    { key: 'first_quarter', icon: 'moon-outline' },
+    { key: 'waxing_gibbous', icon: 'moon-outline' },
+    { key: 'full', icon: 'moon' },
+    { key: 'waning_gibbous', icon: 'moon' },
+    { key: 'last_quarter', icon: 'moon' },
+    { key: 'waning_crescent', icon: 'moon-outline' },
   ];
 
   const getMoonPhaseKey = (phaseName: string): string => {
