@@ -375,4 +375,12 @@ const styles = StyleSheet.create({
   breathPhase: { fontSize: 24, fontWeight: '300', color: '#fff', marginBottom: 8 },
   breathCountdown: { fontSize: 64, fontWeight: '700', color: '#fff' },
   cycleCounter: { marginTop: 40, fontSize: 16 },
+  
+  // Premium lock styles
+  lockedContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 },
+  lockedIcon: { width: 100, height: 100, borderRadius: 50, alignItems: 'center', justifyContent: 'center', marginBottom: 24 },
+  lockedTitle: { fontSize: 22, fontWeight: '600', marginBottom: 12 },
+  lockedSubtitle: { fontSize: 15, textAlign: 'center', lineHeight: 22, marginBottom: 32 },
+  upgradeButton: { paddingVertical: 16, paddingHorizontal: 40, borderRadius: 28 },
+  upgradeButtonText: { color: '#fff', fontSize: 15, fontWeight: '600' },
 });
