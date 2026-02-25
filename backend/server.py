@@ -1334,26 +1334,27 @@ Que vois-tu dans ces lignes ? Que disent-elles de l'âme qui les a tracées ?"""
 async def get_deep_question(request: MirrorRequest):
     """Generate a deep introspective question based on context"""
     
-    system_prompt = """Tu es un maître des questions profondes — tu poses LA question qui peut transformer.
+    system_prompt = """Tu poses des questions simples mais profondes qui font réfléchir.
 
-TES QUESTIONS :
-- Ouvrent des portes intérieures
-- Font réfléchir pendant des heures
-- Touchent l'essentiel sans brusquer
-- Sont poétiques et évocatrices
-- N'ont pas de "bonne" réponse
+RÈGLES :
+- UNE seule question, courte et directe
+- Pas de métaphores floues ou de poésie excessive
+- Des questions qu'on se pose à un ami proche
+- Maximum 15 mots pour la question
 
-INSPIRATIONS :
-- Socrate et la maïeutique
-- Les koans zen
-- Les questions des mystiques soufis
-- La profondeur de Jung
-- La clarté de Krishnamurti
+EXEMPLES DE BONNES QUESTIONS :
+- "Qu'est-ce que tu n'oses pas t'avouer ?"
+- "De quoi as-tu vraiment peur ?"
+- "Qu'est-ce qui te rendrait vraiment heureux ?"
+- "Qu'est-ce que tu attends pour faire ce que tu veux ?"
+- "C'est quoi le pire qui pourrait arriver si tu essayais ?"
+- "À qui tu n'as pas encore pardonné ?"
+- "Qu'est-ce que tu fuies ?"
+- "Si tu mourais demain, qu'est-ce que tu regretterais ?"
+- "Qu'est-ce que tu fais par obligation et non par envie ?"
+- "Qu'est-ce qui te retient vraiment ?"
 
-FORMAT :
-- Une seule question, parfaitement ciselée
-- Éventuellement une phrase d'introduction poétique
-- Maximum 2-3 phrases au total"""
+Réponds UNIQUEMENT avec la question, rien d'autre."""
 
     chat = LlmChat(
         api_key=EMERGENT_LLM_KEY,
@@ -1361,19 +1362,19 @@ FORMAT :
         system_message=system_prompt
     ).with_model("openai", "gpt-4o")
 
-    context = request.message if request.message else "Cette âme cherche une question pour s'éveiller."
-    mood_hint = f" (Son état actuel : {request.mood})" if request.mood else ""
+    context = request.context if request.context else ""
+    mood_hint = f" (humeur : {request.mood})" if request.mood else ""
 
-    prompt = f"""Contexte : {context}{mood_hint}
+    prompt = f"""Contexte de la conversation : {context}{mood_hint}
 
-Pose UNE question profonde qui pourrait illuminer cette âme."""
+Pose UNE question simple et profonde."""
 
     try:
         response = await chat.send_message(UserMessage(text=prompt))
         return {"question": response}
     except Exception as e:
         logging.error(f"Deep question error: {e}")
-        return {"question": "Si tu pouvais murmurer un secret à l'enfant que tu étais, que lui dirais-tu ?"}
+        return {"question": "Qu'est-ce que tu n'oses pas t'avouer ?"}
 
 # --- Astrology Profile Routes ---
 
