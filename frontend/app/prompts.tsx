@@ -58,12 +58,15 @@ const DAILY_PROMPTS = [
 export default function PromptsScreen() {
   const router = useRouter();
   const { theme, isDark } = useTheme();
+  const { fontsLoaded, handwritingFont } = useFonts();
   const [currentPrompt, setCurrentPrompt] = useState('');
   const [category, setCategory] = useState('');
   const [response, setResponse] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [history, setHistory] = useState<any[]>([]);
+
+  const handwritingStyle = fontsLoaded ? { fontFamily: handwritingFont, fontSize: 22 } : { fontSize: 18 };
 
   const ds = {
     container: { backgroundColor: theme.background },
