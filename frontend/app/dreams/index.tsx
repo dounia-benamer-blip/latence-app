@@ -66,6 +66,7 @@ function formatDreamDate(dateStr: string): string {
 export default function DreamsScreen() {
   const router = useRouter();
   const { theme } = useTheme();
+  const { fontsLoaded, handwritingFont } = useFonts();
   const [view, setView] = useState<'list' | 'new' | 'edit'>('list');
   const [dreams, setDreams] = useState<Dream[]>([]);
   const [loading, setLoading] = useState(true);
@@ -83,6 +84,8 @@ export default function DreamsScreen() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [dreamToDelete, setDreamToDelete] = useState<Dream | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const handwritingStyle = fontsLoaded ? { fontFamily: handwritingFont, fontSize: 22 } : { fontSize: 18 };
 
   const ds = {
     container: { backgroundColor: theme.background },
