@@ -67,6 +67,7 @@ const BREATHING_EXERCISES: BreathingExercise[] = [
 export default function AmbientScreen() {
   const router = useRouter();
   const { theme, isDark } = useTheme();
+  const { subscriptionStatus } = useAuth();
   const [activeSound, setActiveSound] = useState<string | null>(null);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [breathingActive, setBreathingActive] = useState(false);
@@ -78,6 +79,9 @@ export default function AmbientScreen() {
   const breathScale = useSharedValue(1);
   const breathOpacity = useSharedValue(0.3);
 
+  const userTier = subscriptionStatus?.tier || 'free';
+  const hasPremiumAccess = userTier === 'premium' || userTier === 'lifetime' || userTier === 'essentiel';
+
   const ds = {
     container: { backgroundColor: theme.background },
     card: { backgroundColor: theme.card },
@@ -85,6 +89,36 @@ export default function AmbientScreen() {
     textSecondary: { color: theme.textSecondary },
     textMuted: { color: theme.textMuted },
   };
+
+  // Redirect non-premium users
+  if (!hasPremiumAccess) {
+    return (
+      <SafeAreaView style={[styles.container, ds.container]}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()}>
+            <Ionicons name="chevron-down" size={28} color={theme.iconColor} />
+          </TouchableOpacity>
+          <Text style={[styles.headerTitle, ds.text]}>Ambiance</Text>
+          <View style={{ width: 28 }} />
+        </View>
+        <View style={styles.lockedContainer}>
+          <View style={[styles.lockedIcon, { backgroundColor: '#7E57C220' }]}>
+            <Ionicons name="lock-closed" size={48} color="#7E57C2" />
+          </View>
+          <Text style={[styles.lockedTitle, ds.text]}>Fonctionnalité Premium</Text>
+          <Text style={[styles.lockedSubtitle, ds.textMuted]}>
+            Accède aux sons d'ambiance et exercices de respiration avec l'abonnement Essentiel ou Premium.
+          </Text>
+          <TouchableOpacity
+            style={[styles.upgradeButton, { backgroundColor: '#7E57C2' }]}
+            onPress={() => router.push('/profile')}
+          >
+            <Text style={styles.upgradeButtonText}>Voir les abonnements</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   useEffect(() => {
     return () => {
