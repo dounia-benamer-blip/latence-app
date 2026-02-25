@@ -18,11 +18,11 @@ import { TwinklingStars } from '../src/components/TwinklingStars';
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
 const SLEEP_QUALITIES = [
-  { id: 1, label: 'Très mauvaise', emoji: '😫', color: '#E74C3C' },
-  { id: 2, label: 'Mauvaise', emoji: '😔', color: '#E67E22' },
-  { id: 3, label: 'Moyenne', emoji: '😐', color: '#F1C40F' },
-  { id: 4, label: 'Bonne', emoji: '😊', color: '#27AE60' },
-  { id: 5, label: 'Excellente', emoji: '😴', color: '#3498DB' },
+  { id: 1, label: 'Très mauvaise', icon: 'cloudy-night-outline', color: '#E74C3C' },
+  { id: 2, label: 'Mauvaise', icon: 'partly-sunny-outline', color: '#E67E22' },
+  { id: 3, label: 'Moyenne', icon: 'sunny-outline', color: '#F1C40F' },
+  { id: 4, label: 'Bonne', icon: 'moon-outline', color: '#27AE60' },
+  { id: 5, label: 'Excellente', icon: 'bed-outline', color: '#3498DB' },
 ];
 
 const HOURS = ['4h', '5h', '6h', '7h', '8h', '9h', '10h', '11h', '12h'];

@@ -129,14 +129,14 @@ export default function PromptsScreen() {
   };
 
   const getCategoryInfo = (cat: string) => {
-    const info: Record<string, { emoji: string; label: string; color: string }> = {
-      introspection: { emoji: '🪞', label: 'Introspection', color: '#9C27B0' },
-      gratitude: { emoji: '🙏', label: 'Gratitude', color: '#E91E63' },
-      reves: { emoji: '✨', label: 'Rêves', color: '#FF9800' },
-      relations: { emoji: '💜', label: 'Relations', color: '#3F51B5' },
-      croissance: { emoji: '🌱', label: 'Croissance', color: '#4CAF50' },
+    const info: Record<string, { icon: string; label: string; color: string }> = {
+      introspection: { icon: 'eye-outline', label: 'Introspection', color: '#9C27B0' },
+      gratitude: { icon: 'heart-outline', label: 'Gratitude', color: '#E91E63' },
+      reves: { icon: 'sparkles-outline', label: 'Rêves', color: '#FF9800' },
+      relations: { icon: 'people-outline', label: 'Relations', color: '#3F51B5' },
+      croissance: { icon: 'leaf-outline', label: 'Croissance', color: '#4CAF50' },
     };
-    return info[cat] || { emoji: '📝', label: 'Écriture', color: theme.accentWarm };
+    return info[cat] || { icon: 'create-outline', label: 'Écriture', color: theme.accentWarm };
   };
 
   const catInfo = getCategoryInfo(category);
