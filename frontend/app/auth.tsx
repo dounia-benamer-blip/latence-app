@@ -61,7 +61,7 @@ export default function AuthScreen() {
           setIsLoading(false);
           return;
         }
-        result = await register(email, password, name);
+        result = await register(email, password, name, lifetimeCode || undefined);
       }
 
       if (result.success) {
