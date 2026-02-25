@@ -100,7 +100,22 @@ Application mobile de journaling immersive avec focus sur l'astrologie, le bien-
 
 ## Historique des mises à jour
 
-### 19 Février 2026 - Session 3 (Actuelle)
+### 25 Février 2026 - Session Actuelle
+- ✅ **Remplacement complet des emojis par icônes Ionicons**
+  - Sélecteur d'humeur (12 émotions avec icônes ligne)
+  - Menu principal home.tsx
+  - Page Ambiance (sons avec icônes rainy, flame, leaf, water, cloudy, moon)
+  - Page Progression (streak, mood distribution)
+  - Page Gratitude (heart-outline)
+  - Page Rituels (phases de lune)
+  - Page Prompts (catégories)
+  - Page Soul Report, Dreams, Dream Dictionary, Dream Oracle, Cadence, Sleep
+- ✅ **Sons d'ambiance corrigés** - URLs SoundBible fonctionnelles (pluie, feu, forêt, vagues, vent, nuit)
+- ✅ **Fichiers inutilisés supprimés** - tarot.tsx, compatibility.tsx
+- ✅ **Configuration iOS mise à jour** - Permission microphone ajoutée (NSMicrophoneUsageDescription)
+- ✅ **Styles emoji nettoyés** - Suppression des styles inutilisés (iconEmoji, streakEmoji, etc.)
+
+### 19 Février 2026 - Session 3
 - ✅ **Suppression complète de l'i18n** - Application en français uniquement
   - Suppression des dépendances i18next, react-i18next de package.json
   - Réécriture de dream-dictionary.tsx, soul-report.tsx, mirror/index.tsx sans i18n
@@ -122,15 +137,20 @@ Application mobile de journaling immersive avec focus sur l'astrologie, le bien-
 
 ## Prochaines Étapes
 
+### P0 - Immédiat
+- [ ] **Soumission iOS** - L'utilisateur va acheter le compte Apple Developer (99€)
+  - Suivre le guide APP_STORE_GUIDE.md
+  - Configurer EAS projectId
+  - Exécuter `eas build --platform ios`
+
 ### P1 - À Faire
 - [ ] Refactorer le backend (découpage de auth.py en routes/)
 - [ ] Maisons astrologiques détaillées
-- [ ] Nettoyage fichiers inutilisés (tarot.tsx, compatibility.tsx)
 
 ### P2 - Backlog
-- [ ] Soumission App Store (reportée par l'utilisateur)
 - [ ] Optimisation des performances
 - [ ] Tests unitaires backend
+- [ ] Migration expo-av vers expo-audio (SDK 54)
 
 ## Credentials Test
 - **Admin**: admin@latence.app / adminpassword
