@@ -407,4 +407,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textDecorationLine: 'underline',
   },
+  codeToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 8,
+  },
+  codeToggleText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
 });
