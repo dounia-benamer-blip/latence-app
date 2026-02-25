@@ -34,14 +34,14 @@ interface Sound {
   url: string;
 }
 
-// Sons d'ambiance avec URLs fonctionnelles (Pixabay CDN - royalty free)
+// Sons d'ambiance avec URLs fonctionnelles (SoundBible - CC licensed)
 const AMBIENT_SOUNDS: Sound[] = [
-  { id: 'rain', name: 'Pluie', icon: 'rainy-outline', color: '#5C6BC0', url: 'https://cdn.pixabay.com/download/audio/2022/03/24/audio_5379687f43.mp3' },
-  { id: 'fire', name: 'Feu', icon: 'flame-outline', color: '#FF7043', url: 'https://cdn.pixabay.com/download/audio/2021/08/04/audio_c2d3b9ecbf.mp3' },
-  { id: 'forest', name: 'Forêt', icon: 'leaf-outline', color: '#66BB6A', url: 'https://cdn.pixabay.com/download/audio/2022/02/23/audio_e9b68a5e28.mp3' },
-  { id: 'waves', name: 'Vagues', icon: 'water-outline', color: '#42A5F5', url: 'https://cdn.pixabay.com/download/audio/2022/03/17/audio_de6e6ba3b2.mp3' },
-  { id: 'wind', name: 'Vent', icon: 'cloudy-outline', color: '#78909C', url: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_79ea0319e7.mp3' },
-  { id: 'night', name: 'Nuit', icon: 'moon-outline', color: '#7E57C2', url: 'https://cdn.pixabay.com/download/audio/2021/09/07/audio_76e18fd6d2.mp3' },
+  { id: 'rain', name: 'Pluie', icon: 'rainy-outline', color: '#5C6BC0', url: 'https://soundbible.com/grab.php?id=2065&type=mp3' },
+  { id: 'fire', name: 'Feu', icon: 'flame-outline', color: '#FF7043', url: 'https://soundbible.com/grab.php?id=2178&type=mp3' },
+  { id: 'forest', name: 'Forêt', icon: 'leaf-outline', color: '#66BB6A', url: 'https://soundbible.com/grab.php?id=1818&type=mp3' },
+  { id: 'waves', name: 'Vagues', icon: 'water-outline', color: '#42A5F5', url: 'https://soundbible.com/grab.php?id=2193&type=mp3' },
+  { id: 'wind', name: 'Vent', icon: 'cloudy-outline', color: '#78909C', url: 'https://soundbible.com/grab.php?id=2132&type=mp3' },
+  { id: 'night', name: 'Nuit', icon: 'moon-outline', color: '#7E57C2', url: 'https://soundbible.com/grab.php?id=1820&type=mp3' },
 ];
 
 interface BreathingExercise {
