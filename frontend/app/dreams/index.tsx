@@ -378,7 +378,7 @@ export default function DreamsScreen() {
           />
 
           <TextInput
-            style={[styles.dreamInput, ds.card, ds.text]}
+            style={[styles.dreamInput, ds.card, ds.text, handwritingStyle]}
             placeholder="J'ai rêvé que..."
             placeholderTextColor={theme.textMuted}
             value={content}
