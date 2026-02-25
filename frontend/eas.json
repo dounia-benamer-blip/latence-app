@@ -29,9 +29,9 @@
   "submit": {
     "production": {
       "ios": {
-        "appleId": "VOTRE_APPLE_ID@email.com",
+        "appleId": "Dounia-Benamer@hotmail.fr",
         "ascAppId": "VOTRE_APP_STORE_CONNECT_APP_ID",
-        "appleTeamId": "VOTRE_TEAM_ID"
+        "appleTeamId": "MNPJV87Q6P"
       }
     }
   }
