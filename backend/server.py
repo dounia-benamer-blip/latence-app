@@ -3389,6 +3389,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Include all API routes
+app.include_router(api_router)
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
