@@ -288,13 +288,36 @@ def register_auth_routes(app, db: AsyncIOMotorDatabase):
         if existing:
             raise HTTPException(status_code=400, detail="Email déjà utilisé")
         
+        # Check for lifetime code if provided
+        tier = "free"
+        is_founder = False
+        lifetime_code = getattr(user_data, 'lifetime_code', None)
+        
+        if lifetime_code:
+            code = lifetime_code.strip().upper()
+            code_doc = await db.lifetime_codes.find_one({"code": code}, {"_id": 0})
+            
+            if code_doc and not code_doc.get("is_used"):
+                tier = "lifetime"
+                is_founder = True
+                # Mark code as used
+                await db.lifetime_codes.update_one(
+                    {"code": code},
+                    {"$set": {
+                        "is_used": True,
+                        "used_by_email": user_data.email,
+                        "used_at": datetime.now(timezone.utc)
+                    }}
+                )
+        
         # Create user
         user_id = f"user_{uuid.uuid4().hex[:12]}"
         user = User(
             user_id=user_id,
             email=user_data.email,
             name=user_data.name,
-            subscription_tier="free"
+            subscription_tier=tier,
+            is_founder=is_founder
         )
         
         # Store with hashed password
@@ -323,7 +346,8 @@ def register_auth_routes(app, db: AsyncIOMotorDatabase):
             max_age=7 * 24 * 60 * 60
         )
         
-        return {"success": True, "user": user.dict()}
+        welcome_msg = "Bienvenue parmi les Membres Fondateurs !" if is_founder else "Inscription réussie"
+        return {"success": True, "user": user.dict(), "message": welcome_msg}
     
     @auth_router.post("/login")
     async def login(credentials: UserLogin, response: Response):
