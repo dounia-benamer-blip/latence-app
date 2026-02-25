@@ -322,8 +322,7 @@ const styles = StyleSheet.create({
   
   qualityGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   qualityCard: { width: '30%', flexGrow: 1, padding: 14, borderRadius: 16, alignItems: 'center', borderWidth: 2, borderColor: 'transparent' },
-  qualityEmoji: { fontSize: 28, marginBottom: 6 },
-  qualityLabel: { fontSize: 12, textAlign: 'center' },
+  qualityLabel: { fontSize: 12, textAlign: 'center', marginTop: 6 },
   
   hoursScroll: { marginBottom: 16 },
   hourChip: { paddingHorizontal: 20, paddingVertical: 12, borderRadius: 20, marginRight: 10 },

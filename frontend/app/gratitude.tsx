@@ -247,7 +247,6 @@ const styles = StyleSheet.create({
   
   iconContainer: { alignItems: 'center', marginBottom: 20 },
   iconCircle: { width: 80, height: 80, borderRadius: 40, justifyContent: 'center', alignItems: 'center' },
-  iconEmoji: { fontSize: 40 },
   
   title: { fontSize: 24, fontWeight: '600', textAlign: 'center', marginBottom: 8 },
   subtitle: { fontSize: 14, textAlign: 'center', marginBottom: 24 },
@@ -270,7 +269,6 @@ const styles = StyleSheet.create({
   weekGrid: { flexDirection: 'row', gap: 8 },
   weekDay: { flex: 1, padding: 12, borderRadius: 12, alignItems: 'center' },
   weekDayLabel: { fontSize: 11, marginBottom: 4 },
-  weekDayEmoji: { fontSize: 18 },
   weekDayCount: { fontSize: 14, fontWeight: '600', marginTop: 4 },
   
   recentSection: { marginTop: 24 },

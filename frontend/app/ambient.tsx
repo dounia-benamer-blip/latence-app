@@ -320,8 +320,7 @@ const styles = StyleSheet.create({
   
   soundsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   soundCard: { width: (width - 64) / 3, aspectRatio: 1, borderRadius: 20, justifyContent: 'center', alignItems: 'center', position: 'relative' },
-  soundEmoji: { fontSize: 32, marginBottom: 8 },
-  soundName: { fontSize: 12, textAlign: 'center' },
+  soundName: { fontSize: 12, textAlign: 'center', marginTop: 8 },
   playingIndicator: { position: 'absolute', top: 8, right: 8 },
   
   exerciseCard: { flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 16, marginBottom: 12 },
