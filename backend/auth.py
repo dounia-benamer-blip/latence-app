@@ -97,7 +97,7 @@ SUBSCRIPTION_TIERS = {
     },
     "essentiel": {
         "name": "Essentiel",
-        "price": 2.99,
+        "price": 4.99,
         "description": "Écriture complète, sans approfondissement",
         "limits": {
             "journal_entries": -1,  # Écriture illimitée
