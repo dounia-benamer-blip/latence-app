@@ -693,6 +693,53 @@ def register_auth_routes(app, db: AsyncIOMotorDatabase):
             "tier": "lifetime"
         }
     
+    @subscription_router.post("/start-trial")
+    async def start_trial(request: Request):
+        """Start 3-day free trial"""
+        user = await get_current_user(request, db)
+        if not user:
+            raise HTTPException(status_code=401, detail="Authentification requise")
+        
+        body = await request.json()
+        plan = body.get("plan", "essentiel")
+        
+        if plan not in ["essentiel", "premium"]:
+            plan = "essentiel"
+        
+        # Check if user already had a trial
+        existing_trial = await db.trials.find_one({"user_id": user.user_id})
+        if existing_trial:
+            raise HTTPException(status_code=400, detail="Vous avez déjà utilisé votre essai gratuit")
+        
+        # Set trial end date (3 days from now)
+        trial_end = datetime.now(timezone.utc) + timedelta(days=3)
+        
+        # Record trial
+        await db.trials.insert_one({
+            "user_id": user.user_id,
+            "email": user.email,
+            "plan": plan,
+            "started_at": datetime.now(timezone.utc),
+            "ends_at": trial_end
+        })
+        
+        # Upgrade user temporarily
+        await db.users.update_one(
+            {"user_id": user.user_id},
+            {"$set": {
+                "subscription_tier": plan,
+                "subscription_expires": trial_end,
+                "is_trial": True
+            }}
+        )
+        
+        return {
+            "success": True,
+            "message": f"Essai gratuit de 3 jours activé pour {plan}",
+            "tier": plan,
+            "trial_ends": trial_end.isoformat()
+        }
+    
     # ==================== ADMIN ROUTES ====================
     
     ADMIN_PASSWORD = "latence_admin_2024"  # Should be in env in production
