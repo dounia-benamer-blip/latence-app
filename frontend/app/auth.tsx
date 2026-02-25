@@ -180,6 +180,34 @@ export default function AuthScreen() {
               />
             </View>
 
+            {mode === 'register' && (
+              <View>
+                <TouchableOpacity
+                  style={styles.codeToggle}
+                  onPress={() => setShowCodeField(!showCodeField)}
+                >
+                  <Ionicons name="key-outline" size={18} color={theme.accent} />
+                  <Text style={[styles.codeToggleText, { color: theme.accent }]}>
+                    {showCodeField ? 'Masquer le code' : 'J\'ai un code Fondateur'}
+                  </Text>
+                </TouchableOpacity>
+                
+                {showCodeField && (
+                  <Animated.View entering={FadeIn.duration(300)} style={styles.inputWrapper}>
+                    <Ionicons name="key-outline" size={20} color="#F39C12" style={styles.inputIcon} />
+                    <TextInput
+                      style={[styles.input, ds.input, { borderColor: '#F39C12' }]}
+                      placeholder="Code Fondateur (ex: LATENCE-XXXX-XXXX)"
+                      placeholderTextColor={theme.textMuted}
+                      value={lifetimeCode}
+                      onChangeText={setLifetimeCode}
+                      autoCapitalize="characters"
+                    />
+                  </Animated.View>
+                )}
+              </View>
+            )}
+
             {error ? (
               <Animated.Text entering={FadeIn.duration(300)} style={styles.errorText}>
                 {error}
