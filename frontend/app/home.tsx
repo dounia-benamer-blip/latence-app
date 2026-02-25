@@ -21,7 +21,7 @@ import AuraAvatar, { AURA_DATABASE } from './components/AuraAvatar';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
-const PREMIUM_FEATURES = ['mirror', 'astro', 'dream-oracle', 'meditation', 'rituals'];
+const PREMIUM_FEATURES = ['mirror', 'astro', 'dream-oracle', 'meditation', 'rituals', 'progress', 'ambient', 'soul-report', 'dream-dictionary'];
 
 const DAYS = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
 const MONTHS = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
