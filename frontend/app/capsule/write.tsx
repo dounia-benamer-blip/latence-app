@@ -170,7 +170,7 @@ export default function WriteScreen() {
               />
               
               <TextInput
-                style={[styles.textInput, ds.text]}
+                style={[styles.textInput, ds.text, ds.handwriting, { fontSize: 22 }]}
                 placeholder="Qu'est-ce qui traverse ton esprit ?"
                 placeholderTextColor={theme.textMuted}
                 value={content}
