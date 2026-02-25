@@ -49,7 +49,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   subscriptionStatus: SubscriptionStatus | null;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  register: (email: string, password: string, name: string) => Promise<{ success: boolean; error?: string }>;
+  register: (email: string, password: string, name: string, lifetimeCode?: string) => Promise<{ success: boolean; error?: string }>;
   loginWithGoogle: () => Promise<{ success: boolean; error?: string }>;
   loginWithApple: () => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
