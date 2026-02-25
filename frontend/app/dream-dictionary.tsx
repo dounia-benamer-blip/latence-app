@@ -113,23 +113,23 @@ export default function DreamDictionaryScreen() {
 
   const getSymbolIcon = (symbol: string) => {
     const iconMap: Record<string, string> = {
-      eau: '💧', water: '💧', agua: '💧',
-      feu: '🔥', fire: '🔥', fuego: '🔥',
-      lune: '🌙', moon: '🌙', luna: '🌙',
-      soleil: '☀️', sun: '☀️', sol: '☀️',
-      arbre: '🌳', tree: '🌳', árbol: '🌳',
-      maison: '🏠', house: '🏠', casa: '🏠',
-      serpent: '🐍', snake: '🐍', serpiente: '🐍',
-      oiseau: '🦅', bird: '🦅', pájaro: '🦅',
-      vol: '🕊️', flight: '🕊️', vuelo: '🕊️',
-      chute: '🌀', fall: '🌀', caída: '🌀',
-      mort: '🦋', death: '🦋', muerte: '🦋',
-      forêt: '🌲', forest: '🌲', bosque: '🌲',
-      mer: '🌊', sea: '🌊', mar: '🌊',
-      montagne: '⛰️', mountain: '⛰️', montaña: '⛰️',
+      eau: 'water-outline', water: 'water-outline', agua: 'water-outline',
+      feu: 'flame-outline', fire: 'flame-outline', fuego: 'flame-outline',
+      lune: 'moon-outline', moon: 'moon-outline', luna: 'moon-outline',
+      soleil: 'sunny-outline', sun: 'sunny-outline', sol: 'sunny-outline',
+      arbre: 'leaf-outline', tree: 'leaf-outline', árbol: 'leaf-outline',
+      maison: 'home-outline', house: 'home-outline', casa: 'home-outline',
+      serpent: 'git-branch-outline', snake: 'git-branch-outline', serpiente: 'git-branch-outline',
+      oiseau: 'airplane-outline', bird: 'airplane-outline', pájaro: 'airplane-outline',
+      vol: 'airplane-outline', flight: 'airplane-outline', vuelo: 'airplane-outline',
+      chute: 'arrow-down-circle-outline', fall: 'arrow-down-circle-outline', caída: 'arrow-down-circle-outline',
+      mort: 'flower-outline', death: 'flower-outline', muerte: 'flower-outline',
+      forêt: 'leaf-outline', forest: 'leaf-outline', bosque: 'leaf-outline',
+      mer: 'water-outline', sea: 'water-outline', mar: 'water-outline',
+      montagne: 'triangle-outline', mountain: 'triangle-outline', montaña: 'triangle-outline',
     };
     const key = symbol.toLowerCase();
-    return iconMap[key] || '✨';
+    return iconMap[key] || 'sparkles-outline';
   };
 
   const formatDate = (dateStr: string) => {
@@ -189,7 +189,7 @@ export default function DreamDictionaryScreen() {
                   activeOpacity={0.7}
                 >
                   <View style={[styles.symbolIcon, { backgroundColor: `${theme.accentWarm}15` }]}>
-                    <Text style={styles.symbolEmoji}>{getSymbolIcon(symbol.symbol)}</Text>
+                    <Ionicons name={getSymbolIcon(symbol.symbol) as any} size={24} color={theme.accentWarm} />
                   </View>
                   <View style={styles.symbolContent}>
                     <Text style={[styles.symbolName, ds.text]}>{symbol.symbol}</Text>
@@ -213,7 +213,7 @@ export default function DreamDictionaryScreen() {
         ) : (
           <Animated.View entering={FadeIn.duration(600)} style={styles.emptyState}>
             <View style={[styles.emptyIcon, { backgroundColor: `${theme.accentWarm}15` }]}>
-              <Text style={styles.emptyEmoji}>📖</Text>
+              <Ionicons name="book-outline" size={48} color={theme.accentWarm} />
             </View>
             <Text style={[styles.emptyTitle, ds.text]}>Ton Dictionnaire Onirique</Text>
             <Text style={[styles.emptySubtitle, ds.textSecondary]}>Crée ton propre lexique de symboles de rêves. Ajoute les images, objets ou personnages qui reviennent dans tes songes et note ce qu'ils signifient pour toi.</Text>
@@ -247,7 +247,7 @@ export default function DreamDictionaryScreen() {
           {selectedSymbol && (
             <ScrollView style={styles.modalContent}>
               <View style={[styles.detailIconContainer, { backgroundColor: `${theme.accentWarm}15` }]}>
-                <Text style={styles.detailEmoji}>{getSymbolIcon(selectedSymbol.symbol)}</Text>
+                <Ionicons name={getSymbolIcon(selectedSymbol.symbol) as any} size={48} color={theme.accentWarm} />
               </View>
 
               <View style={[styles.detailSection, ds.card]}>
@@ -372,7 +372,6 @@ const styles = StyleSheet.create({
   
   symbolCard: { flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 16, marginBottom: 12 },
   symbolIcon: { width: 50, height: 50, borderRadius: 25, justifyContent: 'center', alignItems: 'center' },
-  symbolEmoji: { fontSize: 24 },
   symbolContent: { flex: 1, marginLeft: 14 },
   symbolName: { fontSize: 16, fontWeight: '600', marginBottom: 4 },
   symbolMeaning: { fontSize: 13, lineHeight: 18, marginBottom: 6 },
@@ -382,7 +381,6 @@ const styles = StyleSheet.create({
   
   emptyState: { alignItems: 'center', paddingTop: 60 },
   emptyIcon: { width: 100, height: 100, borderRadius: 50, justifyContent: 'center', alignItems: 'center', marginBottom: 24 },
-  emptyEmoji: { fontSize: 48 },
   emptyTitle: { fontSize: 20, fontWeight: '600', marginBottom: 10 },
   emptySubtitle: { fontSize: 15, textAlign: 'center', lineHeight: 22, paddingHorizontal: 40, marginBottom: 30 },
   addFirstButton: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 24, paddingVertical: 14, borderRadius: 25, gap: 8 },
@@ -394,7 +392,6 @@ const styles = StyleSheet.create({
   modalContent: { padding: 20 },
   
   detailIconContainer: { width: 100, height: 100, borderRadius: 50, justifyContent: 'center', alignItems: 'center', alignSelf: 'center', marginBottom: 24 },
-  detailEmoji: { fontSize: 48 },
   detailSection: { padding: 16, borderRadius: 16, marginBottom: 16 },
   detailLabel: { fontSize: 11, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 },
   detailText: { fontSize: 15, lineHeight: 24 },

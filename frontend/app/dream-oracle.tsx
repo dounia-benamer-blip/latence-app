@@ -489,7 +489,7 @@ export default function DreamOracleScreen() {
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {Object.entries(DREAM_SYMBOLS).slice(0, 8).map(([key, value]) => (
               <View key={key} style={[styles.symbolCard, ds.card]}>
-                <Text style={styles.symbolIcon}>{value.icon}</Text>
+                <Ionicons name={value.icon as any} size={28} color={theme.accentWarm} style={{ marginBottom: 8 }} />
                 <Text style={[styles.symbolName, ds.text]}>{key}</Text>
                 <Text style={[styles.symbolMeaning, ds.textMuted]} numberOfLines={2}>
                   {value.meaning}
@@ -643,8 +643,7 @@ const styles = StyleSheet.create({
     borderRadius: 20, 
     marginBottom: 16 
   },
-  readingIcon: { fontSize: 40, marginBottom: 12 },
-  readingTitle: { fontSize: 20, fontWeight: '600', marginBottom: 12 },
+  readingTitle: { fontSize: 20, fontWeight: '600', marginBottom: 12, marginTop: 12 },
   emotionBadge: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20 },
   emotionText: { fontSize: 13, fontWeight: '500' },
 
@@ -661,7 +660,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(212, 165, 116, 0.2)',
   },
-  patternIcon: { fontSize: 28, marginBottom: 6, textAlign: 'center' },
   patternSymbol: { fontSize: 14, fontWeight: '600', textTransform: 'capitalize', textAlign: 'center' },
   patternCount: { fontSize: 12, fontWeight: '500', marginBottom: 4, textAlign: 'center' },
   patternMeaning: { fontSize: 11, textAlign: 'center', lineHeight: 16 },
@@ -693,7 +691,6 @@ const styles = StyleSheet.create({
     marginRight: 10, 
     alignItems: 'center',
   },
-  symbolIcon: { fontSize: 28, marginBottom: 8 },
   symbolName: { fontSize: 13, fontWeight: '600', marginBottom: 4, textTransform: 'capitalize' },
   symbolMeaning: { fontSize: 10, textAlign: 'center' },
 
