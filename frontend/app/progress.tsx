@@ -68,9 +68,13 @@ const MOOD_ICONS: Record<string, string> = {
 export default function ProgressScreen() {
   const router = useRouter();
   const { theme, isDark } = useTheme();
+  const { subscriptionStatus } = useAuth();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<StatsData | null>(null);
   const [viewMode, setViewMode] = useState<'week' | 'month'>('week');
+
+  const userTier = subscriptionStatus?.tier || 'free';
+  const hasPremiumAccess = userTier === 'premium' || userTier === 'lifetime' || userTier === 'essentiel';
 
   const ds = {
     container: { backgroundColor: theme.background },
@@ -79,6 +83,36 @@ export default function ProgressScreen() {
     textSecondary: { color: theme.textSecondary },
     textMuted: { color: theme.textMuted },
   };
+
+  // Redirect non-premium users
+  if (!hasPremiumAccess) {
+    return (
+      <SafeAreaView style={[styles.container, ds.container]}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()}>
+            <Ionicons name="chevron-down" size={28} color={theme.iconColor} />
+          </TouchableOpacity>
+          <Text style={[styles.headerTitle, ds.text]}>Ma Progression</Text>
+          <View style={{ width: 28 }} />
+        </View>
+        <View style={styles.lockedContainer}>
+          <View style={[styles.lockedIcon, { backgroundColor: '#9B59B620' }]}>
+            <Ionicons name="lock-closed" size={48} color="#9B59B6" />
+          </View>
+          <Text style={[styles.lockedTitle, ds.text]}>Fonctionnalité Premium</Text>
+          <Text style={[styles.lockedSubtitle, ds.textMuted]}>
+            Accède à tes statistiques, streaks et graphiques d'humeur avec l'abonnement Essentiel ou Premium.
+          </Text>
+          <TouchableOpacity
+            style={[styles.upgradeButton, { backgroundColor: '#9B59B6' }]}
+            onPress={() => router.push('/profile')}
+          >
+            <Text style={styles.upgradeButtonText}>Voir les abonnements</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   useEffect(() => {
     fetchStats();
