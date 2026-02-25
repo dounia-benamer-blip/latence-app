@@ -825,6 +825,113 @@ def register_auth_routes(app, db: AsyncIOMotorDatabase):
         ).sort("created_at", -1).to_list(1000)
         return {"transactions": transactions}
     
+    @admin_router.get("/all-capsules")
+    async def list_all_capsules(request: Request):
+        """List all capsules from all users"""
+        if not await verify_admin(request):
+            raise HTTPException(status_code=401, detail="Accès non autorisé")
+        
+        capsules = await db.capsules.find(
+            {},
+            {"_id": 0}
+        ).sort("created_at", -1).to_list(500)
+        return {"capsules": capsules}
+    
+    @admin_router.get("/all-dreams")
+    async def list_all_dreams(request: Request):
+        """List all dreams from all users"""
+        if not await verify_admin(request):
+            raise HTTPException(status_code=401, detail="Accès non autorisé")
+        
+        dreams = await db.dreams.find(
+            {},
+            {"_id": 0}
+        ).sort("created_at", -1).to_list(500)
+        return {"dreams": dreams}
+    
+    @admin_router.get("/all-moods")
+    async def list_all_moods(request: Request):
+        """List all moods from all users"""
+        if not await verify_admin(request):
+            raise HTTPException(status_code=401, detail="Accès non autorisé")
+        
+        moods = await db.moods.find(
+            {},
+            {"_id": 0}
+        ).sort("created_at", -1).to_list(1000)
+        return {"moods": moods}
+    
+    @admin_router.get("/all-soul-reports")
+    async def list_all_soul_reports(request: Request):
+        """List all soul reports from all users"""
+        if not await verify_admin(request):
+            raise HTTPException(status_code=401, detail="Accès non autorisé")
+        
+        reports = await db.soul_reports.find(
+            {},
+            {"_id": 0}
+        ).sort("created_at", -1).to_list(200)
+        return {"reports": reports}
+    
+    @admin_router.delete("/user/{user_id}")
+    async def delete_user(request: Request, user_id: str):
+        """Delete a user and all their data"""
+        if not await verify_admin(request):
+            raise HTTPException(status_code=401, detail="Accès non autorisé")
+        
+        # Delete all user data
+        await db.users.delete_one({"user_id": user_id})
+        await db.capsules.delete_many({"user_id": user_id})
+        await db.dreams.delete_many({"user_id": user_id})
+        await db.moods.delete_many({"user_id": user_id})
+        await db.soul_reports.delete_many({"user_id": user_id})
+        await db.gratitude_entries.delete_many({"user_id": user_id})
+        await db.sleep_entries.delete_many({"user_id": user_id})
+        
+        return {"success": True, "message": f"Utilisateur {user_id} supprimé"}
+    
+    @admin_router.post("/set-user-tier")
+    async def set_user_tier(request: Request):
+        """Set a user's subscription tier"""
+        if not await verify_admin(request):
+            raise HTTPException(status_code=401, detail="Accès non autorisé")
+        
+        body = await request.json()
+        user_id = body.get("user_id")
+        tier = body.get("tier")
+        
+        if tier not in ["free", "essentiel", "premium", "lifetime"]:
+            raise HTTPException(status_code=400, detail="Tier invalide")
+        
+        result = await db.users.update_one(
+            {"user_id": user_id},
+            {"$set": {"subscription_tier": tier}}
+        )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+        
+        return {"success": True, "user_id": user_id, "new_tier": tier}
+    
+    @admin_router.get("/database-stats")
+    async def get_database_stats(request: Request):
+        """Get database collection stats"""
+        if not await verify_admin(request):
+            raise HTTPException(status_code=401, detail="Accès non autorisé")
+        
+        stats = {
+            "capsules": await db.capsules.count_documents({}),
+            "dreams": await db.dreams.count_documents({}),
+            "moods": await db.moods.count_documents({}),
+            "soul_reports": await db.soul_reports.count_documents({}),
+            "gratitude_entries": await db.gratitude_entries.count_documents({}),
+            "sleep_entries": await db.sleep_entries.count_documents({}),
+            "dream_symbols": await db.dream_symbols.count_documents({}),
+            "lifetime_codes": await db.lifetime_codes.count_documents({}),
+            "astrology_profiles": await db.astrology_profiles.count_documents({}),
+        }
+        return {"stats": stats}
+    
     # ==================== APPLE SIGN-IN ====================
     
     @auth_router.post("/apple")
