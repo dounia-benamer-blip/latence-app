@@ -23,6 +23,7 @@ import Animated, {
 import { useTheme } from '../src/context/ThemeContext';
 import { TwinklingStars } from '../src/components/TwinklingStars';
 import { Audio } from 'expo-av';
+import { useAuth } from '../src/context/AuthContext';
 
 const { width } = Dimensions.get('window');
 
