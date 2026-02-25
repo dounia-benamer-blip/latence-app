@@ -379,4 +379,12 @@ const styles = StyleSheet.create({
   
   emptyState: { alignItems: 'center', paddingTop: 60 },
   emptyText: { fontSize: 15, textAlign: 'center' },
+  
+  // Premium lock styles
+  lockedContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 },
+  lockedIcon: { width: 100, height: 100, borderRadius: 50, alignItems: 'center', justifyContent: 'center', marginBottom: 24 },
+  lockedTitle: { fontSize: 22, fontWeight: '600', marginBottom: 12 },
+  lockedSubtitle: { fontSize: 15, textAlign: 'center', lineHeight: 22, marginBottom: 32 },
+  upgradeButton: { paddingVertical: 16, paddingHorizontal: 40, borderRadius: 28 },
+  upgradeButtonText: { color: '#fff', fontSize: 15, fontWeight: '600' },
 });
