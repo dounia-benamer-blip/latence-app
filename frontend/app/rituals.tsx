@@ -333,7 +333,12 @@ export default function RitualsScreen() {
                 }}
                 data-testid={`phase-${phase.shortName}`}
               >
-                <Text style={styles.phaseChipIcon}>{phase.icon}</Text>
+                <Ionicons 
+                  name={phase.icon as any} 
+                  size={24} 
+                  color={phase.name === currentPhase ? '#fff' : theme.textSecondary} 
+                  style={styles.phaseChipIcon}
+                />
                 <Text style={[
                   styles.phaseChipText,
                   { color: phase.name === currentPhase ? '#fff' : theme.textSecondary }
