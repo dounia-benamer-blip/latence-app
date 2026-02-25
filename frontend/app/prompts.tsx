@@ -177,7 +177,7 @@ export default function PromptsScreen() {
           />
           
           <TextInput
-            style={[styles.responseInput, ds.card, ds.text]}
+            style={[styles.responseInput, ds.card, ds.text, handwritingStyle]}
             placeholder="Écris ta réponse ici..."
             placeholderTextColor={theme.textMuted}
             value={response}
