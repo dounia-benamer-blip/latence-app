@@ -57,11 +57,7 @@
     "experiments": {
       "typedRoutes": true
     },
-    "extra": {
-      "eas": {
-        "projectId": "YOUR_EAS_PROJECT_ID"
-      }
-    },
+    "extra": {},
     "updates": {
       "url": "https://u.expo.dev/YOUR_EAS_PROJECT_ID"
     },
