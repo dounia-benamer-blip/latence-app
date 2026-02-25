@@ -65,7 +65,8 @@ export default function AuthScreen() {
       }
 
       if (result.success) {
-        router.replace('/home');
+        // Redirect to paywall if free tier, otherwise home
+        router.replace('/paywall');
       } else {
         setError(result.error || 'Une erreur est survenue');
       }
