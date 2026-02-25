@@ -14,6 +14,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInUp, FadeInDown } from 'react-native-reanimated';
 import { useTheme } from '../src/context/ThemeContext';
+import { useFonts } from '../src/context/FontContext';
 import { TwinklingStars } from '../src/components/TwinklingStars';
 import VoiceRecorder from '../src/components/VoiceRecorder';
 
