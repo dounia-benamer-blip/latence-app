@@ -14,8 +14,8 @@
       "bundleIdentifier": "com.atelierbenamer.latence",
       "buildNumber": "1",
       "infoPlist": {
-        "NSCameraUsageDescription": "Latence utilise la cam\u00e9ra pour les photos de souvenirs.",
-        "NSPhotoLibraryUsageDescription": "Latence utilise la biblioth\u00e8que photo pour ajouter des souvenirs.",
+        "NSCameraUsageDescription": "Latence utilise la caméra pour les photos de souvenirs.",
+        "NSPhotoLibraryUsageDescription": "Latence utilise la bibliothèque photo pour ajouter des souvenirs.",
         "NSMicrophoneUsageDescription": "Latence utilise le microphone pour les notes vocales et la transcription.",
         "CFBundleLocalizations": [
           "fr"
@@ -57,7 +57,12 @@
     "experiments": {
       "typedRoutes": true
     },
-    "extra": {},
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "b2ee8544-c550-490c-939a-f6a4189faaae"
+      }
+    },
     "updates": {
       "url": "https://u.expo.dev/YOUR_EAS_PROJECT_ID"
     },
