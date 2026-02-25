@@ -134,7 +134,7 @@ export default function GratitudeScreen() {
             <Animated.View entering={FadeInUp.duration(500)}>
               <View style={styles.iconContainer}>
                 <View style={[styles.iconCircle, { backgroundColor: `${theme.accentWarm}20` }]}>
-                  <Text style={styles.iconEmoji}>🙏</Text>
+                  <Ionicons name="heart-outline" size={40} color={theme.accentWarm} />
                 </View>
               </View>
               

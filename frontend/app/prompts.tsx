@@ -160,7 +160,7 @@ export default function PromptsScreen() {
         {/* Prompt Card */}
         <Animated.View entering={FadeInUp.duration(500)} style={[styles.promptCard, { borderLeftColor: catInfo.color }]}>
           <View style={styles.categoryBadge}>
-            <Text style={styles.categoryEmoji}>{catInfo.emoji}</Text>
+            <Ionicons name={catInfo.icon as any} size={20} color={catInfo.color} />
             <Text style={[styles.categoryLabel, { color: catInfo.color }]}>{catInfo.label}</Text>
           </View>
           
@@ -173,7 +173,7 @@ export default function PromptsScreen() {
           <VoiceRecorder
             onTranscription={(text) => setResponse(prev => prev ? `${prev} ${text}` : text)}
             theme={theme}
-            placeholder="🎙️ Dicte ta réponse..."
+            placeholder="Dicte ta réponse..."
           />
           
           <TextInput
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
   
   promptCard: { borderRadius: 20, padding: 24, backgroundColor: 'rgba(0,0,0,0.03)', borderLeftWidth: 4, marginBottom: 24 },
   categoryBadge: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
-  categoryEmoji: { fontSize: 20, marginRight: 8 },
+  categoryIcon: { marginRight: 8 },
   categoryLabel: { fontSize: 13, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1 },
   promptText: { fontSize: 22, fontWeight: '500', lineHeight: 32 },
   
