@@ -99,7 +99,14 @@ export default function PaywallScreen() {
     }
   };
 
-  const plans = {
+  const plans: Record<'essentiel' | 'premium', {
+    name: string;
+    price: string;
+    period: string;
+    color: string;
+    popular?: boolean;
+    features: string[];
+  }> = {
     essentiel: {
       name: 'Essentiel',
       price: '4,99',
