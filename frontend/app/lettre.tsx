@@ -218,7 +218,7 @@ export default function LettreScreen() {
   const renderSent = () => (
     <Animated.View entering={FadeIn.duration(600)} style={styles.sentContainer}>
       <View style={[styles.sentIconContainer, { backgroundColor: `${theme.accentWarm}20` }]}>
-        <Text style={styles.sentEmoji}>💌</Text>
+        <Ionicons name="mail-outline" size={50} color={theme.accentWarm} />
       </View>
       <Text style={[styles.sentTitle, ds.text]}>Lettre envoyée</Text>
       <Text style={[styles.sentSubtitle, ds.textSecondary]}>
