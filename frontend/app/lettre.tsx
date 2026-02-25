@@ -75,7 +75,7 @@ const FloatingEnvelope = ({ size = 80 }: { size?: number }) => {
         style={[styles.envelopeGlow, glowStyle, { width: size * 1.6, height: size * 1.6, borderRadius: size * 0.8 }]}
       />
       <Animated.View style={envelopeStyle}>
-        <Text style={{ fontSize: size }}>💌</Text>
+        <Ionicons name="mail-outline" size={size} color="#D4A574" />
       </Animated.View>
     </View>
   );
