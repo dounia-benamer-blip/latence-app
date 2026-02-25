@@ -49,10 +49,19 @@ const MOOD_COLORS: Record<string, string> = {
   eveille: '#FFC107',
 };
 
-const MOOD_EMOJIS: Record<string, string> = {
-  serein: '😌', joyeux: '😊', reveur: '🌙', melancolique: '😔',
-  fatigue: '😴', inspire: '✨', anxieux: '😰', nostalgique: '💭',
-  perdu: '🌀', reconnaissant: '🙏', contemplatif: '🧘', eveille: '🌟',
+const MOOD_ICONS: Record<string, string> = {
+  serein: 'leaf-outline',
+  joyeux: 'sunny-outline', 
+  reveur: 'cloud-outline',
+  melancolique: 'rainy-outline',
+  fatigue: 'moon-outline',
+  inspire: 'sparkles-outline',
+  anxieux: 'water-outline',
+  nostalgique: 'time-outline',
+  perdu: 'compass-outline',
+  reconnaissant: 'heart-outline',
+  contemplatif: 'eye-outline',
+  eveille: 'flash-outline',
 };
 
 export default function ProgressScreen() {
