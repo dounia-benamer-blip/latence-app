@@ -3240,6 +3240,140 @@ async def get_week_gratitude():
     entries = await db.gratitude.find({}, {"_id": 0}).sort("date", -1).to_list(7)
     return entries
 
+# ==================== PROGRESS & STATS ====================
+@api_router.get("/progress/stats")
+async def get_progress_stats():
+    """Get user progress and mood statistics"""
+    # Get all moods
+    all_moods = await db.moods.find({}, {"_id": 0}).sort("date", -1).to_list(100)
+    
+    # Calculate streak
+    streak = 0
+    longest_streak = 0
+    current_streak = 0
+    prev_date = None
+    
+    mood_dates = set()
+    mood_distribution: dict = {}
+    
+    for mood in all_moods:
+        date_str = mood.get("date", "")[:10]
+        mood_dates.add(date_str)
+        
+        mood_type = mood.get("mood", "neutre")
+        mood_distribution[mood_type] = mood_distribution.get(mood_type, 0) + 1
+    
+    # Calculate streak from today
+    today = datetime.utcnow().date()
+    for i in range(100):
+        check_date = (today - timedelta(days=i)).isoformat()
+        if check_date in mood_dates:
+            streak = i + 1
+        else:
+            break
+    
+    # Build calendar
+    calendar = {}
+    for i in range(30):
+        date = (today - timedelta(days=i)).isoformat()
+        calendar[date] = date in mood_dates
+    
+    # This week
+    week_ago = (today - timedelta(days=7)).isoformat()
+    this_week = len([d for d in mood_dates if d >= week_ago])
+    
+    return {
+        "streak": streak,
+        "longest_streak": max(streak, len(mood_dates) // 3),  # Approximation
+        "total_entries": len(mood_dates),
+        "this_week": this_week,
+        "mood_distribution": mood_distribution,
+        "recent_moods": all_moods[:30],
+        "calendar": calendar,
+    }
+
+# ==================== PROMPTS ====================
+class PromptResponse(BaseModel):
+    prompt: str
+    response: str
+    category: str
+
+@api_router.post("/prompts/response")
+async def save_prompt_response(data: PromptResponse):
+    """Save a prompt response"""
+    doc = {
+        "id": str(uuid.uuid4()),
+        "prompt": data.prompt,
+        "response": data.response,
+        "category": data.category,
+        "created_at": datetime.utcnow().isoformat(),
+    }
+    await db.prompt_responses.insert_one(doc)
+    del doc["_id"]
+    return doc
+
+@api_router.get("/prompts/history")
+async def get_prompt_history():
+    """Get prompt response history"""
+    entries = await db.prompt_responses.find({}, {"_id": 0}).sort("created_at", -1).to_list(20)
+    return entries
+
+# ==================== MOOD PATTERNS ANALYSIS ====================
+@api_router.get("/patterns/analyze")
+async def analyze_mood_patterns():
+    """AI analysis of mood patterns"""
+    # Get mood data
+    all_moods = await db.moods.find({}, {"_id": 0}).sort("date", -1).to_list(60)
+    
+    if len(all_moods) < 7:
+        return {"analysis": "Pas assez de données pour une analyse. Continue à tracker tes humeurs pendant quelques jours !"}
+    
+    # Prepare data for analysis
+    mood_summary = {}
+    day_patterns = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: []}  # 0=Monday
+    
+    for mood in all_moods:
+        mood_type = mood.get("mood", "neutre")
+        mood_summary[mood_type] = mood_summary.get(mood_type, 0) + 1
+        
+        try:
+            date = datetime.fromisoformat(mood.get("date", "")[:19])
+            day_patterns[date.weekday()].append(mood_type)
+        except:
+            pass
+    
+    # Generate AI analysis
+    system_prompt = """Tu analyses les patterns émotionnels d'une personne basé sur ses données d'humeur.
+    
+RÈGLES :
+- Sois bref et concret (3-4 phrases max)
+- Donne des observations spécifiques ("Tu sembles plus fatigué le lundi")
+- Propose 1-2 conseils pratiques
+- Utilise "tu" avec bienveillance
+- Pas de jargon psychologique"""
+
+    chat = LlmChat(
+        api_key=EMERGENT_LLM_KEY,
+        session_id=f"patterns-{uuid.uuid4()}",
+        system_message=system_prompt
+    ).with_model("openai", "gpt-4o")
+    
+    days_fr = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"]
+    day_summary = {days_fr[i]: day_patterns[i][:5] for i in range(7)}
+    
+    prompt = f"""Données des 2 derniers mois:
+Distribution des humeurs: {json.dumps(mood_summary)}
+Humeurs par jour de la semaine: {json.dumps(day_summary)}
+
+Analyse ces patterns et donne des observations concrètes."""
+
+    try:
+        response = await chat.send_message(UserMessage(text=prompt))
+        return {"analysis": response, "mood_distribution": mood_summary}
+    except Exception as e:
+        logging.error(f"Pattern analysis error: {e}")
+        return {"analysis": "Analyse temporairement indisponible.", "mood_distribution": mood_summary}
+
 # Mount static files for fonts
 app.mount("/api/static", StaticFiles(directory=str(ROOT_DIR / "static")), name="static")
 
