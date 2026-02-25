@@ -263,7 +263,7 @@ export default function AmbientScreen() {
                     ]}
                     onPress={() => toggleSound(s)}
                   >
-                    <Text style={styles.soundEmoji}>{s.emoji}</Text>
+                    <Ionicons name={s.icon as any} size={32} color={activeSound === s.id ? '#fff' : s.color} />
                     <Text style={[styles.soundName, activeSound === s.id ? { color: '#fff' } : ds.text]}>
                       {s.name}
                     </Text>
