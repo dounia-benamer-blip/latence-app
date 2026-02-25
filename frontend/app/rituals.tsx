@@ -538,7 +538,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
     minWidth: 70,
   },
-  phaseChipIcon: { fontSize: 24, marginBottom: 4 },
+  phaseChipIcon: { marginBottom: 4 },
   phaseChipText: { fontSize: 11, fontWeight: '500' },
 
   intentionCard: { padding: 20, borderRadius: 16, marginBottom: 20 },
