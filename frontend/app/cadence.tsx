@@ -147,7 +147,7 @@ const StreakFlame = ({ streak }: { streak: number }) => {
 
   return (
     <Animated.View style={[styles.streakBadge, flickerStyle]}>
-      <Text style={styles.streakEmoji}>🔥</Text>
+      <Ionicons name="flame-outline" size={14} color="#FF9632" />
       <Text style={styles.streakText}>{streak}j</Text>
     </Animated.View>
   );
@@ -491,7 +491,7 @@ export default function CadenceScreen() {
 
         {allCompleted && (
           <Animated.View entering={FadeIn.duration(600)} style={[styles.completionCard, { backgroundColor: `${theme.accentWarm}15` }]}>
-            <Text style={styles.completionEmoji}>✨</Text>
+            <Ionicons name="sparkles" size={36} color={theme.accentWarm} />
             <Text style={[styles.completionTitle, { color: theme.accentWarm }]}>
               Cadence honorée
             </Text>
@@ -517,7 +517,6 @@ const styles = StyleSheet.create({
   pulseGlow: { position: 'absolute', backgroundColor: 'rgba(212, 165, 116, 0.2)' },
 
   streakBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255, 150, 50, 0.15)', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12, gap: 4 },
-  streakEmoji: { fontSize: 14 },
   streakText: { fontSize: 12, fontWeight: '600', color: '#FF9632' },
 
   timeBadgeContainer: { alignItems: 'center', marginBottom: 16 },
@@ -571,7 +570,6 @@ const styles = StyleSheet.create({
   modalSaveText: { color: '#fff', fontSize: 14, fontWeight: '500' },
 
   completionCard: { padding: 24, borderRadius: 16, alignItems: 'center', marginTop: 20 },
-  completionEmoji: { fontSize: 36, marginBottom: 10 },
-  completionTitle: { fontSize: 18, fontWeight: '500', marginBottom: 6 },
+  completionTitle: { fontSize: 18, fontWeight: '500', marginBottom: 6, marginTop: 10 },
   completionText: { fontSize: 14, textAlign: 'center' },
 });

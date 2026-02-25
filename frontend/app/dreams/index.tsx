@@ -266,7 +266,7 @@ export default function DreamsScreen() {
         data-testid="oracle-btn"
       >
         <View style={[styles.oracleIcon, { backgroundColor: `${theme.accentWarm}20` }]}>
-          <Text style={styles.oracleEmoji}>👁️</Text>
+          <Ionicons name="eye-outline" size={26} color={theme.accentWarm} />
         </View>
         <View style={styles.oracleTextContainer}>
           <Text style={[styles.oracleTitle, ds.text]}>Oracle des Rêves</Text>
@@ -374,7 +374,7 @@ export default function DreamsScreen() {
           <VoiceRecorder
             onTranscription={(text) => setContent(prev => prev ? `${prev}\n${text}` : text)}
             theme={theme}
-            placeholder="🎙️ Dicte ton rêve..."
+            placeholder="Dicte ton rêve..."
           />
 
           <TextInput
@@ -530,7 +530,6 @@ const styles = StyleSheet.create({
     alignItems: 'center', 
     justifyContent: 'center' 
   },
-  oracleEmoji: { fontSize: 26 },
   oracleTextContainer: { flex: 1, marginLeft: 14 },
   oracleTitle: { fontSize: 16, fontWeight: '500' },
   oracleSubtitle: { fontSize: 12, marginTop: 2 },
