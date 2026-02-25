@@ -27,6 +27,8 @@ export default function AuthScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [lifetimeCode, setLifetimeCode] = useState('');
+  const [showCodeField, setShowCodeField] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [isAppleAvailable, setIsAppleAvailable] = useState(false);
