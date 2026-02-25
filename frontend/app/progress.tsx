@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
 import { useTheme } from '../src/context/ThemeContext';
 import { TwinklingStars } from '../src/components/TwinklingStars';
+import { useAuth } from '../src/context/AuthContext';
 
 const { width } = Dimensions.get('window');
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
