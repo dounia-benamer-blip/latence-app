@@ -32,6 +32,7 @@ function formatToday(): string {
 export default function WriteScreen() {
   const router = useRouter();
   const { theme } = useTheme();
+  const { fontsLoaded, handwritingFont } = useFonts();
   const [content, setContent] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [interpretation, setInterpretation] = useState('');
@@ -46,6 +47,7 @@ export default function WriteScreen() {
     textMuted: { color: theme.textMuted },
     border: { borderColor: theme.border },
     input: { backgroundColor: theme.inputBackground, color: theme.text },
+    handwriting: { fontFamily: fontsLoaded ? handwritingFont : undefined },
   };
 
   const pickImage = async () => {
