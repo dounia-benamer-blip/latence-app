@@ -305,7 +305,6 @@ const styles = StyleSheet.create({
 
   sentContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 60 },
   sentIconContainer: { width: 100, height: 100, borderRadius: 50, alignItems: 'center', justifyContent: 'center', marginBottom: 24 },
-  sentEmoji: { fontSize: 50 },
   sentTitle: { fontSize: 28, fontWeight: '200', letterSpacing: 2, marginBottom: 12 },
   sentSubtitle: { fontSize: 15, textAlign: 'center', lineHeight: 24, marginBottom: 24 },
   sentNote: { flexDirection: 'row', alignItems: 'center', padding: 14, borderRadius: 12, gap: 10, marginBottom: 32 },

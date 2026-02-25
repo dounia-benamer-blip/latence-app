@@ -306,7 +306,6 @@ const styles = StyleSheet.create({
   
   streakCard: { borderRadius: 24, padding: 24, alignItems: 'center', marginBottom: 20 },
   streakIcon: { marginBottom: 8 },
-  streakEmoji: { fontSize: 48 },
   streakInfo: { flexDirection: 'row', alignItems: 'baseline', marginBottom: 8 },
   streakNumber: { fontSize: 56, fontWeight: '700', color: '#fff' },
   streakLabel: { fontSize: 18, color: 'rgba(255,255,255,0.9)', marginLeft: 8 },
@@ -338,7 +337,6 @@ const styles = StyleSheet.create({
   distributionContainer: { marginTop: 8 },
   distributionRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
   distributionLeft: { flexDirection: 'row', alignItems: 'center', width: 100 },
-  distributionEmoji: { fontSize: 18, marginRight: 8 },
   distributionMood: { fontSize: 13, textTransform: 'capitalize' },
   distributionBarContainer: { flex: 1, height: 8, backgroundColor: 'rgba(0,0,0,0.05)', borderRadius: 4, marginHorizontal: 10 },
   distributionBar: { height: '100%', borderRadius: 4 },
