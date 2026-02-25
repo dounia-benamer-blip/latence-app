@@ -1046,7 +1046,8 @@ STYLE :
 - Métaphores de la nature, des saisons, des marées
 
 Tes réponses font 3-5 phrases poétiques qui parlent à l'âme.
-Tu ne prédis pas l'avenir, tu éclaires le présent."""
+Tu ne prédis pas l'avenir, tu éclaires le présent.
+IMPORTANT : N'utilise JAMAIS de formatage markdown (pas de **, ***, #). Écris en prose fluide."""
 
     chat = LlmChat(
         api_key=EMERGENT_LLM_KEY,
