@@ -114,6 +114,13 @@ Application mobile de journaling immersive avec focus sur l'astrologie, le bien-
 - ✅ **Fichiers inutilisés supprimés** - tarot.tsx, compatibility.tsx
 - ✅ **Configuration iOS mise à jour** - Permission microphone ajoutée (NSMicrophoneUsageDescription)
 - ✅ **Styles emoji nettoyés** - Suppression des styles inutilisés (iconEmoji, streakEmoji, etc.)
+- ✅ **Page Admin améliorée** - Dashboard complet avec :
+  - Onglet Stats : utilisateurs, revenus, répartition abonnements, codes
+  - Onglet Users : liste des utilisateurs, modifier tier, supprimer
+  - Onglet Codes : tous les codes "Accès à Vie"
+  - Onglet DB : stats de toutes les collections MongoDB
+  - Onglet Générer : création de codes avec QR
+  - Endpoints backend ajoutés : /all-capsules, /all-dreams, /all-moods, /all-soul-reports, /database-stats, /set-user-tier, /user/{id} DELETE
 
 ### 19 Février 2026 - Session 3
 - ✅ **Suppression complète de l'i18n** - Application en français uniquement
