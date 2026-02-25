@@ -10,12 +10,14 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInUp, FadeInDown } from 'react-native-reanimated';
 import { useTheme } from '../../src/context/ThemeContext';
 import VoiceRecorder from '../../src/components/VoiceRecorder';
+import * as ImagePicker from 'expo-image-picker';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
@@ -33,6 +35,7 @@ export default function WriteScreen() {
   const [isSaving, setIsSaving] = useState(false);
   const [interpretation, setInterpretation] = useState('');
   const [phase, setPhase] = useState<'write' | 'reflecting' | 'done'>('write');
+  const [photoUri, setPhotoUri] = useState<string | null>(null);
 
   const ds = {
     container: { backgroundColor: theme.background },
@@ -42,6 +45,19 @@ export default function WriteScreen() {
     textMuted: { color: theme.textMuted },
     border: { borderColor: theme.border },
     input: { backgroundColor: theme.inputBackground, color: theme.text },
+  };
+
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.7,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      setPhotoUri(result.assets[0].uri);
+    }
   };
 
   const handleSaveAndReflect = async () => {
