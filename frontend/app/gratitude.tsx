@@ -212,7 +212,7 @@ export default function GratitudeScreen() {
                   {weekEntries.slice(0, 7).map((entry, i) => (
                     <View key={i} style={[styles.weekDay, ds.card]}>
                       <Text style={[styles.weekDayLabel, ds.textMuted]}>{formatDate(entry.date)}</Text>
-                      <Text style={styles.weekDayEmoji}>💖</Text>
+                      <Ionicons name="heart" size={18} color={theme.accentWarm} />
                       <Text style={[styles.weekDayCount, { color: theme.accentWarm }]}>
                         {entry.items.length}
                       </Text>
