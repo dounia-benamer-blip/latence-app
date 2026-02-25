@@ -141,6 +141,24 @@ export default function WriteScreen() {
             <Animated.View entering={FadeInUp.duration(400)}>
               <Text style={[styles.date, ds.textMuted]}>{formatToday()}</Text>
               
+              {/* Photo Memory */}
+              {photoUri ? (
+                <View style={styles.photoContainer}>
+                  <Image source={{ uri: photoUri }} style={styles.photo} />
+                  <TouchableOpacity 
+                    style={styles.removePhotoBtn}
+                    onPress={() => setPhotoUri(null)}
+                  >
+                    <Ionicons name="close-circle" size={28} color="#E74C3C" />
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <TouchableOpacity style={[styles.addPhotoBtn, ds.card]} onPress={pickImage}>
+                  <Ionicons name="camera-outline" size={24} color={theme.textMuted} />
+                  <Text style={[styles.addPhotoText, ds.textMuted]}>Ajouter une photo souvenir</Text>
+                </TouchableOpacity>
+              )}
+              
               {/* Voice Recorder */}
               <VoiceRecorder
                 onTranscription={(text) => setContent(prev => prev ? `${prev}\n${text}` : text)}
