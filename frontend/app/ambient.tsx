@@ -29,18 +29,19 @@ const { width } = Dimensions.get('window');
 interface Sound {
   id: string;
   name: string;
-  emoji: string;
+  icon: string;
   color: string;
   url: string;
 }
 
+// Sons d'ambiance avec URLs fonctionnelles (freesound.org - CC0)
 const AMBIENT_SOUNDS: Sound[] = [
-  { id: 'rain', name: 'Pluie', emoji: '🌧️', color: '#5C6BC0', url: 'https://cdn.pixabay.com/audio/2022/05/16/audio_1333465b94.mp3' },
-  { id: 'fire', name: 'Feu de cheminée', emoji: '🔥', color: '#FF7043', url: 'https://cdn.pixabay.com/audio/2021/08/04/audio_c65c73181a.mp3' },
-  { id: 'forest', name: 'Forêt', emoji: '🌲', color: '#66BB6A', url: 'https://cdn.pixabay.com/audio/2022/03/15/audio_8e36a0e0a8.mp3' },
-  { id: 'waves', name: 'Vagues', emoji: '🌊', color: '#42A5F5', url: 'https://cdn.pixabay.com/audio/2022/06/25/audio_d0c150bfa3.mp3' },
-  { id: 'wind', name: 'Vent', emoji: '💨', color: '#78909C', url: 'https://cdn.pixabay.com/audio/2022/02/22/audio_b1d09c9d4c.mp3' },
-  { id: 'night', name: 'Nuit d\'été', emoji: '🦗', color: '#7E57C2', url: 'https://cdn.pixabay.com/audio/2022/08/02/audio_884fe92c21.mp3' },
+  { id: 'rain', name: 'Pluie', icon: 'rainy-outline', color: '#5C6BC0', url: 'https://freesound.org/data/previews/531/531947_5674468-lq.mp3' },
+  { id: 'fire', name: 'Feu', icon: 'flame-outline', color: '#FF7043', url: 'https://freesound.org/data/previews/368/368634_4284968-lq.mp3' },
+  { id: 'forest', name: 'Forêt', icon: 'leaf-outline', color: '#66BB6A', url: 'https://freesound.org/data/previews/530/530415_9497060-lq.mp3' },
+  { id: 'waves', name: 'Vagues', icon: 'water-outline', color: '#42A5F5', url: 'https://freesound.org/data/previews/527/527602_2093968-lq.mp3' },
+  { id: 'wind', name: 'Vent', icon: 'cloudy-outline', color: '#78909C', url: 'https://freesound.org/data/previews/219/219024_2347290-lq.mp3' },
+  { id: 'night', name: 'Nuit', icon: 'moon-outline', color: '#7E57C2', url: 'https://freesound.org/data/previews/365/365167_5121236-lq.mp3' },
 ];
 
 interface BreathingExercise {
