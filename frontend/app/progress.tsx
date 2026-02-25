@@ -185,10 +185,11 @@ export default function ProgressScreen() {
       <View style={styles.distributionContainer}>
         {entries.map(([mood, count], i) => {
           const percentage = Math.round((count / total) * 100);
+          const iconName = MOOD_ICONS[mood] || 'ellipse-outline';
           return (
             <View key={mood} style={styles.distributionRow}>
               <View style={styles.distributionLeft}>
-                <Text style={styles.distributionEmoji}>{MOOD_EMOJIS[mood] || '💫'}</Text>
+                <Ionicons name={iconName as any} size={18} color={MOOD_COLORS[mood] || theme.accent} />
                 <Text style={[styles.distributionMood, ds.text]}>{mood}</Text>
               </View>
               <View style={styles.distributionBarContainer}>
