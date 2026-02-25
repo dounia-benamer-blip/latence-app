@@ -16,6 +16,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInUp, FadeInDown } from 'react-native-reanimated';
 import { useTheme } from '../../src/context/ThemeContext';
+import { useFonts } from '../../src/context/FontContext';
 import VoiceRecorder from '../../src/components/VoiceRecorder';
 import * as ImagePicker from 'expo-image-picker';
 
