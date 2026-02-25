@@ -14,9 +14,10 @@
       "bundleIdentifier": "com.atelierbenamer.latence",
       "buildNumber": "1",
       "infoPlist": {
-        "NSCameraUsageDescription": "Latence needs camera access for profile photos.",
-        "NSPhotoLibraryUsageDescription": "Latence needs photo library access to save images.",
-        "CFBundleLocalizations": ["fr", "en", "es"],
+        "NSCameraUsageDescription": "Latence utilise la caméra pour les photos de souvenirs.",
+        "NSPhotoLibraryUsageDescription": "Latence utilise la bibliothèque photo pour ajouter des souvenirs.",
+        "NSMicrophoneUsageDescription": "Latence utilise le microphone pour les notes vocales et la transcription.",
+        "CFBundleLocalizations": ["fr"],
         "CFBundleDevelopmentRegion": "fr"
       },
       "config": {
