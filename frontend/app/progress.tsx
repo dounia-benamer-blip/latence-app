@@ -229,7 +229,7 @@ export default function ProgressScreen() {
             {/* Streak Card */}
             <Animated.View entering={FadeInUp.duration(500)} style={[styles.streakCard, { backgroundColor: theme.accentWarm }]}>
               <View style={styles.streakIcon}>
-                <Text style={styles.streakEmoji}>🔥</Text>
+                <Ionicons name="flame-outline" size={48} color="#fff" />
               </View>
               <View style={styles.streakInfo}>
                 <Text style={styles.streakNumber}>{stats.streak}</Text>
