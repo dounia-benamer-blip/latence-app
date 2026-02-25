@@ -29,6 +29,7 @@ class UserCreate(BaseModel):
     email: EmailStr
     password: str
     name: str
+    lifetime_code: Optional[str] = None
 
 class UserLogin(BaseModel):
     email: EmailStr
