@@ -164,7 +164,7 @@ export default function SleepTrackerScreen() {
                     ]}
                     onPress={() => setQuality(q.id)}
                   >
-                    <Text style={styles.qualityEmoji}>{q.emoji}</Text>
+                    <Ionicons name={q.icon as any} size={28} color={quality === q.id ? '#fff' : q.color} />
                     <Text style={[
                       styles.qualityLabel,
                       { color: quality === q.id ? '#fff' : theme.textSecondary }
