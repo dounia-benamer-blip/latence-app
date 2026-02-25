@@ -306,4 +306,35 @@ const styles = StyleSheet.create({
     lineHeight: 26,
     fontStyle: 'italic',
   },
+  photoContainer: {
+    position: 'relative',
+    marginBottom: 16,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  photo: {
+    width: '100%',
+    height: 200,
+    borderRadius: 16,
+  },
+  removePhotoBtn: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+  },
+  addPhotoBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
+    borderRadius: 16,
+    marginBottom: 16,
+    gap: 10,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    borderColor: 'rgba(0,0,0,0.1)',
+  },
+  addPhotoText: {
+    fontSize: 14,
+  },
 });
