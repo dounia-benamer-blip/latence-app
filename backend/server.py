@@ -3117,8 +3117,6 @@ async def delete_dream_symbol(symbol_id: str):
     return {"status": "deleted"}
 
 
-app.include_router(api_router)
-
 # ==================== VOICE TRANSCRIPTION ====================
 from fastapi import File, UploadFile
 from emergentintegrations.llm.openai import OpenAISpeechToText
