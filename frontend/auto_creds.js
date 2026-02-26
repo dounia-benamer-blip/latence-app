@@ -16,7 +16,6 @@ const proc = pty.spawn('eas', ['credentials', '--platform', 'ios'], {
 });
 
 let outputBuffer = '';
-let handled = {};
 let stepsDone = new Set();
 
 function respond(key, input, delay = 500) {
@@ -47,7 +46,7 @@ proc.onData((data) => {
     
     const cleanOutput = outputBuffer.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '').replace(/\s+/g, ' ');
     
-    // Step 1: Build profile selection - production (need to go down twice)
+    // Step 1: Build profile selection - production
     if (cleanOutput.includes('Which build profile') && cleanOutput.includes('development') && !stepsDone.has('profile')) {
         respondMultiple('profile', ['\x1b[B', '\x1b[B', '\r'], 300);
     }
@@ -57,7 +56,7 @@ proc.onData((data) => {
         respond('loginprompt', 'Y\r');
     }
     
-    // Apple ID prompt - wait for the prompt to fully appear
+    // Apple ID prompt
     if (cleanOutput.includes('Apple ID:') && cleanOutput.includes('Log in to your Apple') && !stepsDone.has('appleid')) {
         setTimeout(() => {
             if (!stepsDone.has('appleid')) {
@@ -79,13 +78,20 @@ proc.onData((data) => {
         }, 1000);
     }
     
+    // 2FA validation method - select device
+    if (cleanOutput.includes('How do you want to validate') && cleanOutput.includes('device') && !stepsDone.has('2fa_method')) {
+        respond('2fa_method', '\r');  // Select device (default)
+    }
+    
     // 2FA code prompt
-    if ((cleanOutput.includes('verification code') || cleanOutput.includes('6 digit code') || cleanOutput.includes('two-factor')) && !stepsDone.has('2fa_notice')) {
-        stepsDone.add('2fa_notice');
-        console.log('\n\n========================================');
-        console.log('🔐 CODE DE VÉRIFICATION APPLE REQUIS');
-        console.log('Vérifiez votre iPhone/iPad pour le code');
-        console.log('========================================\n');
+    if ((cleanOutput.includes('Enter the 6 digit code') || cleanOutput.includes('verification code') || cleanOutput.includes('› _')) && !stepsDone.has('2fa_code')) {
+        setTimeout(() => {
+            if (!stepsDone.has('2fa_code')) {
+                stepsDone.add('2fa_code');
+                console.log('\n>>> Entering 2FA code');
+                proc.write('686980\r');
+            }
+        }, 1000);
     }
     
     // Team type - Individual
