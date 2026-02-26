@@ -7,7 +7,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://serene-mirror.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://dream-journal-app-2.preview.emergentagent.com')
 
 class TestHealthAndBasicEndpoints:
     """Test basic API health and root endpoints"""
