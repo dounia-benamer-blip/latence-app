@@ -41,6 +41,11 @@ proc.onData((data) => {
         respond('profile', ['\x1b[B', '\x1b[B', '\r']);
     }
     
+    // Do you want to log in to your Apple account?
+    if (outputBuffer.includes('Do you want to log in to your Apple account') && !handled['loginprompt']) {
+        respond('loginprompt', 'Y\r');
+    }
+    
     // Step 2: Team type - Individual
     if (outputBuffer.includes('Apple Team Type') && outputBuffer.includes('Enterprise') && !handled['team']) {
         respond('team', ['\x1b[B', '\x1b[B', '\r']);
@@ -57,24 +62,23 @@ proc.onData((data) => {
     }
     
     // Apple ID prompt
-    if (outputBuffer.includes('Apple ID:') && !handled['appleid']) {
+    if (outputBuffer.includes('Apple ID:') && !outputBuffer.includes('Dounia') && !handled['appleid']) {
         respond('appleid', 'Dounia-Benamer@hotmail.fr\r');
     }
     
-    // Password prompt
-    if ((outputBuffer.includes('Password') || outputBuffer.includes('password')) && outputBuffer.includes('Apple') && !handled['password']) {
+    // Password prompt  
+    if (outputBuffer.includes('Password') && outputBuffer.includes('[hidden]') && !handled['password']) {
         respond('password', 'Doudou1993\r');
     }
     
-    // 2FA code prompt - we need user input for this
-    if (outputBuffer.includes('verification code') || outputBuffer.includes('two-factor') || outputBuffer.includes('2FA')) {
-        if (!handled['2fa_notice']) {
-            handled['2fa_notice'] = true;
-            console.log('\n\n========================================');
-            console.log('🔐 CODE DE VÉRIFICATION APPLE REQUIS');
-            console.log('Vérifiez votre iPhone/iPad pour le code');
-            console.log('========================================\n');
-        }
+    // 2FA code prompt
+    if ((outputBuffer.includes('verification code') || outputBuffer.includes('Enter the 6 digit code')) && !handled['2fa_notice']) {
+        handled['2fa_notice'] = true;
+        console.log('\n\n========================================');
+        console.log('🔐 CODE DE VÉRIFICATION APPLE REQUIS');
+        console.log('Vérifiez votre iPhone/iPad pour le code');
+        console.log('Entrez le code à 6 chiffres ici:');
+        console.log('========================================\n');
     }
     
     // Distribution Certificate options
@@ -92,22 +96,10 @@ proc.onData((data) => {
         respond('provprofile', '\r');
     }
     
-    // Generate new profile
-    if (outputBuffer.includes('Generate a new') && outputBuffer.includes('Provisioning Profile') && !handled['newprofile']) {
-        respond('newprofile', '\r');
-    }
-    
     // Success indicators
     if (outputBuffer.includes('All credentials are ready to build')) {
         console.log('\n\n✅ CERTIFICATS CRÉÉS AVEC SUCCÈS!');
     }
-});
-
-// Allow manual input for 2FA
-process.stdin.setRawMode && process.stdin.setRawMode(true);
-process.stdin.resume();
-process.stdin.on('data', (key) => {
-    proc.write(key.toString());
 });
 
 proc.onExit(({ exitCode }) => {
@@ -116,7 +108,7 @@ proc.onExit(({ exitCode }) => {
     process.exit(exitCode);
 });
 
-// Timeout after 5 minutes (need time for 2FA)
+// Timeout after 5 minutes
 setTimeout(() => {
     console.log('\n\n>>> Timeout reached');
     console.log('>>> Steps completed:', Object.keys(handled).join(', '));
