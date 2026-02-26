@@ -19,13 +19,14 @@
     },
     "production": {
       "distribution": "store",
+      "autoIncrement": true,
       "ios": {
         "resourceClass": "m-medium",
-        "credentialsSource": "remote",
-        "autoIncrement": true
+        "credentialsSource": "remote"
       },
       "android": {
-        "buildType": "app-bundle"
+        "buildType": "app-bundle",
+        "credentialsSource": "remote"
       }
     }
   },
