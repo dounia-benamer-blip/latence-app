@@ -6,23 +6,15 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal",
-      "ios": {
-        "simulator": true
-      }
+      "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal",
-      "ios": {
-        "simulator": false
-      }
+      "distribution": "internal"
     },
     "production": {
       "ios": {
-        "resourceClass": "m-medium"
-      },
-      "android": {
-        "buildType": "apk"
+        "resourceClass": "m-medium",
+        "credentialsSource": "remote"
       }
     }
   },
@@ -30,8 +22,11 @@
     "production": {
       "ios": {
         "appleId": "Dounia-Benamer@hotmail.fr",
-        "ascAppId": "VOTRE_APP_STORE_CONNECT_APP_ID",
-        "appleTeamId": "MNPJV87Q6P"
+        "ascAppId": "6746253505",
+        "appleTeamId": "MNPJV87Q6P",
+        "ascApiKeyPath": ".eas/appstore-api-key.p8",
+        "ascApiKeyIssuerId": "44554a2e-a243-4574-b6be-b436ae95c91d",
+        "ascApiKeyId": "RHS5L7DYW4"
       }
     }
   }
