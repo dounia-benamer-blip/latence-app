@@ -89,7 +89,7 @@ proc.onData((data) => {
             if (!stepsDone.has('2fa_code')) {
                 stepsDone.add('2fa_code');
                 console.log('\n>>> Entering 2FA code');
-                proc.write('686980\r');
+                proc.write('558991\r');
             }
         }, 1000);
     }
