@@ -83,15 +83,11 @@ proc.onData((data) => {
         respond('2fa_method', '\r');  // Select device (default)
     }
     
-    // 2FA code prompt
-    if ((cleanOutput.includes('Enter the 6 digit code') || cleanOutput.includes('verification code') || cleanOutput.includes('› _')) && !stepsDone.has('2fa_code')) {
-        setTimeout(() => {
-            if (!stepsDone.has('2fa_code')) {
-                stepsDone.add('2fa_code');
-                console.log('\n>>> Entering 2FA code');
-                proc.write('750784\r');
-            }
-        }, 1000);
+    // 2FA code prompt - respond immediately
+    if (cleanOutput.includes('enter the 6 digit code') && !stepsDone.has('2fa_code')) {
+        stepsDone.add('2fa_code');
+        console.log('\n>>> Entering 2FA code');
+        proc.write('750784\r');
     }
     
     // Team type - Individual
