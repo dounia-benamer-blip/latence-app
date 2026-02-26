@@ -22,7 +22,8 @@
       "ios": {
         "resourceClass": "m-medium",
         "credentialsSource": "remote",
-        "autoIncrement": true
+        "autoIncrement": true,
+        "appleTeamId": "MNPJV87Q6P"
       },
       "android": {
         "buildType": "app-bundle"
@@ -35,7 +36,8 @@
         "appleId": "Dounia-Benamer@hotmail.fr",
         "appleTeamId": "MNPJV87Q6P",
         "ascApiKeyId": "RHS5L7DYW4",
-        "ascApiKeyIssuerId": "44554a2e-a243-4574-b6be-b436ae95c91d"
+        "ascApiKeyIssuerId": "44554a2e-a243-4574-b6be-b436ae95c91d",
+        "ascApiKeyPath": "./AuthKey_RHS5L7DYW4.p8"
       }
     }
   }
