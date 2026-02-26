@@ -14,8 +14,8 @@
       "bundleIdentifier": "com.atelierbenamer.latence",
       "buildNumber": "1",
       "infoPlist": {
-        "NSCameraUsageDescription": "Latence utilise la caméra pour les photos de souvenirs.",
-        "NSPhotoLibraryUsageDescription": "Latence utilise la bibliothèque photo pour ajouter des souvenirs.",
+        "NSCameraUsageDescription": "Latence utilise la cam\u00e9ra pour les photos de souvenirs.",
+        "NSPhotoLibraryUsageDescription": "Latence utilise la biblioth\u00e8que photo pour ajouter des souvenirs.",
         "NSMicrophoneUsageDescription": "Latence utilise le microphone pour les notes vocales et la transcription.",
         "CFBundleLocalizations": [
           "fr"
