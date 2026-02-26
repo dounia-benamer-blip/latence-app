@@ -19,88 +19,84 @@ const proc = pty.spawn('eas', ['credentials', '--platform', 'ios'], {
 });
 
 let outputBuffer = '';
-let step = 0;
-let lastAction = Date.now();
+let handled = {};
 
-function sendKeys(keys, delay = 300) {
-    keys.forEach((key, i) => {
-        setTimeout(() => {
-            proc.write(key);
-        }, delay * (i + 1));
-    });
+function respond(key, keys, delay = 400) {
+    if (handled[key]) return;
+    handled[key] = true;
+    console.log('\n>>> ' + key);
+    
+    if (Array.isArray(keys)) {
+        keys.forEach((k, i) => {
+            setTimeout(() => proc.write(k), delay * (i + 1));
+        });
+    } else {
+        setTimeout(() => proc.write(keys), delay);
+    }
 }
 
 proc.onData((data) => {
     outputBuffer += data;
     process.stdout.write(data);
     
-    const now = Date.now();
-    
-    // Build profile selection - we want production (3rd option)
-    if (outputBuffer.includes('Which build profile') && step === 0 && (now - lastAction > 1000)) {
-        step = 1;
-        lastAction = now;
-        console.log('\n>>> Selecting production profile...');
-        sendKeys(['\x1b[B', '\x1b[B', '\r'], 500);
+    // Step 1: Build profile selection - production
+    if (outputBuffer.includes('Which build profile') && outputBuffer.includes('development')) {
+        respond('profile', ['\x1b[B', '\x1b[B', '\r']);
     }
     
-    // Team type - Individual
-    if (outputBuffer.includes('Apple Team Type') && step === 1 && (now - lastAction > 1000)) {
-        step = 2;
-        lastAction = now;
-        console.log('\n>>> Selecting Individual team type...');
-        sendKeys(['\x1b[B', '\x1b[B', '\r'], 500);
+    // Step 2: Team type - Individual
+    if (outputBuffer.includes('Apple Team Type') && outputBuffer.includes('Enterprise')) {
+        respond('team', ['\x1b[B', '\x1b[B', '\r']);
     }
     
-    // Login prompt
-    if ((outputBuffer.includes('Do you want to log in') || outputBuffer.includes('log in to your Apple')) && step === 2 && (now - lastAction > 1000)) {
-        step = 3;
-        lastAction = now;
-        console.log('\n>>> Accepting Apple login...');
-        setTimeout(() => proc.write('Y\r'), 500);
+    // Step 3: Main menu - Build Credentials
+    if (outputBuffer.includes('What do you want to do') && outputBuffer.includes('Build Credentials')) {
+        respond('menu', '\r');
     }
     
-    // What do you want to do
-    if (outputBuffer.includes('What do you want to do') && step >= 3 && (now - lastAction > 1000)) {
-        step = 4;
-        lastAction = now;
-        console.log('\n>>> Selecting first option...');
-        setTimeout(() => proc.write('\r'), 500);
+    // Step 4: Apple login
+    if (outputBuffer.includes('Do you want to log in to your Apple account')) {
+        respond('login', 'Y\r');
     }
     
-    // Distribution Certificate 
-    if (outputBuffer.includes('Set up a') && outputBuffer.includes('Distribution Certificate') && step >= 4 && (now - lastAction > 1000)) {
-        step = 5;
-        lastAction = now;
-        console.log('\n>>> Setting up Distribution Certificate...');
-        setTimeout(() => proc.write('\r'), 500);
+    // Step 5: Set up Distribution Certificate
+    if (outputBuffer.includes('Set up a Distribution Certificate') || 
+        (outputBuffer.includes('Distribution Certificate') && outputBuffer.includes('Set up'))) {
+        respond('distcert', '\r');
     }
     
-    // Generate new 
-    if ((outputBuffer.includes('Generate a new') || outputBuffer.includes('generate new')) && step >= 5 && (now - lastAction > 1000)) {
-        step = 6;
-        lastAction = now;
-        console.log('\n>>> Generating new certificate...');
-        setTimeout(() => proc.write('\r'), 500);
+    // Step 6: Generate new certificate
+    if (outputBuffer.includes('Generate a new Apple Distribution Certificate')) {
+        respond('newcert', '\r');
     }
     
-    // Provisioning Profile
-    if (outputBuffer.includes('Set up a') && outputBuffer.includes('Provisioning Profile') && step >= 6 && (now - lastAction > 1000)) {
-        step = 7;
-        lastAction = now;
-        console.log('\n>>> Setting up Provisioning Profile...');
-        setTimeout(() => proc.write('\r'), 500);
+    // Step 7: Provisioning Profile
+    if (outputBuffer.includes('Set up a Provisioning Profile') ||
+        (outputBuffer.includes('Provisioning Profile') && outputBuffer.includes('Set up'))) {
+        respond('provprofile', '\r');
+    }
+    
+    // Step 8: Generate new profile
+    if (outputBuffer.includes('Generate a new') && outputBuffer.includes('Provisioning Profile')) {
+        respond('newprofile', '\r');
+    }
+    
+    // Back to menu or exit
+    if (outputBuffer.includes('Go back') && outputBuffer.includes('Exit') && Object.keys(handled).length > 5) {
+        respond('exit', ['\x1b[B', '\x1b[B', '\x1b[B', '\x1b[B', '\x1b[B', '\r']);
     }
 });
 
 proc.onExit(({ exitCode }) => {
     console.log('\n\n>>> Process exited with code:', exitCode);
+    console.log('>>> Steps completed:', Object.keys(handled).join(', '));
     process.exit(exitCode);
 });
 
 // Timeout after 3 minutes
 setTimeout(() => {
-    console.log('\n\n>>> Timeout reached - stopping');
+    console.log('\n\n>>> Timeout reached');
+    console.log('>>> Steps completed:', Object.keys(handled).join(', '));
     proc.kill();
     process.exit(1);
 }, 180000);
