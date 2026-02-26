@@ -17,101 +17,123 @@ const proc = pty.spawn('eas', ['credentials', '--platform', 'ios'], {
 
 let outputBuffer = '';
 let handled = {};
+let stepsDone = new Set();
 
-function respond(key, keys, delay = 400) {
-    if (handled[key]) return;
-    handled[key] = true;
-    console.log('\n>>> ' + key);
+function respond(key, input, delay = 500) {
+    if (stepsDone.has(key)) return;
+    stepsDone.add(key);
+    console.log('\n>>> Executing step: ' + key);
     
-    if (Array.isArray(keys)) {
-        keys.forEach((k, i) => {
-            setTimeout(() => proc.write(k), delay * (i + 1));
-        });
-    } else {
-        setTimeout(() => proc.write(keys), delay);
-    }
+    setTimeout(() => {
+        proc.write(input);
+    }, delay);
+}
+
+function respondMultiple(key, inputs, delay = 400) {
+    if (stepsDone.has(key)) return;
+    stepsDone.add(key);
+    console.log('\n>>> Executing step: ' + key);
+    
+    inputs.forEach((input, i) => {
+        setTimeout(() => {
+            proc.write(input);
+        }, delay * (i + 1));
+    });
 }
 
 proc.onData((data) => {
     outputBuffer += data;
     process.stdout.write(data);
     
-    // Step 1: Build profile selection - production
-    if (outputBuffer.includes('Which build profile') && outputBuffer.includes('development') && !handled['profile']) {
-        respond('profile', ['\x1b[B', '\x1b[B', '\r']);
+    const cleanOutput = outputBuffer.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '').replace(/\s+/g, ' ');
+    
+    // Step 1: Build profile selection - production (need to go down twice)
+    if (cleanOutput.includes('Which build profile') && cleanOutput.includes('development') && !stepsDone.has('profile')) {
+        respondMultiple('profile', ['\x1b[B', '\x1b[B', '\r'], 300);
     }
     
     // Do you want to log in to your Apple account?
-    if (outputBuffer.includes('Do you want to log in to your Apple account') && !handled['loginprompt']) {
+    if (cleanOutput.includes('Do you want to log in to your Apple account') && !stepsDone.has('loginprompt')) {
         respond('loginprompt', 'Y\r');
     }
     
-    // Step 2: Team type - Individual
-    if (outputBuffer.includes('Apple Team Type') && outputBuffer.includes('Enterprise') && !handled['team']) {
-        respond('team', ['\x1b[B', '\x1b[B', '\r']);
+    // Apple ID prompt - wait for the prompt to fully appear
+    if (cleanOutput.includes('Apple ID:') && cleanOutput.includes('Log in to your Apple') && !stepsDone.has('appleid')) {
+        setTimeout(() => {
+            if (!stepsDone.has('appleid')) {
+                stepsDone.add('appleid');
+                console.log('\n>>> Entering Apple ID');
+                proc.write('Dounia-Benamer@hotmail.fr\r');
+            }
+        }, 1000);
     }
     
-    // Step 3: Main menu - Build Credentials
-    if (outputBuffer.includes('What do you want to do') && outputBuffer.includes('Build Credentials') && !handled['menu']) {
-        respond('menu', '\r');
-    }
-    
-    // Step 4: All credentials setup
-    if (outputBuffer.includes('All: Set up all') && !handled['all']) {
-        respond('all', '\r');
-    }
-    
-    // Apple ID prompt
-    if (outputBuffer.includes('Apple ID:') && !outputBuffer.includes('Dounia') && !handled['appleid']) {
-        respond('appleid', 'Dounia-Benamer@hotmail.fr\r');
-    }
-    
-    // Password prompt  
-    if (outputBuffer.includes('Password') && outputBuffer.includes('[hidden]') && !handled['password']) {
-        respond('password', 'Doudou1993\r');
+    // Password prompt
+    if (cleanOutput.includes('Password') && cleanOutput.includes('Dounia-Benamer') && !stepsDone.has('password')) {
+        setTimeout(() => {
+            if (!stepsDone.has('password')) {
+                stepsDone.add('password');
+                console.log('\n>>> Entering password');
+                proc.write('Doudou1993\r');
+            }
+        }, 1000);
     }
     
     // 2FA code prompt
-    if ((outputBuffer.includes('verification code') || outputBuffer.includes('Enter the 6 digit code')) && !handled['2fa_notice']) {
-        handled['2fa_notice'] = true;
+    if ((cleanOutput.includes('verification code') || cleanOutput.includes('6 digit code') || cleanOutput.includes('two-factor')) && !stepsDone.has('2fa_notice')) {
+        stepsDone.add('2fa_notice');
         console.log('\n\n========================================');
         console.log('🔐 CODE DE VÉRIFICATION APPLE REQUIS');
         console.log('Vérifiez votre iPhone/iPad pour le code');
-        console.log('Entrez le code à 6 chiffres ici:');
         console.log('========================================\n');
     }
     
+    // Team type - Individual
+    if (cleanOutput.includes('Apple Team Type') && cleanOutput.includes('Enterprise') && !stepsDone.has('team')) {
+        respondMultiple('team', ['\x1b[B', '\x1b[B', '\r'], 300);
+    }
+    
+    // Main menu - Build Credentials
+    if (cleanOutput.includes('What do you want to do') && cleanOutput.includes('Build Credentials') && !stepsDone.has('menu')) {
+        respond('menu', '\r');
+    }
+    
+    // All credentials setup
+    if (cleanOutput.includes('All: Set up all') && !stepsDone.has('all')) {
+        respond('all', '\r');
+    }
+    
     // Distribution Certificate options
-    if (outputBuffer.includes('Set up a Distribution Certificate') && !handled['distcert']) {
+    if (cleanOutput.includes('Set up a Distribution Certificate') && !stepsDone.has('distcert')) {
         respond('distcert', '\r');
     }
     
     // Generate new certificate
-    if (outputBuffer.includes('Generate a new Apple Distribution Certificate') && !handled['newcert']) {
+    if (cleanOutput.includes('Generate a new Apple Distribution Certificate') && !stepsDone.has('newcert')) {
         respond('newcert', '\r');
     }
     
     // Provisioning Profile
-    if (outputBuffer.includes('Set up a Provisioning Profile') && !handled['provprofile']) {
+    if (cleanOutput.includes('Set up a Provisioning Profile') && !stepsDone.has('provprofile')) {
         respond('provprofile', '\r');
     }
     
     // Success indicators
-    if (outputBuffer.includes('All credentials are ready to build')) {
+    if (cleanOutput.includes('All credentials are ready to build') || cleanOutput.includes('credentials are set up')) {
         console.log('\n\n✅ CERTIFICATS CRÉÉS AVEC SUCCÈS!');
     }
 });
 
 proc.onExit(({ exitCode }) => {
     console.log('\n\n>>> Process exited with code:', exitCode);
-    console.log('>>> Steps completed:', Object.keys(handled).join(', '));
+    console.log('>>> Steps completed:', Array.from(stepsDone).join(', '));
     process.exit(exitCode);
 });
 
 // Timeout after 5 minutes
 setTimeout(() => {
     console.log('\n\n>>> Timeout reached');
-    console.log('>>> Steps completed:', Object.keys(handled).join(', '));
+    console.log('>>> Steps completed:', Array.from(stepsDone).join(', '));
     proc.kill();
     process.exit(1);
 }, 300000);
