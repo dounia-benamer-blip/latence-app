@@ -1,20 +1,31 @@
 {
   "cli": {
     "version": ">= 12.0.0",
-    "appVersionSource": "local"
+    "appVersionSource": "remote"
   },
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "ios": {
+        "resourceClass": "m-medium"
+      }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "ios": {
+        "resourceClass": "m-medium"
+      }
     },
     "production": {
+      "distribution": "store",
       "ios": {
         "resourceClass": "m-medium",
-        "credentialsSource": "remote"
+        "credentialsSource": "remote",
+        "autoIncrement": true
+      },
+      "android": {
+        "buildType": "app-bundle"
       }
     }
   },
@@ -22,11 +33,9 @@
     "production": {
       "ios": {
         "appleId": "Dounia-Benamer@hotmail.fr",
-        "ascAppId": "6746253505",
         "appleTeamId": "MNPJV87Q6P",
-        "ascApiKeyPath": ".eas/appstore-api-key.p8",
-        "ascApiKeyIssuerId": "44554a2e-a243-4574-b6be-b436ae95c91d",
-        "ascApiKeyId": "RHS5L7DYW4"
+        "ascApiKeyId": "RHS5L7DYW4",
+        "ascApiKeyIssuerId": "44554a2e-a243-4574-b6be-b436ae95c91d"
       }
     }
   }
