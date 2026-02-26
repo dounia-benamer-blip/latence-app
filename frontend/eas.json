@@ -22,8 +22,7 @@
       "ios": {
         "resourceClass": "m-medium",
         "credentialsSource": "remote",
-        "autoIncrement": true,
-        "appleTeamId": "MNPJV87Q6P"
+        "autoIncrement": true
       },
       "android": {
         "buildType": "app-bundle"
