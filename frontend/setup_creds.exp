@@ -1,0 +1,81 @@
+#!/usr/bin/expect -f
+
+set timeout 120
+set env(EXPO_TOKEN) "2sji0d1hV9e65EPpuU3nyqjpNYzrsWTSsSjVv2hP"
+set env(TERM) "xterm-256color"
+
+cd /app/frontend
+
+spawn eas credentials --platform ios
+
+# Select production (arrow down twice)
+expect "Which build profile"
+sleep 1
+send "\033\[B\033\[B\r"
+
+# Login yes
+expect "Do you want to log in"
+sleep 0.5
+send "Y\r"
+
+# Apple ID
+expect "Apple ID:"
+sleep 0.5
+send "Dounia-Benamer@hotmail.fr\r"
+
+# Password
+expect "Password"
+sleep 0.5
+send "Doudou1993\r"
+
+# 2FA method - device
+expect "How do you want to validate"
+sleep 0.5
+send "\r"
+
+# 2FA code - READ FROM FILE
+expect "enter the 6 digit code"
+puts "\n\n=========================================="
+puts "🔐 EN ATTENTE DU CODE 2FA..."
+puts "Écrivez le code dans /tmp/2fa_code.txt"
+puts "==========================================\n"
+
+# Wait for code file
+while {1} {
+    if {[file exists "/tmp/2fa_code.txt"]} {
+        set fp [open "/tmp/2fa_code.txt" r]
+        set code [string trim [read $fp]]
+        close $fp
+        if {[string length $code] == 6} {
+            puts ">>> Code reçu: $code"
+            send "$code\r"
+            break
+        }
+    }
+    sleep 1
+}
+
+# Team type - Individual
+expect "Apple Team Type" {
+    sleep 0.5
+    send "\033\[B\033\[B\r"
+}
+
+# Menu - Build Credentials
+expect "What do you want to do" {
+    sleep 0.5
+    send "\r"
+}
+
+# Wait for completion
+expect {
+    "credentials are ready" {
+        puts "\n\n✅ CERTIFICATS CRÉÉS AVEC SUCCÈS!"
+    }
+    "successfully" {
+        puts "\n\n✅ SUCCÈS!"
+    }
+    eof {
+        puts "\nProcessus terminé"
+    }
+}
