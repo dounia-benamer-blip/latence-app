@@ -1,8 +1,8 @@
 #!/usr/bin/expect -f
 
 # Clean environment
-unset HOSTNAME
-set env(HOSTNAME) ""
+catch {unset HOSTNAME}
+catch {set env(HOSTNAME) ""}
 
 set timeout 120
 set env(EXPO_TOKEN) "2sji0d1hV9e65EPpuU3nyqjpNYzrsWTSsSjVv2hP"
