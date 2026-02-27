@@ -35,6 +35,7 @@
       "ios": {
         "appleId": "Dounia-Benamer@hotmail.fr",
         "appleTeamId": "MNPJV87Q6P",
+        "ascAppId": "6759762016",
         "ascApiKeyId": "RHS5L7DYW4",
         "ascApiKeyIssuerId": "44554a2e-a243-4574-b6be-b436ae95c91d",
         "ascApiKeyPath": "./AuthKey_RHS5L7DYW4.p8"
