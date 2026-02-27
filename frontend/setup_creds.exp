@@ -1,81 +1,98 @@
 #!/usr/bin/expect -f
 
+# Clean environment
+unset HOSTNAME
+set env(HOSTNAME) ""
+
 set timeout 120
 set env(EXPO_TOKEN) "2sji0d1hV9e65EPpuU3nyqjpNYzrsWTSsSjVv2hP"
-set env(TERM) "xterm-256color"
+set env(TERM) "dumb"
 
 cd /app/frontend
 
 spawn eas credentials --platform ios
 
-# Select production (arrow down twice)
+# Select production
 expect "Which build profile"
 sleep 1
-send "\033\[B\033\[B\r"
+send -- "\x1b\[B\x1b\[B\r"
 
 # Login yes
 expect "Do you want to log in"
 sleep 0.5
-send "Y\r"
+send -- "Y\r"
 
-# Apple ID
+# Apple ID - send slowly character by character
 expect "Apple ID:"
 sleep 0.5
-send "Dounia-Benamer@hotmail.fr\r"
+send -- "Dounia-Benamer@hotmail.fr"
+sleep 0.2
+send -- "\r"
 
 # Password
 expect "Password"
 sleep 0.5
-send "Doudou1993\r"
+send -- "Doudou1993"
+sleep 0.2
+send -- "\r"
 
-# 2FA method - device
+# 2FA method
 expect "How do you want to validate"
 sleep 0.5
-send "\r"
+send -- "\r"
 
-# 2FA code - READ FROM FILE
+# 2FA code
 expect "enter the 6 digit code"
-puts "\n\n=========================================="
-puts "🔐 EN ATTENTE DU CODE 2FA..."
-puts "Écrivez le code dans /tmp/2fa_code.txt"
-puts "==========================================\n"
+puts "\n\n=== EN ATTENTE DU CODE 2FA ==="
 
-# Wait for code file
 while {1} {
     if {[file exists "/tmp/2fa_code.txt"]} {
         set fp [open "/tmp/2fa_code.txt" r]
         set code [string trim [read $fp]]
         close $fp
         if {[string length $code] == 6} {
-            puts ">>> Code reçu: $code"
-            send "$code\r"
+            puts ">>> Envoi du code: $code"
+            send -- "$code"
+            sleep 0.2
+            send -- "\r"
+            file delete "/tmp/2fa_code.txt"
             break
         }
     }
     sleep 1
 }
 
-# Team type - Individual
-expect "Apple Team Type" {
-    sleep 0.5
-    send "\033\[B\033\[B\r"
-}
-
-# Menu - Build Credentials
-expect "What do you want to do" {
-    sleep 0.5
-    send "\r"
-}
-
-# Wait for completion
+# Continue with setup
 expect {
-    "credentials are ready" {
-        puts "\n\n✅ CERTIFICATS CRÉÉS AVEC SUCCÈS!"
+    "Apple Team Type" {
+        sleep 0.5
+        send -- "\x1b\[B\x1b\[B\r"
+        exp_continue
     }
-    "successfully" {
+    "What do you want to do" {
+        sleep 0.5
+        send -- "\r"
+        exp_continue
+    }
+    "Distribution Certificate" {
+        sleep 0.5
+        send -- "\r"
+        exp_continue
+    }
+    "Generate a new" {
+        sleep 0.5
+        send -- "\r"
+        exp_continue
+    }
+    "Provisioning Profile" {
+        sleep 0.5
+        send -- "\r"
+        exp_continue
+    }
+    "credentials are ready" {
         puts "\n\n✅ SUCCÈS!"
     }
     eof {
-        puts "\nProcessus terminé"
+        puts "\nFin du processus"
     }
 }
