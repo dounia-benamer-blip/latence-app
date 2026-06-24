@@ -1,0 +1,61 @@
+
+🎯 Étape unique : créer le workflow sur GitHub
+Clique ce lien direct (il ouvre l'éditeur de nouveau fichier au bon endroit) :
+🔗 https://github.com/dounia-benamer-blip/Latence-app/new/main?filename=.github/workflows/eas-build.yml
+Dans le grand champ texte qui s'ouvre, colle exactement ceci :
+name: EAS Build & Submit (iOS TestFlight)
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: 'EAS build profile'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - production-no-submit
+          - preview
+      auto_submit:
+        description: 'Auto-submit to TestFlight'
+        required: true
+        default: true
+        type: boolean
+
+jobs:
+  build:
+    name: Build iOS via EAS
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.20.0'
+          cache: 'yarn'
+          cache-dependency-path: frontend/yarn.lock
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      - name: Install deps
+        working-directory: frontend
+        run: yarn install --frozen-lockfile
+      - name: Restore Apple .p8 key
+        working-directory: frontend
+        env:
+          ASC_API_KEY_P8_BASE64: ${{ secrets.ASC_API_KEY_P8_BASE64 }}
+        run: |
+          echo "$ASC_API_KEY_P8_BASE64" | base64 -d > AuthKey_HQ2AR7R4VP.p8
+      - name: Trigger EAS Build
+        working-directory: frontend
+        env:
+          PROFILE: ${{ github.event.inputs.profile || 'production' }}
+          AUTO_SUBMIT: ${{ github.event.inputs.auto_submit }}
+        run: |
+          if [ "$AUTO_SUBMIT" = "true" ] || [ "$AUTO_SUBMIT" = "" ]; then
+            eas build --platform ios --profile "$PROFILE" --auto-submit --non-interactive --no-wait
+          else
+            eas build --platform ios --profile "$PROFILE" --non-interactive --no-wait
+          fi
